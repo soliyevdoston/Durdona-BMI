@@ -1,0 +1,151 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-base:      #09090B;
+    --bg-surface:   #111113;
+    --bg-elevated:  #1A1A1F;
+    --bg-overlay:   #222229;
+    --border:       #27272A;
+    --border-muted: #1E1E24;
+    --text-primary: #F8FAFC;
+    --text-secondary: #94A3B8;
+    --text-muted:   #475569;
+    --accent:       #7C3AED;
+    --accent-light: rgba(124,58,237,0.12);
+    --accent-glow:  rgba(124,58,237,0.25);
+  }
+
+  * {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    font-family: 'Inter', system-ui, sans-serif;
+    line-height: 1.6;
+  }
+
+  ::selection {
+    background-color: rgba(124, 58, 237, 0.3);
+    color: #F8FAFC;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #111113;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #27272A;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3F3F46;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-[#111113] border border-[#1E1E24] rounded-2xl;
+  }
+  .card-elevated {
+    @apply bg-[#1A1A1F] border border-[#27272A] rounded-2xl;
+  }
+  .btn-primary {
+    @apply bg-accent-600 hover:bg-accent-700 text-white font-medium px-4 py-2 rounded-xl transition-all duration-200 text-sm;
+  }
+  .btn-secondary {
+    @apply bg-[#1A1A1F] hover:bg-[#222229] text-base-300 border border-[#27272A] font-medium px-4 py-2 rounded-xl transition-all duration-200 text-sm;
+  }
+  .btn-ghost {
+    @apply hover:bg-[#1A1A1F] text-base-400 hover:text-base-200 font-medium px-3 py-1.5 rounded-lg transition-all duration-200 text-sm;
+  }
+  .input {
+    @apply w-full bg-[#1A1A1F] border border-[#27272A] rounded-xl px-4 py-2.5 text-sm text-base-100 placeholder-base-600 focus:outline-none focus:border-accent-600 focus:ring-1 focus:ring-accent-600/30 transition-all duration-200;
+  }
+  .badge {
+    @apply inline-flex items-center gap-1 text-xs font-medium px-2.5 py-0.5 rounded-full;
+  }
+  .badge-accent {
+    @apply badge bg-accent-900/60 text-accent-400 border border-accent-800/50;
+  }
+  .badge-emerald {
+    @apply badge bg-emerald-500/10 text-emerald-400 border border-emerald-500/20;
+  }
+  .badge-amber {
+    @apply badge bg-amber-500/10 text-amber-400 border border-amber-500/20;
+  }
+  .badge-sky {
+    @apply badge bg-sky-500/10 text-sky-400 border border-sky-500/20;
+  }
+  .badge-rose {
+    @apply badge bg-rose-500/10 text-rose-400 border border-rose-500/20;
+  }
+  .stat-card {
+    @apply card p-5 flex flex-col gap-1 hover:border-[#3F3F46] transition-colors duration-200;
+  }
+  .nav-link {
+    @apply flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-base-400 hover:text-base-100 hover:bg-[#1A1A1F] transition-all duration-200;
+  }
+  .nav-link-active {
+    @apply nav-link text-base-100 bg-[#1A1A1F] border border-[#27272A];
+  }
+  .section-title {
+    @apply text-lg font-semibold text-base-100;
+  }
+  .section-sub {
+    @apply text-sm text-base-500;
+  }
+  .divider {
+    @apply border-t border-[#1E1E24] my-1;
+  }
+  .progress-bar {
+    @apply h-1.5 bg-[#1E1E24] rounded-full overflow-hidden;
+  }
+  .progress-fill {
+    @apply h-full bg-gradient-to-r from-accent-600 to-accent-500 rounded-full transition-all duration-700;
+  }
+  .glow-accent {
+    box-shadow: 0 0 40px rgba(124,58,237,0.15);
+  }
+  .text-gradient {
+    @apply bg-gradient-to-r from-white via-white to-base-400 bg-clip-text text-transparent;
+  }
+  .text-gradient-accent {
+    @apply bg-gradient-to-r from-accent-400 to-sky-400 bg-clip-text text-transparent;
+  }
+  .glass {
+    backdrop-filter: blur(12px);
+    background: rgba(17, 17, 19, 0.8);
+    border: 1px solid rgba(39, 39, 42, 0.6);
+  }
+  .code-font {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+  .animate-in {
+    @apply animate-fade-in;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .line-clamp-1 { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1; }
+  .line-clamp-2 { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+}
