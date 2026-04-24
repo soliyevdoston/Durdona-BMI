@@ -2,106 +2,100 @@
 import Link from 'next/link'
 import {
   BookOpen, Code2, Brain, BarChart3, Shield, Users,
-  Zap, ChevronRight, Star, PlayCircle, Check, ArrowRight,
+  ChevronRight, PlayCircle, Check, ArrowRight,
   Cpu, Globe, Database, Network, Terminal, Award
 } from 'lucide-react'
 
 const STATS = [
-  { label: 'Faol Talaba', value: '1,247+' },
+  { label: 'Faol talaba', value: '1 240' },
   { label: 'Kurs', value: '24' },
-  { label: 'Dars', value: '486+' },
-  { label: 'O\'rtacha Reyting', value: '4.9★' },
+  { label: 'Dars moduli', value: '486' },
+  { label: "O'rtacha baho", value: '4.8 / 5' },
 ]
 
 const FEATURES = [
-  { icon: Brain, title: 'AI O\'qituvchi Yordamchi', desc: 'Shaxsiy AI yordamchi xatolaringizni tahlil qiladi, zaif joylarni aniqlaydi va individual tavsiyalar beradi.', color: 'text-accent-400', bg: 'bg-accent-600/10' },
-  { icon: Code2, title: 'Brauzer Kod Muhiti', desc: 'Python, JavaScript, SQL va boshqa tillarda to\'g\'ridan-to\'g\'ri brauzerda kod yozing va sinab ko\'ring.', color: 'text-sky-400', bg: 'bg-sky-500/10' },
-  { icon: BarChart3, title: 'Aqlli Tahlil', desc: 'Real vaqt rejimida o\'qish tahlili, zaif mavzular xaritasi va AI tomonidan beriladigan tavsiyalar.', color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
-  { icon: Zap, title: 'Adaptiv O\'qish', description: 'Tizim sizning darajangizga moslashib, mos qiyinlikdagi materiallarni avtomatik tanlaydi.', color: 'text-amber-400', bg: 'bg-amber-500/10', desc: 'Tizim sizning darajangizga moslashib, mos qiyinlikdagi materiallarni avtomatik tanlaydi.' },
-  { icon: Award, title: 'Gamifikatsiya', desc: 'XP, darajalar, nishonlar va reytinglar orqali o\'qishni qiziqarli va motivatsiyali jarayonga aylantiring.', color: 'text-rose-400', bg: 'bg-rose-500/10' },
-  { icon: Users, title: 'Jonli Sinfxona', desc: 'Video darslar, real vaqt chat, ekran ulashish va interaktiv Q&A sessiyalari bilan jonli ta\'lim.', color: 'text-violet-400', bg: 'bg-violet-500/10' },
+  { icon: Brain, title: "AI o'qituvchi yordamchi", desc: "Talabaning kodidagi xatolarni tahlil qiladi, tushuntirib beradi va mos tavsiya beradi. Tayyor javob bermaydi — o'zi tushunishga yo'naltiradi.", color: 'text-accent-400', bg: 'bg-accent-600/10' },
+  { icon: Code2, title: 'Brauzerdagi kod muhiti', desc: "Python, JavaScript, SQL. Hech narsa o'rnatmasdan, brauzerning o'zidan kod yozib ishga tushirish mumkin.", color: 'text-sky-400', bg: 'bg-sky-500/10' },
+  { icon: BarChart3, title: 'Didaktik tahlil', desc: "O'qituvchi har bir talabaning kuchli/zaif joylarini va umumiy sinfdagi qiyin mavzularni vizual ko'radi.", color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
+  { icon: BookOpen, title: 'Adaptiv sur\'at', desc: "Tizim talabaning oxirgi javoblariga qarab qiyinlikni moslaydi. Hammaga bir xil tempda yurish shart emas.", color: 'text-amber-400', bg: 'bg-amber-500/10' },
+  { icon: Award, title: 'XP va darajalar', desc: "Har bir bajarilgan topshiriq, seriya, muvaffaqiyat XP beradi. Ichki motivatsiya uchun, emas raqobat uchun.", color: 'text-rose-400', bg: 'bg-rose-500/10' },
+  { icon: Users, title: 'Jonli dars', desc: "Video, chat, ekran ulashish. Qo'l ko'tarish va savol-javoblar. Qo'shimcha Zoom link kerak emas.", color: 'text-violet-400', bg: 'bg-violet-500/10' },
 ]
 
 const COURSES_PREVIEW = [
-  { icon: Terminal, title: 'Python Dasturlash', level: 'Boshlang\'ich', students: 342, color: 'from-blue-600 to-cyan-600' },
-  { icon: Globe, title: 'Web Dasturlash', level: 'Boshlang\'ich', students: 521, color: 'from-orange-600 to-amber-600' },
-  { icon: Database, title: 'SQL & Ma\'lumotlar Bazasi', level: 'O\'rta', students: 198, color: 'from-emerald-600 to-teal-600' },
-  { icon: Network, title: 'Kompyuter Tarmoqlari', level: 'O\'rta', students: 145, color: 'from-violet-600 to-purple-600' },
-  { icon: Cpu, title: 'Algoritmlar & DSA', level: 'Murakkab', students: 89, color: 'from-rose-600 to-pink-600' },
-  { icon: Shield, title: 'Kiberxavfsizlik', level: 'Murakkab', students: 112, color: 'from-slate-600 to-zinc-600' },
+  { icon: Terminal, title: 'Python dasturlash', level: "Boshlang'ich", students: 342 },
+  { icon: Globe, title: 'Web: HTML, CSS, JS', level: "Boshlang'ich", students: 521 },
+  { icon: Database, title: 'SQL va ma\'lumotlar bazasi', level: "O'rta", students: 198 },
+  { icon: Network, title: 'Kompyuter tarmoqlari', level: "O'rta", students: 145 },
+  { icon: Cpu, title: "Algoritmlar va DSA", level: 'Murakkab', students: 89 },
+  { icon: Shield, title: 'Kiberxavfsizlik asoslari', level: 'Murakkab', students: 112 },
 ]
 
 const TESTIMONIALS = [
-  { name: 'Azizbek K.', role: 'Talaba', text: 'AI yordamchi tufayli Python darslarini ancha tez o\'zlashtirib oldim. Kod xatolarimni avvalidan tushuntirishi ajoyib!', rating: 5, avatar: 'AK' },
-  { name: 'Malika T.', role: 'Talaba', text: 'Gamifikatsiya tizimi o\'qishni juda motivatsiyali qildi. Har kuni yangi nishon olish uchun kirishni xohlayman.', rating: 5, avatar: 'MT' },
-  { name: 'Jasur R.', role: 'Talaba', text: 'Brauzerda kod yozish imkoniyati juda qulay. Hech nima o\'rnatmasdan dars boshlash mumkin.', rating: 5, avatar: 'JR' },
+  { name: 'Azizbek K.', role: '4-kurs, TATU', text: 'Avval Python\'da nega xato chiqayotganini tushunmasdim. AI izohi bilan bir haftada ko\'p narsa oydinlashdi.', avatar: 'AK' },
+  { name: 'Malika T.', role: '3-kurs', text: 'Kod yozishni boshlash eng qiyin qismi edi. Brauzerdan yozilishi o\'rnatish jarayonini olib tashladi.', avatar: 'MT' },
+  { name: 'Dilnoza Y.', role: "O'qituvchi", text: 'Har bir talabaning qayerda qiynalayotganini ko\'rish imkonini beradi. Avvallari buni qo\'lda aniqlash mumkin emas edi.', avatar: 'DY' },
 ]
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-base-950 overflow-x-hidden">
+    <div className="min-h-screen bg-app">
       {/* NAV */}
-      <nav className="fixed top-0 inset-x-0 z-50 glass border-b border-[#1E1E24]">
+      <nav className="sticky top-0 z-50 bg-base-950/85 backdrop-blur-sm border-b border-[#18181B]">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-600 to-accent-500 flex items-center justify-center">
-              <BookOpen className="w-4 h-4 text-white" />
-            </div>
-            <span className="font-bold text-base-100 text-lg">EduCode</span>
+            <div className="w-7 h-7 rounded-md bg-base-100 text-base-950 flex items-center justify-center font-semibold text-sm">E</div>
+            <span className="font-medium text-base-100">EduCode</span>
           </div>
-          <div className="hidden md:flex items-center gap-6 text-sm text-base-400">
-            <a href="#features" className="hover:text-base-100 transition-colors">Imkoniyatlar</a>
-            <a href="#courses" className="hover:text-base-100 transition-colors">Kurslar</a>
-            <a href="#about" className="hover:text-base-100 transition-colors">Haqida</a>
+          <div className="hidden md:flex items-center gap-7 text-sm text-base-400">
+            <a href="#features" className="hover:text-base-200 transition-colors">Imkoniyatlar</a>
+            <a href="#courses" className="hover:text-base-200 transition-colors">Kurslar</a>
+            <a href="#rollar" className="hover:text-base-200 transition-colors">Rollar</a>
           </div>
           <div className="flex items-center gap-3">
-            <Link href="/login" className="btn-ghost text-sm">Kirish</Link>
-            <Link href="/register" className="btn-primary text-sm">Boshlash</Link>
+            <Link href="/login" className="text-sm text-base-300 hover:text-base-100">Kirish</Link>
+            <Link href="/register" className="btn-primary text-sm">Ro'yxatdan o'tish</Link>
           </div>
         </div>
       </nav>
 
       {/* HERO */}
-      <section className="relative pt-40 pb-32 px-6 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-mesh pointer-events-none" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent-600/5 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="max-w-4xl mx-auto text-center relative">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent-600/10 border border-accent-600/20 text-accent-400 text-xs font-medium mb-8">
-            <Zap className="w-3 h-3" />
-            AI bilan kuchaytirilgan ta'lim platformasi
-          </div>
-
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-[1.08] tracking-tight">
-            <span className="text-gradient">ICT ni yangi</span>
-            <br />
-            <span className="text-gradient-accent">usulda o'rganing</span>
-          </h1>
-
-          <p className="text-xl text-base-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-            AI yordamchi, interaktiv kod muhiti va adaptiv o'qish tizimi bilan dasturlash, tarmoqlar va
-            ma'lumotlar bazasini professional darajada o'rganing.
+      <section className="relative pt-32 pb-24 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <p className="text-xs uppercase tracking-[0.18em] text-base-500 mb-8">
+            TATU · Bitiruv malakaviy ishi, 2026
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold mb-6 leading-[1.05] tracking-tight text-base-100">
+            AKT fanlarini
+            <br />
+            amaliyot orqali o'rganing.
+          </h1>
+
+          <p className="text-lg text-base-400 mb-10 max-w-2xl mx-auto leading-relaxed">
+            Brauzerda kod yozish, tezkor izohlar va har bir talabaning sur'atiga
+            moslashadigan interaktiv dars tizimi. Nazariya qisqa, amaliyot ko'p.
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link href="/register"
-              className="group flex items-center gap-2 bg-accent-600 hover:bg-accent-700 text-white font-semibold px-8 py-4 rounded-2xl text-base transition-all duration-200 shadow-lg shadow-accent-600/25">
-              Bepul Boshlash
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              className="group inline-flex items-center gap-2 bg-accent-600 hover:bg-accent-700 text-white font-medium px-6 py-3 rounded-xl text-sm transition-colors">
+              Bepul boshlash
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
             </Link>
             <Link href="/login"
-              className="flex items-center gap-2 bg-[#1A1A1F] hover:bg-[#222229] border border-[#27272A] text-base-200 font-semibold px-8 py-4 rounded-2xl text-base transition-all duration-200">
-              <PlayCircle className="w-5 h-5 text-accent-400" />
-              Demo ko'rish
+              className="inline-flex items-center gap-2 text-base-300 hover:text-base-100 font-medium px-5 py-3 text-sm transition-colors">
+              <PlayCircle className="w-4 h-4" />
+              Demo hisobga kirish
             </Link>
           </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-20">
+          {/* Stats strip */}
+          <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-px bg-[#1E1E24] border border-[#1E1E24] rounded-xl overflow-hidden">
             {STATS.map((s) => (
-              <div key={s.label} className="card p-5 text-center">
-                <div className="text-2xl font-bold text-base-100">{s.value}</div>
-                <div className="text-sm text-base-500 mt-1">{s.label}</div>
+              <div key={s.label} className="bg-[#0F0F11] px-4 py-5 text-center">
+                <div className="text-2xl font-semibold text-base-100 tabular-nums">{s.value}</div>
+                <div className="text-xs text-base-500 mt-1">{s.label}</div>
               </div>
             ))}
           </div>
@@ -109,21 +103,25 @@ export default function LandingPage() {
       </section>
 
       {/* FEATURES */}
-      <section id="features" className="py-24 px-6">
+      <section id="features" className="py-24 px-6 border-t border-[#18181B]">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-base-100 mb-4">Zamonaviy ta'lim texnologiyalari</h2>
-            <p className="text-base-400 text-lg max-w-2xl mx-auto">
-              Eng ilg'or pedagogik metodologiyalar va sun'iy intellekt birlashtirilgan platforma
+          <div className="mb-16 max-w-2xl">
+            <div className="text-xs uppercase tracking-[0.18em] text-base-500 mb-3">Imkoniyatlar</div>
+            <h2 className="text-3xl md:text-4xl font-semibold text-base-100 mb-4 leading-tight">
+              Oddiy LMS emas, o'quv muhiti.
+            </h2>
+            <p className="text-base-400 leading-relaxed">
+              Platforma PowerPoint va test o'rniga amaliy mashg'ulot va real vaqtda
+              javob-izohlar atrofida qurilgan.
             </p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
             {FEATURES.map((f) => (
-              <div key={f.title} className="card p-6 hover:border-[#3F3F46] transition-all duration-300 group">
-                <div className={`w-11 h-11 rounded-xl ${f.bg} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+              <div key={f.title} className="card p-6 hover:border-[#3F3F46] transition-colors duration-200">
+                <div className={`w-10 h-10 rounded-lg ${f.bg} flex items-center justify-center mb-4`}>
                   <f.icon className={`w-5 h-5 ${f.color}`} />
                 </div>
-                <h3 className="font-semibold text-base-100 mb-2">{f.title}</h3>
+                <h3 className="font-medium text-base-100 mb-2">{f.title}</h3>
                 <p className="text-sm text-base-500 leading-relaxed">{f.desc}</p>
               </div>
             ))}
@@ -132,133 +130,160 @@ export default function LandingPage() {
       </section>
 
       {/* METHODOLOGY */}
-      <section className="py-24 px-6 bg-gradient-to-b from-transparent to-[#0D0D10]">
+      <section className="py-24 px-6 border-t border-[#18181B] bg-black/30">
         <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div className="grid lg:grid-cols-2 gap-16 items-start">
             <div>
-              <div className="badge-accent mb-6">Pedagogik Model</div>
-              <h2 className="text-4xl font-bold text-base-100 mb-6">70% Amaliyot,<br />30% Nazariya</h2>
-              <p className="text-base-400 text-lg mb-8 leading-relaxed">
-                Zamonaviy "Practice-First" metodologiyasiga asoslanib, har bir mavzuda avval amaliy
-                tajriba ortiriladi, so'ngra nazariy bilim mustahkamlanadi.
+              <div className="text-xs uppercase tracking-[0.18em] text-base-500 mb-3">Pedagogik yondashuv</div>
+              <h2 className="text-3xl md:text-4xl font-semibold text-base-100 mb-6 leading-tight">
+                70% amaliyot, 30% nazariya.
+              </h2>
+              <p className="text-base-400 text-base mb-8 leading-relaxed">
+                Nazariya qisqa — amaliyot davomida mustahkamlanadi. Har mavzudan keyin
+                darhol kod yoziladi, so'ng qoidalar izohlanadi. Bu "eslab qolish"
+                emas, "tushunish" orqali o'rganish usuli.
               </p>
-              <div className="space-y-4">
+              <ul className="space-y-4">
                 {[
-                  { title: 'Mikrodarsllar', desc: '8-15 daqiqalik qisqa, aniq darslar', icon: '⚡' },
-                  { title: 'Tezkor Fikr-mulohaza', desc: 'Har bir javobga darhol tushuntirish', icon: '💬' },
-                  { title: 'Adaptiv Qiyinlik', desc: 'Sizning tempingizga moslashadi', icon: '🎯' },
-                  { title: 'Doimiy Baholash', desc: 'Yakuniy imtihon o\'rniga davomiy monitoring', icon: '📊' },
+                  { title: 'Mikro-darslar', desc: "8–15 daqiqalik fokuslangan modullar" },
+                  { title: 'Tezkor izoh', desc: 'Har javobga bir zumda tushuntirish' },
+                  { title: 'Adaptiv qiyinlik', desc: "Sizning sur'atingizga moslashadi" },
+                  { title: 'Davomiy baholash', desc: "Yakuniy imtihon o'rniga doimiy monitoring" },
                 ].map((item) => (
-                  <div key={item.title} className="flex items-start gap-4 p-4 card rounded-xl">
-                    <span className="text-2xl">{item.icon}</span>
+                  <li key={item.title} className="flex gap-4 pb-4 border-b border-[#1E1E24] last:border-0 last:pb-0">
+                    <div className="flex-shrink-0 mt-1">
+                      <Check className="w-4 h-4 text-emerald-500" />
+                    </div>
                     <div>
-                      <div className="font-medium text-base-200">{item.title}</div>
+                      <div className="font-medium text-base-200 mb-0.5">{item.title}</div>
                       <div className="text-sm text-base-500">{item.desc}</div>
                     </div>
-                  </div>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
-            <div className="relative">
-              <div className="card p-6 space-y-4">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-accent-600/20 flex items-center justify-center">
-                    <Brain className="w-5 h-5 text-accent-400" />
-                  </div>
-                  <div>
-                    <div className="font-semibold text-base-100">AI Yordamchi</div>
-                    <div className="text-xs text-base-500">Python - Sikllar darsi</div>
-                  </div>
+
+            {/* Example card — less "glow", more realistic */}
+            <div className="card p-6">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-9 h-9 rounded-lg bg-accent-600/15 border border-accent-600/20 flex items-center justify-center">
+                  <Brain className="w-4 h-4 text-accent-400" />
                 </div>
-                <div className="bg-[#1A1A1F] rounded-xl p-4 text-sm code-font text-emerald-400">
-                  <div className="text-base-500 mb-2"># Sizning kodingiz:</div>
-                  <div>{'for i in range(10):'}</div>
-                  <div className="pl-4">{'print(i * i)'}</div>
-                </div>
-                <div className="flex gap-2">
-                  <div className="w-2 h-2 rounded-full bg-accent-500 mt-1.5 flex-shrink-0" />
-                  <p className="text-sm text-base-300 leading-relaxed">
-                    Kodingiz to'g'ri ishlayapti! Lekin samaradorlikni oshirish uchun <span className="text-accent-400 code-font">list comprehension</span> ishlatishni ko'rib chiqing:
-                  </p>
-                </div>
-                <div className="bg-[#1A1A1F] rounded-xl p-4 text-sm code-font text-sky-400">
-                  <div className="text-base-500 mb-2"># Tavsiya etilgan:</div>
-                  <div>{'kvadratlar = [i*i for i in range(10)]'}</div>
-                  <div className="text-base-500 mt-1">{'# 2x tezroq va pythonic'}</div>
-                </div>
-                <div className="flex items-center gap-2 pt-2">
-                  <div className="badge-emerald">+15 XP</div>
-                  <div className="badge-sky">Yangi Usul O'rgandingiz</div>
+                <div>
+                  <div className="font-medium text-sm text-base-100">AI yordamchi</div>
+                  <div className="text-xs text-base-500">Python · Sikllar darsi</div>
                 </div>
               </div>
+
+              <div className="bg-[#0D0D10] border border-[#1E1E24] rounded-lg p-4 text-xs code-font leading-6 mb-3">
+                <div className="text-base-600 mb-1">{'# Sizning yechimingiz:'}</div>
+                <div className="text-base-300">{'for i in range(10):'}</div>
+                <div className="text-base-300 pl-4">{'print(i * i)'}</div>
+              </div>
+
+              <p className="text-sm text-base-400 leading-relaxed mb-3">
+                Kod to'g'ri ishlayapti. Ko'pincha pythonchilar buni qisqaroq yozadi:
+              </p>
+
+              <div className="bg-[#0D0D10] border border-[#1E1E24] rounded-lg p-4 text-xs code-font leading-6 mb-4">
+                <div className="text-base-600 mb-1">{'# Qisqaroq usul:'}</div>
+                <div className="text-sky-400">{'kvadratlar = [i*i for i in range(10)]'}</div>
+              </div>
+
+              <p className="text-xs text-base-500 leading-relaxed">
+                Bunga <span className="code-font bg-[#1A1A1F] px-1.5 py-0.5 rounded text-base-300">list comprehension</span> deyiladi.
+                Hozir majburiy emas — keyingi darsda chuqurroq tushuntiramiz.
+              </p>
             </div>
           </div>
         </div>
       </section>
 
       {/* COURSES */}
-      <section id="courses" className="py-24 px-6">
+      <section id="courses" className="py-24 px-6 border-t border-[#18181B]">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-base-100 mb-4">Kurslar Katalogi</h2>
-            <p className="text-base-400">ICT sohasining barcha yo'nalishlarini qamrab olgan kurslar</p>
+          <div className="mb-14 flex items-end justify-between flex-wrap gap-4">
+            <div>
+              <div className="text-xs uppercase tracking-[0.18em] text-base-500 mb-3">Katalog</div>
+              <h2 className="text-3xl md:text-4xl font-semibold text-base-100 leading-tight">Kurslar.</h2>
+            </div>
+            <p className="text-sm text-base-500 max-w-sm">
+              Dasturlash, web, ma'lumotlar bazasi, tarmoqlar va xavfsizlik —
+              AKT sohasining asosiy yo'nalishlari.
+            </p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-px bg-[#1E1E24] border border-[#1E1E24] rounded-xl overflow-hidden">
             {COURSES_PREVIEW.map((c) => (
-              <div key={c.title} className="card p-6 hover:border-[#3F3F46] transition-all duration-300 group cursor-pointer">
-                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${c.color} flex items-center justify-center mb-4 shadow-lg`}>
-                  <c.icon className="w-6 h-6 text-white" />
+              <div key={c.title} className="group bg-[#0F0F11] p-6 hover:bg-[#131316] transition-colors cursor-pointer">
+                <div className="w-9 h-9 rounded-lg bg-[#1A1A1F] border border-[#27272A] flex items-center justify-center mb-5">
+                  <c.icon className="w-4 h-4 text-base-300" />
                 </div>
-                <h3 className="font-semibold text-base-100 mb-2 group-hover:text-accent-400 transition-colors">{c.title}</h3>
-                <div className="flex items-center justify-between text-sm text-base-500">
+                <h3 className="font-medium text-base-100 mb-3 group-hover:text-white">{c.title}</h3>
+                <div className="flex items-center justify-between text-xs text-base-500">
                   <span>{c.level}</span>
-                  <span>{c.students} talaba</span>
-                </div>
-                <div className="mt-4 flex items-center gap-1 text-xs text-accent-400">
-                  <Star className="w-3 h-3 fill-current" />
-                  <Star className="w-3 h-3 fill-current" />
-                  <Star className="w-3 h-3 fill-current" />
-                  <Star className="w-3 h-3 fill-current" />
-                  <Star className="w-3 h-3 fill-current" />
-                  <span className="ml-1 text-base-500">4.9</span>
+                  <span className="tabular-nums">{c.students} talaba</span>
                 </div>
               </div>
             ))}
           </div>
-          <div className="text-center mt-10">
-            <Link href="/register" className="btn-secondary inline-flex items-center gap-2 px-6 py-3">
-              Barcha kurslarni ko'rish
-              <ChevronRight className="w-4 h-4" />
+
+          <div className="mt-8 flex justify-center">
+            <Link href="/register" className="inline-flex items-center gap-1.5 text-sm text-base-300 hover:text-base-100 border-b border-base-700 hover:border-base-400 pb-0.5 transition-colors">
+              Kurslarning to'liq ro'yxatini ko'rish
+              <ChevronRight className="w-3.5 h-3.5" />
             </Link>
           </div>
         </div>
       </section>
 
       {/* ROLES */}
-      <section id="about" className="py-24 px-6 bg-[#0D0D10]">
+      <section id="rollar" className="py-24 px-6 border-t border-[#18181B] bg-black/30">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-base-100 mb-4">Har bir rol uchun maxsus panel</h2>
+          <div className="mb-14">
+            <div className="text-xs uppercase tracking-[0.18em] text-base-500 mb-3">Rollar</div>
+            <h2 className="text-3xl md:text-4xl font-semibold text-base-100 leading-tight">
+              Har bir rol uchun alohida panel.
+            </h2>
           </div>
-          <div className="grid md:grid-cols-3 gap-6">
+
+          <div className="grid md:grid-cols-3 gap-5">
             {[
-              { role: 'Talaba', icon: '👨‍💻', color: 'border-accent-600/30 hover:border-accent-600/60', items: ['Shaxsiy o\'quv yo\'li', 'XP & Darajalar tizimi', 'AI yordamchi', 'Kod muхiti', 'Portfolio', 'Yutuqlar va nishonlar'], link: '/login', cta: 'Talaba sifatida kirish' },
-              { role: 'O\'qituvchi', icon: '👩‍🏫', color: 'border-sky-600/30 hover:border-sky-600/60', items: ['Kurs yaratish vositasi', 'Talabalar monitoringi', 'AI tavsiyalari', 'Avtomatik baholash', 'Tahlil va hisobotlar', 'Jonli darslar'], link: '/login', cta: 'O\'qituvchi sifatida kirish' },
-              { role: 'Admin', icon: '⚙️', color: 'border-emerald-600/30 hover:border-emerald-600/60', items: ['Tizim boshqaruvi', 'Foydalanuvchi menejment', 'Keng tahlil', 'Server monitoring', 'Kontent moderatsiya', 'Xavfsizlik audit'], link: '/login', cta: 'Admin sifatida kirish' },
+              {
+                role: 'Talaba',
+                sub: 'O\'rganuvchi, amaliyotchi',
+                items: ["Shaxsiy o'quv yo'li", 'XP va darajalar', 'AI yordamchi', 'Kod muhiti', 'Portfolio', 'Yutuqlar'],
+                cta: 'Talaba sifatida kirish',
+              },
+              {
+                role: "O'qituvchi",
+                sub: 'Kurs tuzadi, progress kuzatadi',
+                items: ['Kurs yaratish vositasi', 'Talabalar monitoringi', 'AI tavsiyalar', 'Avtomatik baholash', 'Tahlil va hisobotlar', 'Jonli darslar'],
+                cta: "O'qituvchi sifatida kirish",
+              },
+              {
+                role: 'Admin',
+                sub: 'Tizim barqarorligi uchun',
+                items: ['Tizim boshqaruvi', 'Foydalanuvchi menejment', 'Keng tahlil', 'Server monitoring', 'Kontent moderatsiya', 'Xavfsizlik audit'],
+                cta: 'Admin sifatida kirish',
+              },
             ].map((r) => (
-              <div key={r.role} className={`card p-8 border ${r.color} transition-colors duration-300`}>
-                <div className="text-4xl mb-4">{r.icon}</div>
-                <h3 className="text-xl font-bold text-base-100 mb-6">{r.role}</h3>
-                <ul className="space-y-3 mb-8">
+              <div key={r.role} className="card p-7 flex flex-col">
+                <div>
+                  <h3 className="text-xl font-medium text-base-100">{r.role}</h3>
+                  <div className="text-xs text-base-500 mt-1">{r.sub}</div>
+                </div>
+                <ul className="space-y-2.5 mt-6 mb-8 flex-1">
                   {r.items.map((item) => (
-                    <li key={item} className="flex items-center gap-2 text-sm text-base-400">
-                      <Check className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                    <li key={item} className="flex items-start gap-2.5 text-sm text-base-400">
+                      <span className="text-base-700 mt-0.5">·</span>
                       {item}
                     </li>
                   ))}
                 </ul>
-                <Link href={r.link} className="btn-secondary w-full text-center block">
+                <Link href="/login" className="text-sm text-base-200 hover:text-white inline-flex items-center gap-1 border-b border-base-700 hover:border-base-400 pb-0.5 w-fit transition-colors">
                   {r.cta}
+                  <ChevronRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             ))}
@@ -267,50 +292,53 @@ export default function LandingPage() {
       </section>
 
       {/* TESTIMONIALS */}
-      <section className="py-24 px-6">
+      <section className="py-24 px-6 border-t border-[#18181B]">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-base-100 mb-4">Talabalar fikri</h2>
+          <div className="mb-14">
+            <div className="text-xs uppercase tracking-[0.18em] text-base-500 mb-3">Fikrlar</div>
+            <h2 className="text-3xl md:text-4xl font-semibold text-base-100 leading-tight">
+              Foydalanuvchilardan.
+            </h2>
           </div>
           <div className="grid md:grid-cols-3 gap-5">
             {TESTIMONIALS.map((t) => (
-              <div key={t.name} className="card p-6">
-                <div className="flex gap-0.5 mb-4">
-                  {Array.from({ length: t.rating }).map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
-                  ))}
-                </div>
-                <p className="text-sm text-base-400 leading-relaxed mb-6">"{t.text}"</p>
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-accent-600/20 border border-accent-600/30 flex items-center justify-center text-xs font-bold text-accent-400">
+              <figure key={t.name} className="card p-6 flex flex-col">
+                <blockquote className="text-sm text-base-300 leading-relaxed mb-6 flex-1">
+                  "{t.text}"
+                </blockquote>
+                <figcaption className="flex items-center gap-3 pt-4 border-t border-[#1E1E24]">
+                  <div className="w-8 h-8 rounded-full bg-[#1A1A1F] border border-[#27272A] flex items-center justify-center text-xs font-medium text-base-300">
                     {t.avatar}
                   </div>
                   <div>
-                    <div className="text-sm font-medium text-base-200">{t.name}</div>
-                    <div className="text-xs text-base-500">{t.role}</div>
+                    <div className="text-sm text-base-200">{t.name}</div>
+                    <div className="text-xs text-base-600">{t.role}</div>
                   </div>
-                </div>
-              </div>
+                </figcaption>
+              </figure>
             ))}
           </div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-24 px-6">
-        <div className="max-w-3xl mx-auto text-center">
-          <div className="card p-12 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-accent-600/5 via-transparent to-sky-600/5" />
-            <div className="relative">
-              <h2 className="text-4xl font-bold text-base-100 mb-4">Bugunoq boshlang</h2>
-              <p className="text-base-400 text-lg mb-8">Ro'yxatdan o'tish bepul. Karta kerak emas.</p>
+      <section className="py-24 px-6 border-t border-[#18181B]">
+        <div className="max-w-3xl mx-auto">
+          <div className="card p-10">
+            <h2 className="text-3xl font-semibold text-base-100 mb-4 leading-tight">Sinab ko'rishni boshlang.</h2>
+            <p className="text-base-400 mb-8 leading-relaxed max-w-lg">
+              Ro'yxatdan o'tish bepul, karta talab qilinmaydi. Quyidagi demo hisoblar
+              orqali platformaning ichini ko'rish mumkin.
+            </p>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
               <Link href="/register"
-                className="inline-flex items-center gap-2 bg-accent-600 hover:bg-accent-700 text-white font-semibold px-10 py-4 rounded-2xl text-lg transition-all duration-200 shadow-lg shadow-accent-600/25">
-                Bepul Boshlash
-                <ArrowRight className="w-5 h-5" />
+                className="inline-flex items-center gap-2 bg-accent-600 hover:bg-accent-700 text-white font-medium px-5 py-2.5 rounded-xl text-sm transition-colors">
+                Boshlash
+                <ArrowRight className="w-4 h-4" />
               </Link>
-              <div className="mt-6 text-sm text-base-500">
-                Demo: student@edu.uz / teacher@edu.uz / admin@edu.uz — parol: 1234
+              <div className="text-xs text-base-500 font-mono leading-relaxed">
+                student@edu.uz &nbsp;·&nbsp; teacher@edu.uz &nbsp;·&nbsp; admin@edu.uz
+                <div className="text-base-700">parol: 1234</div>
               </div>
             </div>
           </div>
@@ -318,20 +346,13 @@ export default function LandingPage() {
       </section>
 
       {/* FOOTER */}
-      <footer className="border-t border-[#1E1E24] py-10 px-6">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+      <footer className="border-t border-[#18181B] py-8 px-6">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-base-600">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-accent-600 to-accent-500 flex items-center justify-center">
-              <BookOpen className="w-3.5 h-3.5 text-white" />
-            </div>
-            <span className="font-bold text-base-300">EduCode</span>
+            <div className="w-5 h-5 rounded-sm bg-base-800 text-base-300 flex items-center justify-center font-semibold">E</div>
+            <span>EduCode — AKT Virtual Classroom</span>
           </div>
-          <div className="text-sm text-base-600">
-            © 2026 EduCode — ICT Virtual Classroom Platform
-          </div>
-          <div className="text-sm text-base-600">
-            TATU — Axborot va Kommunikatsiya Texnologiyalari
-          </div>
+          <div>© 2026 · Toshkent Axborot Texnologiyalari Universiteti</div>
         </div>
       </footer>
     </div>

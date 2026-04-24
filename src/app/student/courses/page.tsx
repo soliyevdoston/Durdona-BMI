@@ -33,7 +33,7 @@ export default function CoursesPage() {
     <div className="max-w-7xl mx-auto space-y-6 animate-fade-in">
       <div>
         <h1 className="text-2xl font-bold text-base-100">Kurslar Katalogi</h1>
-        <p className="text-sm text-base-500 mt-1">ICT sohasidagi barcha yo'nalishlarni o'rganing</p>
+        <p className="text-sm text-base-500 mt-1">AKT sohasidagi barcha yo'nalishlarni o'rganing</p>
       </div>
 
       {/* Search & Filters */}

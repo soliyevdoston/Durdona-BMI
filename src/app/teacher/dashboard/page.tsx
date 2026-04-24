@@ -1,8 +1,8 @@
 'use client'
 import Link from 'next/link'
 import {
-  Users, GraduationCap, TrendingUp, Clock, AlertTriangle, Brain,
-  ChevronRight, Video, Plus, FileText, BarChart3, CheckCircle2
+  Users, TrendingUp, AlertTriangle, Brain,
+  ChevronRight, Video, Plus, FileText, CheckCircle2
 } from 'lucide-react'
 import {
   LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
@@ -40,17 +40,23 @@ export default function TeacherDashboard() {
   return (
     <div className="max-w-7xl mx-auto space-y-6 animate-fade-in">
       {/* Welcome */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-base-100">Assalomu alaykum, {user.name.split(' ')[0]}</h1>
-          <p className="text-sm text-base-500 mt-1">Bugun sizning {totalStudents} talabangiz faol</p>
+          <p className="text-xs text-base-500 uppercase tracking-wider mb-1.5">
+            {new Date().toLocaleDateString('uz-UZ', { weekday: 'long', day: 'numeric', month: 'long' })}
+          </p>
+          <h1 className="text-2xl font-semibold text-base-100">Assalomu alaykum, {user.name.split(' ')[0]}.</h1>
+          <p className="text-sm text-base-500 mt-1.5 max-w-lg">
+            Hozir <span className="text-base-300 tabular-nums">{activeStudents}</span> talaba faol,
+            <span className="text-base-300 tabular-nums"> {pendingGrading}</span> ish baholashni kutmoqda.
+          </p>
         </div>
         <div className="flex gap-2">
           <Link href="/teacher/live" className="btn-secondary flex items-center gap-2 text-sm">
-            <Video className="w-4 h-4 text-rose-400" /> Jonli Dars Boshlash
+            <Video className="w-4 h-4 text-rose-400" /> Jonli dars
           </Link>
           <Link href="/teacher/create-course" className="btn-primary bg-sky-600 hover:bg-sky-700 flex items-center gap-2 text-sm">
-            <Plus className="w-4 h-4" /> Yangi Kurs
+            <Plus className="w-4 h-4" /> Yangi kurs
           </Link>
         </div>
       </div>

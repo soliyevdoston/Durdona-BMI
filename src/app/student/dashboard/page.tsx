@@ -2,8 +2,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import {
-  Flame, Star, Target, TrendingUp, Clock, Code2,
-  ChevronRight, Brain, BookOpen, CheckCircle2, Circle,
+  Flame, Target, ChevronRight, Brain, BookOpen, CheckCircle2, Circle,
   Zap, Trophy, ArrowRight, BarChart3, Calendar
 } from 'lucide-react'
 import {
@@ -52,51 +51,49 @@ export default function StudentDashboard() {
     <div className="max-w-7xl mx-auto space-y-6 animate-fade-in">
 
       {/* Welcome Banner */}
-      <div className="relative card overflow-hidden p-6">
-        <div className="absolute inset-0 bg-gradient-to-r from-accent-600/10 via-transparent to-transparent" />
-        <div className="absolute right-0 top-0 w-64 h-full opacity-5">
-          <div className="absolute right-8 top-8 w-40 h-40 bg-accent-500 rounded-full blur-2xl" />
-        </div>
-        <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="card p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <p className="text-base-500 text-sm mb-1">Xush kelibsiz,</p>
-            <h1 className="text-2xl font-bold text-base-100">{user.name.split(' ')[0]} 👋</h1>
-            <div className="flex items-center gap-3 mt-3">
-              <div className="flex items-center gap-1.5 badge-accent">
-                <Flame className="w-3.5 h-3.5" />
-                {user.streak} kunlik seriya
-              </div>
-              <div className="flex items-center gap-1.5 badge bg-base-800 text-base-400 border border-base-700">
-                <Star className="w-3.5 h-3.5 text-amber-400" />
+            <p className="text-xs text-base-500 uppercase tracking-wider mb-1.5">
+              {new Date().toLocaleDateString('uz-UZ', { weekday: 'long', day: 'numeric', month: 'long' })}
+            </p>
+            <h1 className="text-2xl font-semibold text-base-100">Salom, {user.name.split(' ')[0]}.</h1>
+            <div className="flex items-center gap-2 mt-3">
+              {user.streak > 0 && (
+                <span className="badge bg-[#1A1A1F] text-base-300 border border-[#27272A]">
+                  <Flame className="w-3 h-3 text-amber-400" />
+                  {user.streak} kunlik seriya
+                </span>
+              )}
+              <span className="badge bg-[#1A1A1F] text-base-400 border border-[#27272A]">
                 {getRankLabel(level)}
-              </div>
+              </span>
             </div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6 sm:gap-8 tabular-nums">
             <div className="text-center">
-              <div className="text-3xl font-bold text-accent-400">{level}</div>
-              <div className="text-xs text-base-500">Daraja</div>
+              <div className="text-2xl font-semibold text-base-100">{level}</div>
+              <div className="text-xs text-base-500 mt-0.5">Daraja</div>
             </div>
-            <div className="w-px h-10 bg-[#27272A]" />
+            <div className="w-px h-8 bg-[#27272A]" />
             <div className="text-center">
-              <div className="text-3xl font-bold text-amber-400">{user.xp.toLocaleString()}</div>
-              <div className="text-xs text-base-500">XP</div>
+              <div className="text-2xl font-semibold text-base-100">{user.xp.toLocaleString()}</div>
+              <div className="text-xs text-base-500 mt-0.5">Jami XP</div>
             </div>
-            <div className="w-px h-10 bg-[#27272A]" />
+            <div className="w-px h-8 bg-[#27272A]" />
             <div className="text-center">
-              <div className="text-3xl font-bold text-emerald-400">{todayXP}</div>
-              <div className="text-xs text-base-500">Bugungi XP</div>
+              <div className="text-2xl font-semibold text-emerald-400">+{todayXP}</div>
+              <div className="text-xs text-base-500 mt-0.5">Bugun</div>
             </div>
           </div>
         </div>
-        {/* XP Progress */}
-        <div className="mt-4 relative">
+        <div className="mt-5">
           <div className="flex justify-between text-xs text-base-600 mb-1.5">
             <span>Daraja {level} → {level + 1}</span>
-            <span>{current}/{required} XP</span>
+            <span className="font-mono">{current}/{required} XP</span>
           </div>
-          <div className="progress-bar h-2">
-            <div className="progress-fill h-2" style={{ width: `${xpProgress}%` }} />
+          <div className="progress-bar h-1.5">
+            <div className="progress-fill h-1.5" style={{ width: `${xpProgress}%` }} />
           </div>
         </div>
       </div>

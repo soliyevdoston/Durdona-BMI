@@ -57,8 +57,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-base-950 flex items-center justify-center px-4">
-      <div className="absolute inset-0 bg-gradient-mesh pointer-events-none" />
+    <div className="min-h-screen bg-app flex items-center justify-center px-4">
 
       <div className="relative w-full max-w-md animate-slide-up">
         <div className="text-center mb-8">

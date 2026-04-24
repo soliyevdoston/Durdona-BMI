@@ -56,9 +56,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-base-950 flex items-center justify-center px-4">
-      <div className="absolute inset-0 bg-gradient-mesh pointer-events-none" />
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-accent-600/5 rounded-full blur-3xl" />
+    <div className="min-h-screen bg-app flex items-center justify-center px-4">
 
       <div className="relative w-full max-w-md animate-slide-up">
         {/* Logo */}

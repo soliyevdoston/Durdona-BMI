@@ -87,7 +87,7 @@ export default function TeacherLayout({ children }: { children: React.ReactNode 
   )
 
   return (
-    <div className="flex h-screen bg-base-950 overflow-hidden">
+    <div className="flex h-screen bg-app overflow-hidden">
       <div className="hidden lg:flex w-64 flex-shrink-0 flex-col">
         <Sidebar />
       </div>
