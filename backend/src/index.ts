@@ -51,6 +51,17 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
   res.status(500).json({ error: 'Ichki server xatosi' })
 })
 
+// Diagnostic: DATABASE_URL bor-yo'qligini va formatini tekshirish
+const dbUrl = process.env.DATABASE_URL
+if (!dbUrl) {
+  console.error('✗ DATABASE_URL o\'rnatilmagan!')
+} else {
+  const trimmed = dbUrl.trim()
+  const hasWhitespace = dbUrl !== trimmed
+  const startsOk = trimmed.startsWith('postgresql://') || trimmed.startsWith('postgres://')
+  console.log(`✓ DATABASE_URL: uzunligi=${dbUrl.length}, trimmed=${trimmed.length}, startsOk=${startsOk}${hasWhitespace ? ' ⚠ (bo\'sh joy bor!)' : ''}`)
+}
+
 app.listen(PORT, () => {
   console.log(`✓ Backend ishga tushdi: http://localhost:${PORT}`)
   console.log(`  CORS: ${corsOrigins.join(', ')}`)
