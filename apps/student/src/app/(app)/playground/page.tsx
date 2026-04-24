@@ -4,9 +4,15 @@ import {
   Play, RefreshCw, Brain, ChevronDown, CheckCircle2,
   XCircle, AlertCircle, Zap, Copy, BookOpen, Settings2
 } from 'lucide-react'
-import { CODE_EXAMPLES } from '@/lib/data'
+import { api } from '@/lib/api'
 
 type Lang = 'python' | 'javascript' | 'sql'
+
+const CODE_EXAMPLES: Record<Lang, string> = {
+  python: `# Python - Ro'yxatlarni qayta ishlash\ndef toping_maksimum(royxat):\n    if len(royxat) == 0:\n        return None\n    maksimum = royxat[0]\n    for element in royxat:\n        if element > maksimum:\n            maksimum = element\n    return maksimum\n\nsonlar = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3]\nnatija = toping_maksimum(sonlar)\nprint(f"Maksimum son: {natija}")`,
+  javascript: `// JavaScript - Async/Await misoli\nasync function foydalanuvchiMalumoti(id) {\n  try {\n    const javob = await fetch(\`/api/users/\${id}\`)\n    if (!javob.ok) throw new Error('Topilmadi')\n    return await javob.json()\n  } catch (xato) {\n    console.error('Xato:', xato.message)\n    return null\n  }\n}\n\nfoydalanuvchiMalumoti(42).then(user => console.log(user?.name))`,
+  sql: `-- SQL - Murakkab so'rov\nSELECT t.ism, k.sarlavha AS kurs,\n    AVG(b.ball) AS o_rtacha\nFROM talabalar t\nJOIN yozilishlar y ON t.id = y.talaba_id\nJOIN kurslar k ON y.kurs_id = k.id\nLEFT JOIN baholar b ON t.id = b.talaba_id\nGROUP BY t.id, t.ism, k.id, k.sarlavha\nORDER BY o_rtacha DESC;`,
+}
 
 const LANGS: { id: Lang; label: string; color: string }[] = [
   { id: 'python', label: 'Python', color: 'text-blue-400' },
@@ -46,13 +52,12 @@ export default function PlaygroundPage() {
   const runCode = async () => {
     setRunning(true)
     setActiveTab('output')
-    await new Promise(r => setTimeout(r, 1200))
-    const outputs: Record<Lang, string> = {
-      python: `Maksimum son: 9\n\nJarayon tugadi (0.023s)\n✓ Muvaffaqiyatli bajarildi`,
-      javascript: `Foydalanuvchi: undefined\n\n[Promise: resolved]\nJarayon tugadi (0.015s)`,
-      sql: `nomi           | kurs              | o_rtacha_ball | o_rin\n--------------+-----------------+---------------+------\nJasur R.       | Python Asoslari  | 94.5          | 1\nAzizbek K.     | Python Asoslari  | 87.3          | 2\nMalika T.      | Python Asoslari  | 76.8          | 3\n\n3 ta satr topildi (0.042s)`,
+    try {
+      const { output, duration } = await api.runCode(code, lang)
+      setOutput(`${output}\n\n(${duration}ms)`)
+    } catch {
+      setOutput('Backend ulanishda xatolik. Keyinroq urinib ko\'ring.')
     }
-    setOutput(outputs[lang])
     setRunning(false)
   }
 

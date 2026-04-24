@@ -84,6 +84,7 @@ model Lesson {
   order     Int
   xpReward  Int     @default(10)
   content   String? @db.Text
+  videoUrl  String? // YouTube yoki boshqa video manzili
 
   progress  LessonProgress[]
 

@@ -9,8 +9,9 @@ import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer
 } from 'recharts'
 import { useAuthStore } from '@/lib/store'
-import { COURSES, ASSIGNMENTS, ACHIEVEMENTS, ANALYTICS_DATA, AI_SUGGESTIONS } from '@/lib/data'
-import { getLevelFromXP, getRankLabel, getDifficultyColor, getDifficultyLabel, formatDate } from '@/lib/utils'
+import { api } from '@/lib/api'
+import { useApi } from '@/lib/useApi'
+import { getLevelFromXP, getRankLabel, formatDate, iconEmoji } from '@/lib/utils'
 
 const TODAY_TASKS = [
   { id: 1, text: 'Python: Sikllar darsini tugatish', done: false, xp: 25, type: 'lesson' },
@@ -34,16 +35,24 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 export default function StudentDashboard() {
   const { user } = useAuthStore()
   const [tasks, setTasks] = useState(TODAY_TASKS)
+
+  const { data: courses } = useApi(() => api.myCourses())
+  const { data: assignments } = useApi(() => api.myAssignments())
+  const { data: achievements } = useApi(() => api.achievements())
+  const { data: weekly } = useApi(() => api.weekly())
+  const { data: aiSuggestions } = useApi(() => api.aiSuggestions())
+
   if (!user) return null
 
   const { level, current, required } = getLevelFromXP(user.xp)
   const xpProgress = Math.round((current / required) * 100)
-  const activeCourses = COURSES.filter(c => (c.progress ?? 0) > 0)
-  const pendingAssignments = ASSIGNMENTS.filter(a => a.status === 'pending')
-  const earnedAchievements = ACHIEVEMENTS.filter(a => a.earned)
+  const activeCourses = (courses || []).filter((c: any) => (c.progress ?? 0) > 0)
+  const pendingAssignments = (assignments || []).filter((a: any) => a.status === 'pending')
+  const earnedAchievements = (achievements || []).filter((a: any) => a.earned)
+  const totalAchievements = (achievements || []).length
   const completedTasks = tasks.filter(t => t.done).length
   const todayXP = tasks.filter(t => t.done).reduce((sum, t) => sum + t.xp, 0)
-  const aiTip = AI_SUGGESTIONS[0]
+  const aiTip = aiSuggestions?.[0] || ''
 
   const toggleTask = (id: number) => setTasks(prev => prev.map(t => t.id === id ? { ...t, done: !t.done } : t))
 
@@ -121,7 +130,7 @@ export default function StudentDashboard() {
             <span className="text-xs text-base-500 uppercase tracking-wider">Yutuqlar</span>
             <Trophy className="w-4 h-4 text-amber-400" />
           </div>
-          <div className="text-2xl font-bold text-base-100">{earnedAchievements.length}/{ACHIEVEMENTS.length}</div>
+          <div className="text-2xl font-bold text-base-100">{earnedAchievements.length}/{totalAchievements}</div>
           <div className="text-xs text-base-500">Nishonlar</div>
         </div>
         <div className="stat-card">
@@ -148,7 +157,7 @@ export default function StudentDashboard() {
               </Link>
             </div>
             <div className="space-y-3">
-              {activeCourses.map((course) => {
+              {activeCourses.map((course: any) => {
                 const pct = course.progress ?? 0
                 return (
                   <Link key={course.id} href={`/courses/${course.id}`}
@@ -186,7 +195,7 @@ export default function StudentDashboard() {
               </div>
             </div>
             <ResponsiveContainer width="100%" height={160}>
-              <AreaChart data={ANALYTICS_DATA.weeklyActivity}>
+              <AreaChart data={weekly || []}>
                 <defs>
                   <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#7C3AED" stopOpacity={0.3} />
@@ -256,9 +265,9 @@ export default function StudentDashboard() {
               </Link>
             </div>
             <div className="space-y-2">
-              {earnedAchievements.slice(0, 4).map((ach) => (
+              {earnedAchievements.slice(0, 4).map((ach: any) => (
                 <div key={ach.id} className="flex items-center gap-3 p-2 rounded-xl">
-                  <span className="text-2xl">{ach.icon}</span>
+                  <span className="text-2xl">{iconEmoji(ach.icon)}</span>
                   <div className="flex-1 min-w-0">
                     <div className="text-xs font-medium text-base-200">{ach.title}</div>
                     <div className="text-xs text-base-600">{ach.description}</div>
@@ -276,7 +285,7 @@ export default function StudentDashboard() {
               <h2 className="section-title">Yaqin Muddatlar</h2>
             </div>
             <div className="space-y-2">
-              {ASSIGNMENTS.filter(a => a.status === 'pending').slice(0, 3).map((a) => (
+              {(assignments || []).filter((a: any) => a.status === 'pending').slice(0, 3).map((a: any) => (
                 <div key={a.id} className="flex items-center justify-between p-2.5 rounded-xl bg-[#1A1A1F]">
                   <div>
                     <div className="text-xs font-medium text-base-200 line-clamp-1">{a.title}</div>

@@ -9,7 +9,8 @@ import {
   AreaChart, Area, LineChart, Line, PieChart, Pie, Cell,
   XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend
 } from 'recharts'
-import { ANALYTICS_DATA, STUDENTS } from '@/lib/data'
+import { api } from '@/lib/api'
+import { useApi } from '@/lib/useApi'
 
 const REVENUE_DATA = [
   { month: 'Yan', revenue: 12500, users: 156 },
@@ -49,7 +50,15 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 }
 
 export default function AdminDashboard() {
-  const stats = ANALYTICS_DATA.systemStats
+  const { data: statsData } = useApi(() => api.systemStats())
+  const { data: logs } = useApi(() => api.systemLogs(10))
+  const { data: growth } = useApi(() => api.growth())
+
+  const stats = statsData || {
+    totalUsers: 0, activeToday: 0, coursesTotal: 0, lessonsTotal: 0,
+    assignmentsTotal: 0, avgCompletionRate: 0, avgRating: 0,
+    serverLoad: 0, storageUsed: 0, uptime: 0,
+  }
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 animate-fade-in">
@@ -150,7 +159,7 @@ export default function AdminDashboard() {
             <p className="text-xs text-base-500 mt-0.5">Oylik dinamika</p>
           </div>
           <ResponsiveContainer width="100%" height={260}>
-            <AreaChart data={ANALYTICS_DATA.studentProgress}>
+            <AreaChart data={growth || []}>
               <defs>
                 <linearGradient id="grad1" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#10B981" stopOpacity={0.3} />

@@ -55,18 +55,18 @@ async function main() {
   ])
   console.log(`  ✓ ${courses.length} kurs yaratildi`)
 
-  // LESSONS (Python kursi uchun)
+  // LESSONS (Python kursi uchun — YouTube video URL'lar bilan)
   const lessons = [
-    { id: 'l-001', courseId: 'c-001', title: "Python nima va nima uchun?", duration: '8 daq', type: 'video', order: 1, xpReward: 10 },
-    { id: 'l-002', courseId: 'c-001', title: "O'rnatish va muhit sozlash", duration: '12 daq', type: 'text', order: 2, xpReward: 10 },
-    { id: 'l-003', courseId: 'c-001', title: 'Birinchi dastur: Hello World', duration: '15 daq', type: 'practice', order: 3, xpReward: 20 },
-    { id: 'l-004', courseId: 'c-001', title: "O'zgaruvchilar va ma'lumot turlari", duration: '20 daq', type: 'video', order: 4, xpReward: 15 },
-    { id: 'l-005', courseId: 'c-001', title: 'Mavzu 1 testi', duration: '10 daq', type: 'quiz', order: 5, xpReward: 30 },
-    { id: 'l-006', courseId: 'c-001', title: 'Shartli operatorlar (if/else)', duration: '18 daq', type: 'video', order: 6, xpReward: 15 },
-    { id: 'l-007', courseId: 'c-001', title: 'Sikllar: for va while', duration: '22 daq', type: 'practice', order: 7, xpReward: 25 },
-    { id: 'l-008', courseId: 'c-001', title: 'Funksiyalar', duration: '25 daq', type: 'video', order: 8, xpReward: 20 },
-    { id: 'l-009', courseId: 'c-001', title: "Ro'yxatlar (Lists)", duration: '20 daq', type: 'practice', order: 9, xpReward: 25 },
-    { id: 'l-010', courseId: 'c-001', title: "Lug'atlar (Dictionaries)", duration: '20 daq', type: 'video', order: 10, xpReward: 20 },
+    { id: 'l-001', courseId: 'c-001', title: "Python nima va nima uchun?", duration: '8 daq', type: 'video', order: 1, xpReward: 10, videoUrl: 'https://www.youtube.com/embed/kqtD5dpn9C8' },
+    { id: 'l-002', courseId: 'c-001', title: "O'rnatish va muhit sozlash", duration: '12 daq', type: 'text', order: 2, xpReward: 10, videoUrl: null },
+    { id: 'l-003', courseId: 'c-001', title: 'Birinchi dastur: Hello World', duration: '15 daq', type: 'practice', order: 3, xpReward: 20, videoUrl: null },
+    { id: 'l-004', courseId: 'c-001', title: "O'zgaruvchilar va ma'lumot turlari", duration: '20 daq', type: 'video', order: 4, xpReward: 15, videoUrl: 'https://www.youtube.com/embed/cQT33yu9pY8' },
+    { id: 'l-005', courseId: 'c-001', title: 'Mavzu 1 testi', duration: '10 daq', type: 'quiz', order: 5, xpReward: 30, videoUrl: null },
+    { id: 'l-006', courseId: 'c-001', title: 'Shartli operatorlar (if/else)', duration: '18 daq', type: 'video', order: 6, xpReward: 15, videoUrl: 'https://www.youtube.com/embed/DZwmZ8Usvnk' },
+    { id: 'l-007', courseId: 'c-001', title: 'Sikllar: for va while', duration: '22 daq', type: 'practice', order: 7, xpReward: 25, videoUrl: 'https://www.youtube.com/embed/KWgYha0clzw' },
+    { id: 'l-008', courseId: 'c-001', title: 'Funksiyalar', duration: '25 daq', type: 'video', order: 8, xpReward: 20, videoUrl: 'https://www.youtube.com/embed/9Os0o3wzS_I' },
+    { id: 'l-009', courseId: 'c-001', title: "Ro'yxatlar (Lists)", duration: '20 daq', type: 'practice', order: 9, xpReward: 25, videoUrl: 'https://www.youtube.com/embed/ohCDWZgNIU0' },
+    { id: 'l-010', courseId: 'c-001', title: "Lug'atlar (Dictionaries)", duration: '20 daq', type: 'video', order: 10, xpReward: 20, videoUrl: 'https://www.youtube.com/embed/daefaLgNkw0' },
   ]
   for (const l of lessons) await prisma.lesson.create({ data: l })
   console.log(`  ✓ ${lessons.length} dars yaratildi`)

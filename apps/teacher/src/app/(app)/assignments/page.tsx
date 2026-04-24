@@ -1,7 +1,8 @@
 'use client'
 import { useState } from 'react'
 import { Plus, Search, Filter, Eye, Clock, CheckCircle2, Users, ChevronRight, MoreVertical, Star, FileText } from 'lucide-react'
-import { ASSIGNMENTS, STUDENTS } from '@/lib/data'
+import { api } from '@/lib/api'
+import { useApi } from '@/lib/useApi'
 import { formatDate } from '@/lib/utils'
 
 const TEACHER_ASSIGNMENTS = [
@@ -22,9 +23,18 @@ export default function TeacherAssignmentsPage() {
   const [tab, setTab] = useState<'active' | 'grading' | 'completed'>('active')
   const [search, setSearch] = useState('')
 
-  const filtered = TEACHER_ASSIGNMENTS.filter(a => a.status === tab && a.title.toLowerCase().includes(search.toLowerCase()))
-  const grading = TEACHER_ASSIGNMENTS.filter(a => a.status === 'grading').length
-  const active = TEACHER_ASSIGNMENTS.filter(a => a.status === 'active').length
+  const { data } = useApi(() => api.teachingAssignments())
+  const BACKEND_ASSIGNMENTS: any[] = (data || []).map((a: any) => ({
+    ...a,
+    status: a.graded === a.submissions && a.submissions > 0
+      ? 'completed'
+      : a.submissions > a.graded ? 'grading' : 'active',
+  }))
+  const DATA = BACKEND_ASSIGNMENTS.length > 0 ? BACKEND_ASSIGNMENTS : TEACHER_ASSIGNMENTS
+
+  const filtered = DATA.filter(a => a.status === tab && a.title.toLowerCase().includes(search.toLowerCase()))
+  const grading = DATA.filter(a => a.status === 'grading').length
+  const active = DATA.filter(a => a.status === 'active').length
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 animate-fade-in">
@@ -43,7 +53,7 @@ export default function TeacherAssignmentsPage() {
         {[
           { label: 'Faol', value: active, icon: Clock, color: 'text-sky-400' },
           { label: 'Baholash', value: grading, icon: FileText, color: 'text-amber-400' },
-          { label: "Tugatilgan", value: TEACHER_ASSIGNMENTS.filter(a => a.status === 'completed').length, icon: CheckCircle2, color: 'text-emerald-400' },
+          { label: "Tugatilgan", value: DATA.filter(a => a.status === 'completed').length, icon: CheckCircle2, color: 'text-emerald-400' },
           { label: "O'rtacha Ball", value: '83.5', icon: Star, color: 'text-accent-400' },
         ].map((s) => (
           <div key={s.label} className="stat-card">
@@ -116,7 +126,7 @@ export default function TeacherAssignmentsPage() {
 
       {/* Assignments Grid */}
       <div className="grid md:grid-cols-2 gap-4">
-        {filtered.map((a) => (
+        {filtered.map((a: any) => (
           <div key={a.id} className="card p-5 hover:border-sky-600/30 transition-all group">
             <div className="flex items-start justify-between gap-3 mb-3">
               <div className="flex-1">

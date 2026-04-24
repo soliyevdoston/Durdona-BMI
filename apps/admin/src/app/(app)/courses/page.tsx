@@ -1,14 +1,18 @@
 'use client'
 import { useState } from 'react'
 import { Search, BookOpen, Users, Star, Eye, Edit, Trash2, Plus } from 'lucide-react'
-import { COURSES } from '@/lib/data'
+import { api } from '@/lib/api'
+import { useApi } from '@/lib/useApi'
 import { getDifficultyColor, getDifficultyLabel } from '@/lib/utils'
 
 export default function AdminCoursesPage() {
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('all')
 
-  const filtered = COURSES.filter(c =>
+  const { data } = useApi(() => api.courses())
+  const courses: any[] = data || []
+
+  const filtered = courses.filter(c =>
     c.title.toLowerCase().includes(search.toLowerCase()) &&
     (category === 'all' || c.category === category)
   )
@@ -18,7 +22,7 @@ export default function AdminCoursesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-base-100">Kurslarni Boshqarish</h1>
-          <p className="text-sm text-base-500 mt-1">{COURSES.length} ta kurs tizimda</p>
+          <p className="text-sm text-base-500 mt-1">{courses.length} ta kurs tizimda</p>
         </div>
       </div>
 
@@ -53,7 +57,7 @@ export default function AdminCoursesPage() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map(c => (
+              {filtered.map((c: any) => (
                 <tr key={c.id} className="border-b border-[#1E1E24] hover:bg-[#1A1A1F]/50">
                   <td className="px-4 py-3">
                     <div className="text-sm font-medium text-base-200 line-clamp-1">{c.title}</div>

@@ -6,12 +6,13 @@ import {
   ChevronLeft, Play, Lock, CheckCircle2, Clock, BookOpen, Users,
   Star, Code2, FileQuestion, FileText, Zap, Brain, ChevronDown, ChevronUp
 } from 'lucide-react'
-import { COURSES, LESSONS } from '@/lib/data'
+import { api } from '@/lib/api'
+import { useApi } from '@/lib/useApi'
 import { getDifficultyColor, getDifficultyLabel } from '@/lib/utils'
 
-const TYPE_ICON = { video: Play, text: FileText, quiz: FileQuestion, practice: Code2 }
-const TYPE_LABEL = { video: 'Video', text: 'Matn', quiz: 'Test', practice: 'Amaliyot' }
-const TYPE_COLOR = { video: 'text-sky-400', text: 'text-base-400', quiz: 'text-amber-400', practice: 'text-emerald-400' }
+const TYPE_ICON: Record<string, any> = { video: Play, text: FileText, quiz: FileQuestion, practice: Code2 }
+const TYPE_LABEL: Record<string, string> = { video: 'Video', text: 'Matn', quiz: 'Test', practice: 'Amaliyot' }
+const TYPE_COLOR: Record<string, string> = { video: 'text-sky-400', text: 'text-base-400', quiz: 'text-amber-400', practice: 'text-emerald-400' }
 
 const QUIZ_QUESTIONS = [
   {
@@ -36,9 +37,9 @@ const QUIZ_QUESTIONS = [
 
 export default function CourseDetailPage() {
   const { id } = useParams()
-  const course = COURSES.find(c => c.id === id)
-  const lessons = LESSONS.filter(l => l.courseId === id)
-  const [activeLesson, setActiveLesson] = useState<string | null>(lessons.find(l => !l.completed && !l.locked)?.id || null)
+  const { data: course, loading } = useApi(() => api.course(String(id)), [id])
+  const lessons: any[] = course?.lessons || []
+  const [activeLesson, setActiveLesson] = useState<string | null>(null)
   const [quizActive, setQuizActive] = useState(false)
   const [quizAnswers, setQuizAnswers] = useState<Record<number, number>>({})
   const [quizSubmitted, setQuizSubmitted] = useState(false)
@@ -47,13 +48,26 @@ export default function CourseDetailPage() {
   ])
   const [aiInput, setAiInput] = useState('')
 
+  // Auto-select first unlocked unfinished lesson
+  useState(() => {
+    const first = lessons.find((l: any) => !l.completed && !l.locked)
+    if (first && !activeLesson) setActiveLesson(first.id)
+    return null
+  })
+
+  if (loading) return (
+    <div className="flex items-center justify-center h-64">
+      <p className="text-base-500">Yuklanmoqda...</p>
+    </div>
+  )
+
   if (!course) return (
     <div className="flex items-center justify-center h-64">
       <p className="text-base-500">Kurs topilmadi</p>
     </div>
   )
 
-  const currentLesson = lessons.find(l => l.id === activeLesson)
+  const currentLesson = lessons.find((l: any) => l.id === activeLesson)
   const completedCount = lessons.filter(l => l.completed).length
   const progress = Math.round((completedCount / lessons.length) * 100)
 
@@ -111,7 +125,7 @@ export default function CourseDetailPage() {
 
             {/* Lessons */}
             <div className="space-y-1 max-h-[60vh] overflow-y-auto no-scrollbar">
-              {lessons.map((lesson, idx) => {
+              {lessons.map((lesson: any, idx: number) => {
                 const Icon = TYPE_ICON[lesson.type]
                 const active = lesson.id === activeLesson
                 return (
@@ -164,23 +178,26 @@ export default function CourseDetailPage() {
                   <div className="badge-amber flex-shrink-0">+{currentLesson.xpReward} XP</div>
                 </div>
 
-                {/* Video Placeholder */}
+                {/* Video Player */}
                 {currentLesson.type === 'video' && (
-                  <div className="bg-[#0D0D10] rounded-xl aspect-video flex flex-col items-center justify-center border border-[#1E1E24] relative overflow-hidden mb-4">
-                    <div className="absolute inset-0 bg-gradient-to-br from-accent-600/5 to-sky-600/5" />
-                    <div className="w-16 h-16 rounded-full bg-accent-600/20 border border-accent-600/30 flex items-center justify-center mb-3">
-                      <Play className="w-7 h-7 text-accent-400 ml-1" />
+                  currentLesson.videoUrl ? (
+                    <div className="bg-black rounded-xl aspect-video overflow-hidden mb-4 border border-[#1E1E24]">
+                      <iframe
+                        className="w-full h-full"
+                        src={currentLesson.videoUrl}
+                        title={currentLesson.title}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowFullScreen
+                      />
                     </div>
-                    <p className="text-sm text-base-500">Video dars — {currentLesson.duration}</p>
-                    <div className="absolute bottom-4 left-4 right-4">
-                      <div className="flex items-center gap-2 text-xs text-base-600">
-                        <div className="flex-1 h-1 bg-[#27272A] rounded-full overflow-hidden">
-                          <div className="h-full w-0 bg-accent-600 rounded-full" />
-                        </div>
-                        <span>0:00 / {currentLesson.duration}</span>
+                  ) : (
+                    <div className="bg-[#0D0D10] rounded-xl aspect-video flex flex-col items-center justify-center border border-[#1E1E24] relative overflow-hidden mb-4">
+                      <div className="w-16 h-16 rounded-full bg-accent-600/20 border border-accent-600/30 flex items-center justify-center mb-3">
+                        <Play className="w-7 h-7 text-accent-400 ml-1" />
                       </div>
+                      <p className="text-sm text-base-500">Video hali yuklanmagan</p>
                     </div>
-                  </div>
+                  )
                 )}
 
                 {/* Text Content */}

@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Brain, Send, Sparkles, Code2, BookOpen, Lightbulb, Bot, User as UserIcon, Zap, MessageSquare } from 'lucide-react'
 import { useAuthStore } from '@/lib/store'
+import { api } from '@/lib/api'
 
 const SUGGESTED = [
   { icon: Code2, text: 'Python\'da rekursiyani tushuntirib bering', color: 'text-sky-400' },
@@ -87,12 +88,21 @@ export default function AIAssistantPage() {
     setInput('')
     setTyping(true)
 
-    await new Promise(r => setTimeout(r, 1200))
-    setMessages(prev => [...prev, {
-      role: 'ai',
-      content: detectResponse(message),
-      time: new Date().toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' }),
-    }])
+    try {
+      const { reply } = await api.aiChat(message)
+      setMessages(prev => [...prev, {
+        role: 'ai',
+        content: reply,
+        time: new Date().toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' }),
+      }])
+    } catch {
+      // Backend mavjud emas bo'lsa, lokal javob
+      setMessages(prev => [...prev, {
+        role: 'ai',
+        content: detectResponse(message),
+        time: new Date().toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' }),
+      }])
+    }
     setTyping(false)
   }
 

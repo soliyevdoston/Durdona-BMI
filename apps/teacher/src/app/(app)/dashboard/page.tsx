@@ -9,7 +9,8 @@ import {
   BarChart, Bar, Legend
 } from 'recharts'
 import { useAuthStore } from '@/lib/store'
-import { STUDENTS, COURSES, ASSIGNMENTS, ANALYTICS_DATA, AI_SUGGESTIONS } from '@/lib/data'
+import { api } from '@/lib/api'
+import { useApi } from '@/lib/useApi'
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
@@ -27,15 +28,25 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export default function TeacherDashboard() {
   const { user } = useAuthStore()
+
+  const { data: students } = useApi(() => api.students())
+  const { data: courses } = useApi(() => api.myCourses())
+  const { data: assignments } = useApi(() => api.teachingAssignments())
+  const { data: growth } = useApi(() => api.growth())
+  const { data: difficulty } = useApi(() => api.difficulty())
+  const { data: aiSuggestions } = useApi(() => api.aiSuggestions())
+
   if (!user) return null
 
-  const atRisk = STUDENTS.filter(s => s.risk === 'high')
-  const totalStudents = STUDENTS.length
-  const activeStudents = STUDENTS.filter(s => {
+  const studentList = students || []
+  const atRisk = studentList.filter((s: any) => s.risk === 'high')
+  const totalStudents = studentList.length
+  const activeStudents = studentList.filter((s: any) => {
+    if (!s.lastActive) return false
     const d = new Date(s.lastActive)
     return (Date.now() - d.getTime()) < 86400000 * 3
   }).length
-  const pendingGrading = ASSIGNMENTS.filter(a => a.status === 'submitted').length
+  const pendingGrading = (assignments || []).reduce((sum: number, a: any) => sum + (a.submissions - a.graded), 0)
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 animate-fade-in">
@@ -109,7 +120,7 @@ export default function TeacherDashboard() {
             <span className="text-xs text-base-600">So'nggi 8 oy</span>
           </div>
           <ResponsiveContainer width="100%" height={220}>
-            <LineChart data={ANALYTICS_DATA.studentProgress}>
+            <LineChart data={growth || []}>
               <CartesianGrid strokeDasharray="3 3" stroke="#1E1E24" />
               <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#52525B' }} />
               <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#52525B' }} />
@@ -128,13 +139,13 @@ export default function TeacherDashboard() {
             <span className="text-xs text-base-600">% talabalar qiynalgan</span>
           </div>
           <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={ANALYTICS_DATA.topicDifficulty} layout="vertical" margin={{ left: 20 }}>
+            <BarChart data={difficulty || []} layout="vertical" margin={{ left: 20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#1E1E24" />
               <XAxis type="number" domain={[0, 100]} axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#52525B' }} />
               <YAxis type="category" dataKey="topic" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#A1A1AA' }} width={80} />
               <Tooltip content={<CustomTooltip />} />
               <Bar dataKey="difficulty" radius={[0, 6, 6, 0]}>
-                {ANALYTICS_DATA.topicDifficulty.map((entry, index) => (
+                {(difficulty || []).map((entry: any, index: number) => (
                   <Bar key={index} dataKey="difficulty" fill={entry.difficulty > 80 ? '#EF4444' : entry.difficulty > 60 ? '#F59E0B' : '#10B981'} />
                 ))}
               </Bar>
@@ -156,7 +167,7 @@ export default function TeacherDashboard() {
             </Link>
           </div>
           <div className="space-y-2">
-            {atRisk.map((s) => (
+            {atRisk.map((s: any) => (
               <div key={s.id} className="flex items-center gap-3 p-3 rounded-xl bg-rose-500/5 border border-rose-500/20 hover:bg-rose-500/10 transition-colors">
                 <div className="w-10 h-10 rounded-xl bg-rose-500/20 border border-rose-500/30 flex items-center justify-center text-xs font-bold text-rose-400">
                   {s.avatar}
@@ -192,7 +203,7 @@ export default function TeacherDashboard() {
             </div>
           </div>
           <div className="space-y-3">
-            {AI_SUGGESTIONS.slice(0, 3).map((s, i) => (
+            {(aiSuggestions || []).slice(0, 3).map((s: string, i: number) => (
               <div key={i} className="flex gap-2 text-xs text-base-400 leading-relaxed">
                 <div className="w-5 h-5 rounded-full bg-sky-600/15 flex items-center justify-center flex-shrink-0 mt-0.5">
                   <span className="text-xs text-sky-400">{i + 1}</span>
@@ -213,7 +224,7 @@ export default function TeacherDashboard() {
           </Link>
         </div>
         <div className="grid md:grid-cols-3 gap-4">
-          {COURSES.slice(0, 3).map((c) => (
+          {(courses || []).slice(0, 3).map((c: any) => (
             <div key={c.id} className="p-4 rounded-xl bg-[#1A1A1F] border border-[#27272A] hover:border-sky-600/30 transition-colors">
               <div className="flex items-center justify-between mb-3">
                 <div className="badge bg-sky-500/10 text-sky-400 border border-sky-500/20">{c.category}</div>

@@ -4,9 +4,25 @@ import {
   Search, Filter, MessageSquare, Mail, TrendingUp, TrendingDown,
   AlertTriangle, CheckCircle2, Flame, Star, ChevronRight, ArrowUpDown
 } from 'lucide-react'
-import { STUDENTS, COURSES } from '@/lib/data'
-import type { Student } from '@/lib/data'
+import { api } from '@/lib/api'
+import { useApi } from '@/lib/useApi'
 import { formatDate } from '@/lib/utils'
+
+interface Student {
+  id: string
+  name: string
+  email: string
+  avatar: string
+  level: number
+  xp: number
+  progress: number
+  streak: number
+  lastActive: string
+  risk: 'low' | 'medium' | 'high'
+  courses: string[]
+  completedTasks: number
+  totalTasks: number
+}
 
 const RISK_CONFIG = {
   low: { label: 'Past', color: 'badge-emerald' },
@@ -19,6 +35,10 @@ export default function TeacherStudentsPage() {
   const [filter, setFilter] = useState<'all' | Student['risk']>('all')
   const [selected, setSelected] = useState<Student | null>(null)
   const [sortBy, setSortBy] = useState<'name' | 'progress' | 'xp'>('progress')
+
+  const { data, loading } = useApi(() => api.students())
+  const { data: allCourses } = useApi(() => api.courses())
+  const STUDENTS: Student[] = data || []
 
   const filtered = STUDENTS
     .filter(s => s.name.toLowerCase().includes(search.toLowerCase()))
@@ -204,7 +224,7 @@ export default function TeacherStudentsPage() {
                 <div className="text-xs text-base-500 uppercase tracking-wider mb-2">Yozilgan Kurslar</div>
                 <div className="space-y-2">
                   {selected.courses.map(cid => {
-                    const course = COURSES.find(c => c.id === cid)
+                    const course = (allCourses || []).find((c: any) => c.id === cid)
                     if (!course) return null
                     return (
                       <div key={cid} className="flex items-center justify-between p-3 rounded-xl bg-[#0D0D10]">

@@ -1,13 +1,25 @@
 'use client'
 import { useState } from 'react'
 import {
-  ClipboardList, Clock, CheckCircle2, AlertCircle, XCircle,
+  Clock, CheckCircle2, AlertCircle, XCircle,
   Upload, Code2, FileQuestion, FolderGit2, ChevronRight,
-  Filter, Calendar, Star
+  Calendar, Star
 } from 'lucide-react'
-import { ASSIGNMENTS } from '@/lib/data'
+import { api } from '@/lib/api'
+import { useApi } from '@/lib/useApi'
 import { formatDate } from '@/lib/utils'
-import type { Assignment } from '@/lib/data'
+
+interface Assignment {
+  id: string
+  title: string
+  course?: string
+  description: string
+  dueDate: string
+  status: 'pending' | 'submitted' | 'graded' | 'late'
+  grade?: number
+  maxGrade: number
+  type: 'coding' | 'quiz' | 'project'
+}
 
 const STATUS_CONFIG = {
   pending:   { label: 'Kutilmoqda', color: 'badge-amber', icon: Clock },
@@ -151,13 +163,16 @@ export default function AssignmentsPage() {
   const [filter, setFilter] = useState<'all' | Assignment['status']>('all')
   const [selected, setSelected] = useState<Assignment | null>(null)
 
-  const filtered = filter === 'all' ? ASSIGNMENTS : ASSIGNMENTS.filter(a => a.status === filter)
+  const { data, loading } = useApi(() => api.myAssignments())
+  const assignments: Assignment[] = data || []
 
-  const pending = ASSIGNMENTS.filter(a => a.status === 'pending').length
-  const submitted = ASSIGNMENTS.filter(a => a.status === 'submitted').length
-  const graded = ASSIGNMENTS.filter(a => a.status === 'graded').length
-  const avgGrade = ASSIGNMENTS.filter(a => a.grade !== undefined).reduce((s, a) => s + (a.grade ?? 0), 0) /
-    (ASSIGNMENTS.filter(a => a.grade !== undefined).length || 1)
+  const filtered = filter === 'all' ? assignments : assignments.filter(a => a.status === filter)
+
+  const pending = assignments.filter(a => a.status === 'pending').length
+  const submitted = assignments.filter(a => a.status === 'submitted').length
+  const graded = assignments.filter(a => a.status === 'graded').length
+  const graded_list = assignments.filter(a => a.grade !== undefined)
+  const avgGrade = graded_list.reduce((s, a) => s + (a.grade ?? 0), 0) / (graded_list.length || 1)
 
   return (
     <div className="max-w-5xl mx-auto space-y-6 animate-fade-in">

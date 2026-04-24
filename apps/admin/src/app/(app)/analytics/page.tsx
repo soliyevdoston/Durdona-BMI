@@ -4,7 +4,8 @@ import {
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend
 } from 'recharts'
-import { ANALYTICS_DATA } from '@/lib/data'
+import { api } from '@/lib/api'
+import { useApi } from '@/lib/useApi'
 
 const COLORS = ['#7C3AED', '#0EA5E9', '#10B981', '#F59E0B', '#EF4444']
 
@@ -36,6 +37,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 }
 
 export default function AdminAnalyticsPage() {
+  const { data: growth } = useApi(() => api.growth())
   return (
     <div className="max-w-7xl mx-auto space-y-6 animate-fade-in">
       <div>
@@ -120,7 +122,7 @@ export default function AdminAnalyticsPage() {
           <p className="text-xs text-base-500 mt-0.5">Oylik dinamika</p>
         </div>
         <ResponsiveContainer width="100%" height={260}>
-          <AreaChart data={ANALYTICS_DATA.studentProgress}>
+          <AreaChart data={growth || []}>
             <defs>
               <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#7C3AED" stopOpacity={0.3} />

@@ -1,8 +1,9 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
-import { Search, Filter, BookOpen, Users, Star, Clock, ChevronRight, Play } from 'lucide-react'
-import { COURSES } from '@/lib/data'
+import { Search, BookOpen, Users, Star, Clock, ChevronRight, Play } from 'lucide-react'
+import { api } from '@/lib/api'
+import { useApi } from '@/lib/useApi'
 import { getDifficultyColor, getDifficultyLabel } from '@/lib/utils'
 
 const CATEGORIES = ['Barchasi', 'Dasturlash', 'Web', 'Database', 'Tarmoq', 'Security']
@@ -21,9 +22,11 @@ export default function CoursesPage() {
   const [category, setCategory] = useState('Barchasi')
   const [filter, setFilter] = useState<'all' | 'enrolled' | 'available'>('all')
 
-  const filtered = COURSES.filter(c => {
+  const { data: courses, loading } = useApi(() => api.courses())
+
+  const filtered = (courses || []).filter((c: any) => {
     const matchSearch = c.title.toLowerCase().includes(search.toLowerCase()) ||
-      c.tags.some(t => t.toLowerCase().includes(search.toLowerCase()))
+      (c.tags || []).some((t: string) => t.toLowerCase().includes(search.toLowerCase()))
     const matchCat = category === 'Barchasi' || c.category === category
     const matchFilter = filter === 'all' || (filter === 'enrolled' && (c.progress ?? 0) > 0) || (filter === 'available' && (c.progress ?? 0) === 0)
     return matchSearch && matchCat && matchFilter
@@ -64,11 +67,13 @@ export default function CoursesPage() {
       </div>
 
       {/* Count */}
-      <div className="text-sm text-base-500">{filtered.length} kurs topildi</div>
+      <div className="text-sm text-base-500">
+        {loading ? 'Yuklanmoqda...' : `${filtered.length} kurs topildi`}
+      </div>
 
       {/* Grid */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {filtered.map((course) => {
+        {filtered.map((course: any) => {
           const thumb = THUMBNAIL_MAP[course.thumbnail] || { emoji: '📚', color: 'from-base-700 to-base-600' }
           const enrolled = (course.progress ?? 0) > 0
           return (
@@ -88,7 +93,7 @@ export default function CoursesPage() {
               <div className="p-5">
                 {/* Tags */}
                 <div className="flex gap-1.5 mb-3 flex-wrap">
-                  {course.tags.slice(0, 3).map(tag => (
+                  {(course.tags || []).slice(0, 3).map((tag: string) => (
                     <span key={tag} className="text-xs px-2 py-0.5 rounded-full bg-[#1A1A1F] text-base-500 border border-[#27272A]">{tag}</span>
                   ))}
                 </div>

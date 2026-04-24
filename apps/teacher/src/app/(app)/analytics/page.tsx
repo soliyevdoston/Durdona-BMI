@@ -5,7 +5,8 @@ import {
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar
 } from 'recharts'
 import { Download, Calendar, TrendingUp, TrendingDown, Users, Target, Zap, Brain } from 'lucide-react'
-import { ANALYTICS_DATA, STUDENTS, COURSES, AI_SUGGESTIONS } from '@/lib/data'
+import { api } from '@/lib/api'
+import { useApi } from '@/lib/useApi'
 
 const COLORS = ['#7C3AED', '#0EA5E9', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6']
 
@@ -43,6 +44,10 @@ const CATEGORY_DISTRIBUTION = [
 ]
 
 export default function TeacherAnalyticsPage() {
+  const { data: growth } = useApi(() => api.growth())
+  const { data: difficulty } = useApi(() => api.difficulty())
+  const { data: weekly } = useApi(() => api.weekly())
+  const { data: aiSuggestions } = useApi(() => api.aiSuggestions())
   return (
     <div className="max-w-7xl mx-auto space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
@@ -113,7 +118,7 @@ export default function TeacherAnalyticsPage() {
           </div>
         </div>
         <ResponsiveContainer width="100%" height={280}>
-          <AreaChart data={ANALYTICS_DATA.studentProgress}>
+          <AreaChart data={growth || []}>
             <defs>
               <linearGradient id="c1" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#7C3AED" stopOpacity={0.3} />
@@ -143,13 +148,13 @@ export default function TeacherAnalyticsPage() {
             <p className="text-xs text-base-500 mt-0.5">Qaysi mavzular talabalar uchun qiyin</p>
           </div>
           <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={ANALYTICS_DATA.topicDifficulty} layout="vertical" margin={{ left: 20 }}>
+            <BarChart data={difficulty || []} layout="vertical" margin={{ left: 20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#1E1E24" />
               <XAxis type="number" domain={[0, 100]} axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#52525B' }} />
               <YAxis type="category" dataKey="topic" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#A1A1AA' }} width={85} />
               <Tooltip content={<CustomTooltip />} />
               <Bar dataKey="difficulty" radius={[0, 6, 6, 0]}>
-                {ANALYTICS_DATA.topicDifficulty.map((e, i) => (
+                {(difficulty || []).map((e: any, i: number) => (
                   <Cell key={i} fill={e.difficulty > 80 ? '#EF4444' : e.difficulty > 60 ? '#F59E0B' : '#10B981'} />
                 ))}
               </Bar>
@@ -202,7 +207,7 @@ export default function TeacherAnalyticsPage() {
             <p className="text-xs text-base-500 mt-0.5">Kun bo'yicha o'rtacha daqiqalar</p>
           </div>
           <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={ANALYTICS_DATA.weeklyActivity}>
+            <BarChart data={weekly || []}>
               <CartesianGrid strokeDasharray="3 3" stroke="#1E1E24" />
               <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#52525B' }} />
               <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#52525B' }} />
@@ -226,7 +231,7 @@ export default function TeacherAnalyticsPage() {
           </div>
         </div>
         <div className="grid md:grid-cols-2 gap-3">
-          {AI_SUGGESTIONS.map((s, i) => (
+          {(aiSuggestions || []).map((s: string, i: number) => (
             <div key={i} className="flex gap-3 p-4 rounded-xl bg-[#1A1A1F] border border-[#27272A]">
               <div className="w-7 h-7 rounded-lg bg-accent-600/20 flex items-center justify-center flex-shrink-0">
                 <span className="text-xs font-bold text-accent-400">{i + 1}</span>

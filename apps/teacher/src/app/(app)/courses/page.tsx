@@ -2,7 +2,8 @@
 import Link from 'next/link'
 import { Plus, Users, Star, MoreVertical, Edit, Copy, Trash2, Eye, BookOpen, Clock } from 'lucide-react'
 import { useState } from 'react'
-import { COURSES } from '@/lib/data'
+import { api } from '@/lib/api'
+import { useApi } from '@/lib/useApi'
 import { getDifficultyColor, getDifficultyLabel } from '@/lib/utils'
 
 const THUMB_MAP: Record<string, { emoji: string; color: string }> = {
@@ -16,7 +17,8 @@ const THUMB_MAP: Record<string, { emoji: string; color: string }> = {
 
 export default function TeacherCoursesPage() {
   const [menuOpen, setMenuOpen] = useState<string | null>(null)
-  const myCourses = COURSES.slice(0, 4)
+  const { data } = useApi(() => api.myCourses())
+  const myCourses: any[] = data || []
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 animate-fade-in">
@@ -54,7 +56,7 @@ export default function TeacherCoursesPage() {
 
       {/* Courses Grid */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {myCourses.map((course) => {
+        {myCourses.map((course: any) => {
           const thumb = THUMB_MAP[course.thumbnail] || { emoji: '📚', color: 'from-base-700 to-base-600' }
           return (
             <div key={course.id} className="card hover:border-sky-600/30 transition-all duration-300 overflow-hidden relative">

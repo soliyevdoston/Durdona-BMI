@@ -4,19 +4,9 @@ import {
   Search, Filter, Plus, MoreVertical, Edit, Trash2, Ban, Shield,
   UserPlus, Mail, Download, Users, UserCheck, UserX, Crown
 } from 'lucide-react'
-import { STUDENTS } from '@/lib/data'
+import { api } from '@/lib/api'
+import { useApi } from '@/lib/useApi'
 import { formatDate } from '@/lib/utils'
-
-const ALL_USERS = [
-  ...STUDENTS.map(s => ({
-    id: s.id, name: s.name, email: s.email, role: 'student' as const, avatar: s.avatar,
-    status: s.risk === 'high' ? 'inactive' : 'active', joinedAt: '2024-09-01', lastSeen: s.lastActive,
-  })),
-  { id: 'u-t1', name: 'Dilnoza Yusupova', email: 'teacher@edu.uz', role: 'teacher' as const, avatar: 'DY', status: 'active', joinedAt: '2023-09-01', lastSeen: '2026-04-23' },
-  { id: 'u-t2', name: 'Bobur Toshmatov', email: 'bobur.t@edu.uz', role: 'teacher' as const, avatar: 'BT', status: 'active', joinedAt: '2023-10-15', lastSeen: '2026-04-23' },
-  { id: 'u-t3', name: 'Laziz Abdullayev', email: 'laziz@edu.uz', role: 'teacher' as const, avatar: 'LA', status: 'active', joinedAt: '2024-02-20', lastSeen: '2026-04-22' },
-  { id: 'u-a1', name: 'Sardor Nazarov', email: 'admin@edu.uz', role: 'admin' as const, avatar: 'SN', status: 'active', joinedAt: '2023-01-15', lastSeen: '2026-04-23' },
-]
 
 const ROLE_CONFIG = {
   student: { label: 'Talaba', color: 'badge-accent', icon: '👨‍💻' },
@@ -31,6 +21,13 @@ export default function AdminUsersPage() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all')
   const [menuOpen, setMenuOpen] = useState<string | null>(null)
   const [showAdd, setShowAdd] = useState(false)
+
+  const { data, loading } = useApi(() => api.users())
+  const ALL_USERS: any[] = (data || []).map((u: any) => ({
+    ...u,
+    status: 'active',
+    lastSeen: u.lastActive || u.joinedAt,
+  }))
 
   const filtered = ALL_USERS.filter(u => {
     const matchSearch = u.name.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase())
@@ -128,7 +125,7 @@ export default function AdminUsersPage() {
             </thead>
             <tbody>
               {filtered.map((u) => {
-                const rc = ROLE_CONFIG[u.role]
+                const rc = (ROLE_CONFIG as any)[u.role] || ROLE_CONFIG.student
                 return (
                   <tr key={u.id} className="border-b border-[#1E1E24] hover:bg-[#1A1A1F]/50 transition-colors">
                     <td className="px-4 py-3">

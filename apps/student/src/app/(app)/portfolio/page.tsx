@@ -2,8 +2,9 @@
 import { useState } from 'react'
 import { Award, Star, Lock, Download, Share2, Trophy, Flame, Code2, BookOpen, Zap } from 'lucide-react'
 import { useAuthStore } from '@/lib/store'
-import { ACHIEVEMENTS, COURSES } from '@/lib/data'
-import { getLevelFromXP, getRankLabel } from '@/lib/utils'
+import { api } from '@/lib/api'
+import { useApi } from '@/lib/useApi'
+import { getLevelFromXP, getRankLabel, iconEmoji } from '@/lib/utils'
 
 const CERTIFICATES = [
   { id: 'cert-1', title: 'Python Dasturlash Asoslari', date: '2025-03-15', score: 94, color: 'from-blue-700 to-cyan-700' },
@@ -19,12 +20,17 @@ const PROJECTS = [
 export default function PortfolioPage() {
   const { user } = useAuthStore()
   const [tab, setTab] = useState<'achievements' | 'certificates' | 'projects'>('achievements')
+
+  const { data: achievements } = useApi(() => api.achievements())
+  const { data: courses } = useApi(() => api.myCourses())
+
   if (!user) return null
 
   const { level } = getLevelFromXP(user.xp)
-  const earned = ACHIEVEMENTS.filter(a => a.earned)
-  const notEarned = ACHIEVEMENTS.filter(a => !a.earned)
-  const completedCourses = COURSES.filter(c => (c.progress ?? 0) >= 100).length
+  const achList: any[] = achievements || []
+  const earned = achList.filter(a => a.earned)
+  const notEarned = achList.filter(a => !a.earned)
+  const completedCourses = (courses || []).filter((c: any) => (c.progress ?? 0) >= 100).length
 
   return (
     <div className="max-w-5xl mx-auto space-y-6 animate-fade-in">
@@ -72,7 +78,7 @@ export default function PortfolioPage() {
           {[
             { label: 'Daraja', value: level, icon: Trophy, color: 'text-amber-400' },
             { label: 'Jami XP', value: user.xp.toLocaleString(), icon: Zap, color: 'text-accent-400' },
-            { label: 'Kurslar', value: COURSES.filter(c => (c.progress ?? 0) > 0).length, icon: BookOpen, color: 'text-sky-400' },
+            { label: 'Kurslar', value: (courses || []).filter((c: any) => (c.progress ?? 0) > 0).length, icon: BookOpen, color: 'text-sky-400' },
             { label: 'Loyihalar', value: PROJECTS.length, icon: Code2, color: 'text-emerald-400' },
           ].map(s => (
             <div key={s.label} className="text-center">
@@ -106,7 +112,7 @@ export default function PortfolioPage() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {earned.map((ach) => (
                 <div key={ach.id} className="card p-4 flex items-start gap-3 hover:border-accent-600/30 transition-colors">
-                  <span className="text-3xl flex-shrink-0">{ach.icon}</span>
+                  <span className="text-3xl flex-shrink-0">{iconEmoji(ach.icon)}</span>
                   <div className="flex-1 min-w-0">
                     <div className="font-semibold text-sm text-base-100">{ach.title}</div>
                     <div className="text-xs text-base-500 mt-0.5">{ach.description}</div>
@@ -124,7 +130,7 @@ export default function PortfolioPage() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {notEarned.map((ach) => (
                 <div key={ach.id} className="card p-4 flex items-start gap-3 opacity-40">
-                  <span className="text-3xl flex-shrink-0 grayscale">{ach.icon}</span>
+                  <span className="text-3xl flex-shrink-0 grayscale">{iconEmoji(ach.icon)}</span>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-0.5">
                       <div className="font-semibold text-sm text-base-500">{ach.title}</div>

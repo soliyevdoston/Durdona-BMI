@@ -7,8 +7,9 @@ import {
   Award, Brain, Bell, LogOut, ChevronRight, Flame, Star, Menu, X
 } from 'lucide-react'
 import { useAuthStore } from '@/lib/store'
+import { api } from '@/lib/api'
+import { useApi } from '@/lib/useApi'
 import { getLevelFromXP, getRankLabel } from '@/lib/utils'
-import { NOTIFICATIONS } from '@/lib/data'
 
 const NAV_ITEMS = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Bosh sahifa' },
@@ -25,7 +26,9 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
   const { user, logout } = useAuthStore()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
-  const unread = NOTIFICATIONS.filter(n => !n.read).length
+  const { data: notifications } = useApi(() => api.notifications())
+  const notifList = notifications || []
+  const unread = notifList.filter((n: any) => !n.read).length
 
   useEffect(() => {
     if (!user || user.role !== 'student') router.push('/login')
@@ -149,7 +152,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
                       <X className="w-4 h-4 text-base-500" />
                     </button>
                   </div>
-                  {NOTIFICATIONS.map((n) => (
+                  {notifList.map((n: any) => (
                     <div key={n.id} className={`px-4 py-3 border-b border-[#1E1E24] hover:bg-[#222229] transition-colors ${!n.read ? 'bg-accent-600/5' : ''}`}>
                       <div className="flex items-start gap-2">
                         {!n.read && <div className="w-1.5 h-1.5 rounded-full bg-accent-500 mt-1.5 flex-shrink-0" />}
