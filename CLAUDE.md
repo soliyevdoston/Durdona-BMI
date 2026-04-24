@@ -251,6 +251,22 @@ Vercel'da **Framework Preset** avtomatik Next.js aniqlaydi. Boshqa sozlama shart
 
 ## 📝 Development Log
 
+### Sessiya 5 — 2026-04-24 (4-chi app: landing)
+- ✅ Yangi `apps/landing/` app yaratildi — **asosiy kirish sahifasi**
+- ✅ Landing — rol-tanlovchi: Talaba / O'qituvchi / Admin kartochkalari
+- ✅ 3 ta kartochka tegishli panel URL'iga yo'naltiradi (env var orqali):
+  - `NEXT_PUBLIC_STUDENT_URL`
+  - `NEXT_PUBLIC_TEACHER_URL`
+  - `NEXT_PUBLIC_ADMIN_URL`
+- ✅ Student app'dagi landing page olib tashlandi — endi `/` → `/login` redirect
+- ✅ Port'lar yangilandi:
+  - landing: 3000 (asosiy)
+  - student: 3001
+  - teacher: 3002
+  - admin: 3003
+- ✅ Jami 5 ta deploy: 1 backend (Render) + 4 frontend (Vercel)
+- ✅ README, CLAUDE.md yangilandi — yangi arxitektura bilan
+
 ### Sessiya 4 — 2026-04-24 (Neon PostgreSQL + Prisma)
 - ✅ In-memory storage → **Prisma ORM + Neon PostgreSQL**
 - ✅ `backend/prisma/schema.prisma` — 10 model (User, Course, Lesson, Enrollment, LessonProgress, Assignment, Submission, Notification, Achievement, UserAchievement, ActivityLog)
