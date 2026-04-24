@@ -1,0 +1,183 @@
+// EduCode — Prisma schema
+// Neon PostgreSQL bilan ishlaydi
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ────────────────────────── Modellar ──────────────────────────
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String   @default("student") // student | teacher | admin | super_admin
+  avatar       String
+  xp           Int      @default(0)
+  level        Int      @default(1)
+  streak       Int      @default(0)
+  lastActive   DateTime @default(now())
+  joinedAt     DateTime @default(now())
+
+  coursesTaught    Course[]         @relation("Instructor")
+  enrollments      Enrollment[]
+  lessonProgress   LessonProgress[]
+  submissions      Submission[]
+  notifications    Notification[]
+  achievements     UserAchievement[]
+  logs             ActivityLog[]
+
+  @@index([role])
+  @@index([email])
+}
+
+model Course {
+  id           String   @id @default(cuid())
+  title        String
+  description  String
+  instructorId String
+  instructor   User     @relation("Instructor", fields: [instructorId], references: [id])
+  category     String
+  difficulty   String   @default("beginner")
+  duration     String
+  rating       Float    @default(0)
+  thumbnail    String   @default("python")
+  tags         String[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  lessons      Lesson[]
+  enrollments  Enrollment[]
+  assignments  Assignment[]
+
+  @@index([instructorId])
+  @@index([category])
+}
+
+model Enrollment {
+  userId           String
+  courseId         String
+  progress         Int      @default(0)
+  completedLessons Int      @default(0)
+  enrolledAt       DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@id([userId, courseId])
+  @@index([courseId])
+}
+
+model Lesson {
+  id        String  @id @default(cuid())
+  courseId  String
+  course    Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title     String
+  duration  String
+  type      String  // video | text | quiz | practice
+  order     Int
+  xpReward  Int     @default(10)
+  content   String? @db.Text
+
+  progress  LessonProgress[]
+
+  @@index([courseId])
+}
+
+model LessonProgress {
+  userId      String
+  lessonId    String
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@id([userId, lessonId])
+}
+
+model Assignment {
+  id          String   @id @default(cuid())
+  title       String
+  courseId    String
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  description String
+  dueDate     DateTime
+  maxGrade    Int      @default(100)
+  type        String   // coding | quiz | project
+  createdAt   DateTime @default(now())
+
+  submissions Submission[]
+
+  @@index([courseId])
+}
+
+model Submission {
+  id           String     @id @default(cuid())
+  assignmentId String
+  assignment   Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content      String     @db.Text
+  status       String     @default("submitted") // submitted | graded | late
+  grade        Int?
+  feedback     String?
+  submittedAt  DateTime   @default(now())
+  gradedAt     DateTime?
+
+  @@index([assignmentId])
+  @@index([userId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String
+  title     String
+  body      String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Achievement {
+  id          String @id
+  title       String
+  description String
+  icon        String
+  xpReward    Int
+  category    String
+
+  earnedBy    UserAchievement[]
+}
+
+model UserAchievement {
+  userId        String
+  achievementId String
+  earnedAt      DateTime @default(now())
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@id([userId, achievementId])
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action    String
+  meta      Json?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}

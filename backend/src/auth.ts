@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken'
 import { Request, Response, NextFunction } from 'express'
-import { Role } from './types'
+
+export type Role = 'student' | 'teacher' | 'admin' | 'super_admin'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-only-insecure-secret-change-in-prod'
 const JWT_EXPIRES_IN = (process.env.JWT_EXPIRES_IN || '7d') as any

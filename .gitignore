@@ -1,14 +1,29 @@
-node_modules/
-.next/
-out/
-build/
-.env
-.env.local
-.env.production
+# Dependencies
+**/node_modules/
+
+# Next.js
+**/.next/
+**/out/
+**/build/
+
+# Backend
+backend/dist/
+
+# Environments
+**/.env
+**/.env.local
+**/.env.production
+
+# Logs
 *.log
+
+# OS
 .DS_Store
+
+# Editor
 .vscode/
 .idea/
-coverage/
-*.pem
-next-env.d.ts
+
+# TypeScript
+**/next-env.d.ts
+**/tsconfig.tsbuildinfo

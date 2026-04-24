@@ -1,384 +1,305 @@
-# EduCode — Virtual AKT Classroom Platform
+# EduCode — AKT Virtual Sinf (Monorepo)
 
-> Zamonaviy, sun'iy intellekt bilan kuchaytirilgan AKT ta'lim platformasi.
-> TATU bitiruv malakaviy ishi uchun to'liq ishlaydigan prototip.
-
----
-
-## 📌 Loyiha Haqida
-
-**EduCode** — Axborot va Kommunikatsiya Texnologiyalari (AKT) fanlarini virtual muhitda o'qitish uchun mo'ljallangan zamonaviy web platforma. Oddiy LMS dan farqli o'laroq, bu tizim:
-
-- **Mikrodarslar** (Microlearning) — qisqa, fokuslangan modullar
-- **Amaliyot-birinchi** yondashuv (70% amaliy / 30% nazariy)
-- **AI yordamchi** (real vaqt tahlil va tushuntirish)
-- **Gamifikatsiya** (XP, darajalar, nishonlar, seriyalar)
-- **Adaptiv o'qish** (talabaning darajasiga moslashadigan qiyinlik)
-- **Jonli kod muhiti** (brauzerdagi IDE)
-- **Didaktik tahlil** (mavzu qiyinligi, zaif joylar xaritasi)
-
-Maqsad: **o'qish samaradorligini oshirish** va **o'qituvchi ish yukini kamaytirish**.
+> TATU bitiruv malakaviy ishi, 2026. 4 ta mustaqil loyihadan iborat.
 
 ---
 
-## 🛠️ Texnologik Stack
-
-| Qatlam | Texnologiya |
-|---|---|
-| **Frontend** | Next.js 14 (App Router), React 18, TypeScript |
-| **Styling** | Tailwind CSS 3.4 (custom design tokens) |
-| **Charts** | Recharts 2.12 |
-| **State** | Zustand 4.5 (persist middleware) |
-| **Icons** | Lucide React |
-| **Animations** | CSS keyframes + Framer Motion ready |
-| **Planlashtirilgan Backend** | Node.js / Django + PostgreSQL |
-| **Realtime** | WebSocket (Socket.io ready) |
-| **Code Sandbox** | Docker container isolation |
-| **AI** | OpenAI GPT-4 / Claude API |
-
----
-
-## 📁 Loyiha Strukturasi
+## 🏗 Arxitektura
 
 ```
 Durdona BMI/
-├── package.json              # dependencies
-├── next.config.mjs           # next.js config
-├── tailwind.config.ts        # design tokens
+├── backend/              ←  Render'ga deploy (1 ta)
+├── apps/
+│   ├── student/          ←  Vercel deploy #1 (alohida)
+│   ├── teacher/          ←  Vercel deploy #2 (alohida)
+│   └── admin/            ←  Vercel deploy #3 (alohida)
+├── README.md
+└── CLAUDE.md
+```
+
+Har frontend app — **alohida Next.js loyihasi**. Barchasi bitta backend bilan gaplashadi.
+
+```
+Vercel #1 (student.vercel.app) ──┐
+Vercel #2 (teacher.vercel.app) ──┼──→  Render (educode-backend.onrender.com)
+Vercel #3 (admin.vercel.app)   ──┘
+```
+
+---
+
+## 🛠 Texnologiyalar
+
+| Qatlam | Stack |
+|---|---|
+| **Backend** | Node.js 20 · Express 4 · TypeScript · JWT · bcryptjs · CORS · Morgan |
+| **Frontend (×3)** | Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · Zustand · Recharts · Lucide |
+| **Ma'lumotlar** | In-memory (hozir) → PostgreSQL (keyingi bosqich) |
+| **Auth** | JWT (access token, 7 kun) + role-based routing |
+| **Hosting** | Render (backend) + Vercel (3 ta frontend) |
+
+---
+
+## 📁 Loyiha tuzilmasi
+
+### backend/
+```
+backend/
+├── package.json
+├── tsconfig.json
+├── render.yaml         ← Render blueprint
+├── .env.example
+├── README.md
+└── src/
+    ├── index.ts         ← Express app
+    ├── auth.ts          ← JWT + requireAuth/requireRole middleware
+    ├── db.ts            ← In-memory store + seed
+    ├── types.ts         ← TypeScript interfaces
+    └── routes/
+        ├── auth.ts      ← login, register, me, logout
+        ├── users.ts     ← CRUD (admin)
+        ├── courses.ts   ← CRUD, enroll
+        ├── lessons.ts   ← complete (XP beradi)
+        ├── assignments.ts  ← submit, grade
+        └── misc.ts      ← notifications, achievements, analytics, ai/chat, code/run
+```
+
+### apps/{student,teacher,admin}/
+```
+apps/<role>/
+├── package.json
+├── next.config.mjs
+├── tailwind.config.ts
 ├── postcss.config.js
 ├── tsconfig.json
-├── CLAUDE.md                 # bu fayl
-│
+├── vercel.json
+├── .env.example           ← NEXT_PUBLIC_API_URL
 └── src/
     ├── app/
-    │   ├── layout.tsx         # root layout (dark mode, Inter font)
-    │   ├── page.tsx           # landing page (SaaS-style)
-    │   ├── globals.css        # Tailwind + custom CSS
-    │   │
-    │   ├── (auth)/
-    │   │   ├── login/page.tsx       # rolga asoslangan tezkor login
-    │   │   └── register/page.tsx    # 2-bosqichli ro'yxat
-    │   │
-    │   ├── student/          # 🟣 Talaba paneli (violet accent)
-    │   │   ├── layout.tsx            # sidebar + user card + XP bar
-    │   │   ├── dashboard/page.tsx    # welcome, stats, tasks, AI tip
-    │   │   ├── courses/page.tsx      # kurslar katalogi
-    │   │   ├── courses/[id]/page.tsx # dars ko'rinishi + AI chat + quiz
-    │   │   ├── playground/page.tsx   # kod muhiti (Python/JS/SQL)
-    │   │   ├── assignments/page.tsx  # topshiriqlar
-    │   │   ├── portfolio/page.tsx    # nishonlar, sertifikatlar, loyihalar
-    │   │   └── ai/page.tsx           # AI chat (markdown rendering)
-    │   │
-    │   ├── teacher/           # 🔵 O'qituvchi paneli (sky accent)
-    │   │   ├── layout.tsx
-    │   │   ├── dashboard/page.tsx       # overview, at-risk, AI insights
-    │   │   ├── courses/page.tsx         # mening kurslarim
-    │   │   ├── create-course/page.tsx   # 3-bosqichli kurs yaratish
-    │   │   ├── students/page.tsx        # talabalar jadvali + detail modal
-    │   │   ├── assignments/page.tsx     # baholash kutilayotgan ishlar
-    │   │   ├── analytics/page.tsx       # heatmap, radar, pie charts
-    │   │   └── live/page.tsx            # jonli dars (video, chat, share)
-    │   │
-    │   └── admin/             # 🟢 Admin paneli (emerald accent)
-    │       ├── layout.tsx
-    │       ├── dashboard/page.tsx    # system health + activity log
-    │       ├── users/page.tsx        # foydalanuvchi CRUD
-    │       ├── courses/page.tsx      # kurslar boshqaruvi
-    │       ├── analytics/page.tsx    # revenue, o'sish
-    │       ├── system/page.tsx       # server monitoring, backup
-    │       ├── logs/page.tsx         # audit logs
-    │       ├── security/page.tsx     # xavfsizlik auditi
-    │       └── settings/page.tsx     # 6 bo'lim sozlamalari
-    │
+    │   ├── layout.tsx
+    │   ├── globals.css
+    │   ├── page.tsx           ← landing (yoki /login ga redirect)
+    │   ├── login/page.tsx
+    │   ├── register/page.tsx
+    │   └── (app)/             ← auth-protected route group
+    │       ├── layout.tsx     ← sidebar + header
+    │       └── (role-specific pages)
     └── lib/
-        ├── utils.ts           # cn, formatDate, XP helpers
-        ├── store.ts           # Zustand (auth + UI state)
-        └── data.ts            # mock data (courses, students, etc)
+        ├── api.ts             ← fetch wrapper, barcha endpoint'lar
+        ├── store.ts           ← Zustand auth store
+        ├── utils.ts
+        └── data.ts            ← mock fallback (keyin o'chirish mumkin)
 ```
 
----
+### Sahifalar ro'yxati
 
-## 🎨 UI/UX Dizayn Tizimi
+**Student app:**
+- `/` landing
+- `/login`, `/register`
+- `/dashboard` — XP, kurslar, vazifalar, AI tip
+- `/courses`, `/courses/[id]` — katalog va dars pleyer
+- `/playground` — kod muhiti (Python/JS/SQL)
+- `/assignments` — topshiriqlar
+- `/portfolio` — yutuqlar, sertifikatlar
+- `/ai` — AI chat
 
-### Rang Palitrasi
-- **Base (background)**: `#09090B` → `#18181B` → `#27272A`
-- **Accent (talaba)**: Violet `#7C3AED` (primary), `#8B5CF6` (hover)
-- **Teacher**: Sky `#0EA5E9`
-- **Admin**: Emerald `#10B981`
-- **Status**: Emerald (success), Amber (warn), Rose (error), Sky (info)
+**Teacher app:**
+- `/` redirect → login/dashboard
+- `/login`, `/register`
+- `/dashboard` — KPI, at-risk, chart'lar
+- `/courses`, `/create-course` (3-step wizard)
+- `/students` — talabalar jadvali
+- `/assignments` — baholash
+- `/analytics` — heatmap, radar, pie
+- `/live` — jonli dars UI
 
-### Tipografiya
-- **Sans**: Inter (300-800)
-- **Mono**: JetBrains Mono (kod va muhim raqamlar uchun)
-- **Scale**: text-xs (12px) → text-2xs (10px) → text-3xl (30px)
-
-### Komponent Tizimi
-Barcha komponentlar `globals.css` dagi utility klaslarga asoslangan:
-
-- `.card` — asosiy konteyner (`#111113` + `#1E1E24` chegara + 2xl radius)
-- `.card-elevated` — ko'tarilgan konteyner (modallar, dropdownlar)
-- `.btn-primary` — accent-rangli asosiy tugma
-- `.btn-secondary` — neutral tugma (chegara bilan)
-- `.btn-ghost` — transparent tugma
-- `.input` — form elementi (fokusda accent halqasi)
-- `.badge-*` — rangli belgilar (accent/emerald/amber/sky/rose)
-- `.progress-bar` + `.progress-fill` — gradient progress
-- `.nav-link` + `.nav-link-active` — sidebar elementi
-- `.text-gradient` + `.text-gradient-accent` — gradient matn
-
-### Animatsiyalar
-- `animate-fade-in` (0.4s ease-out)
-- `animate-slide-up` (16px pastdan yuqoriga)
-- `animate-slide-in-right` (mobile sidebar)
-- `animate-pulse-slow` (live indikator)
-- `animate-float` (dekorativ elementlar)
+**Admin app:**
+- `/` redirect
+- `/login`, `/register`
+- `/dashboard`, `/users`, `/courses`, `/analytics`, `/system`, `/logs`, `/security`, `/settings`
 
 ---
 
-## 👥 Foydalanuvchi Rollari va Panellari
+## 🔌 Backend bilan ulanish
 
-### 1️⃣ Talaba (Student) — `/student/*`
+Har app'ning `src/lib/store.ts` dagi **`useAuthStore.login()`** funksiyasi `api.login()`ga murojaat qiladi. API `Bearer` token'ni qaytaradi, `localStorage`da saqlanadi va keyingi har bir so'rovda header'ga qo'shiladi.
 
-**Demo kirish:** `student@edu.uz` / `1234`
+```ts
+// apps/student/src/lib/api.ts
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
+```
 
-| Sahifa | Funksionallik |
-|---|---|
-| **Dashboard** | Welcome banner, XP progress, streak, 4 KPI card, faol kurslar, haftalik faollik chart, bugungi vazifalar, AI tavsiya, yutuqlar, yaqin muddatlar |
-| **Courses** | 6 ta kurs, qidiruv, kategoriya filter, "yozilganlar/mavjud" filter, progress bars |
-| **Course Detail** | Darslar ro'yxati (video/text/quiz/practice), lock/unlock holati, quiz (3 savol + baholash), code editor simulator, AI chat |
-| **Playground** | Python/JavaScript/SQL tanlovi, Monaco-style editor, output/tests/AI 3 tab, test case natijalari, AI kod tahlili |
-| **Assignments** | 5 ta topshiriq, status filter (kutilmoqda/topshirildi/baholandi), submit modal, coding uchun textarea, project uchun file upload UI |
-| **Portfolio** | Profil (level badge), 4 KPI, yutuqlar (earned/locked), sertifikatlar (downloadable), loyihalar |
-| **AI Assistant** | Markdown renderli chat, typing indicator, rekursiya/SQL/OOP/tahlil uchun maxsus javoblar, suggested prompts, so'rovlar hisoblagichi |
+**Muhim:** Har rol uchun store'ning `login` chaqiruvida `expectedRole` yuboriladi — masalan, student app'dan teacher hisob bilan kirishga urinish rad etiladi.
 
-**Pedagogik xususiyatlar:**
-- Mikrodars: har dars 8-25 daqiqa
-- Immediate feedback: javob berilgach darhol tushuntirish
-- Gamifikatsiya: XP (10-50 per task), darajalar (1-11), "Grand Master" ranglar
-- Seriyalar (streak): kundalik o'qishni rag'batlantirish
+### API endpoint'lar
 
-### 2️⃣ O'qituvchi (Teacher) — `/teacher/*`
+Batafsil: `backend/README.md`. Qisqacha:
 
-**Demo kirish:** `teacher@edu.uz` / `1234`
-
-| Sahifa | Funksionallik |
-|---|---|
-| **Dashboard** | Welcome + CTA (Jonli dars, Yangi kurs), 4 KPI card, 2 chart (line + bar), xavfli talabalar (rose highlight), AI didaktik tavsiyalar, tezkor kurslar |
-| **My Courses** | Kurslar gridi, menu (view/edit/copy/delete), stats (enrolled, lessons, avg rating) |
-| **Create Course** | 3-step wizard (basic → lessons → publish), tag tizimi, lesson CRUD (video/text/practice/quiz), duration input, publish confirmation |
-| **Students** | 8 ta talaba jadvalida, qidiruv, risk filter (low/medium/high), sorting, detail modal (4 KPI + courses + tasks) |
-| **Assignments** | Active/grading/completed tabs, baholash kutilayotgan ishlar, avg grade, progress bars |
-| **Analytics** | 4 KPI, 5 ta chart (area, bar horizontal, radar, pie, weekly bar), AI didaktik tavsiyalar |
-| **Live** | Video call UI, 6 ishtirokchi grid, chat, participant list, mic/video/share/hand controls, LIVE badge, timer |
-
-**AI xususiyatlar:**
-- At-risk talabani avtomatik aniqlash
-- Mavzu qiyinligi xaritasi (qaysi mavzu qiyin)
-- Didaktik tavsiyalar (vizual ishlatish, qo'shimcha praktika, va h.k.)
-
-### 3️⃣ Admin — `/admin/*`
-
-**Demo kirish:** `admin@edu.uz` / `1234`
-
-| Sahifa | Funksionallik |
-|---|---|
-| **Dashboard** | 4 KPI (users, active, courses, completion), tizim salomatligi (CPU/RAM/uptime), 2 chart (area + pie), activity log, ogohlantirishlar, quick actions |
-| **Users** | Jami 12+ foydalanuvchi, qidiruv, rol filter, status filter, CRUD menu, add user modal |
-| **Courses** | Kurslar jadvali, edit/delete, o'qituvchi, reyting |
-| **Analytics** | Daromad va xarajatlar (bar chart), qurilma taqsimoti (pie), o'sish dinamikasi |
-| **System** | 4 metric (CPU/RAM/storage/network), 24 soatlik monitoring chart, 8 xizmat holati, 4 backup, tizim ma'lumotlari |
-| **Logs** | 10 ta log yozuvi, level filter (info/success/warn/error), timestamp, IP, action |
-| **Security** | Xavfsizlik bali (score ring), 8 tekshiruv, so'nggi hodisalar, AI xavfsizlik tavsiyalari |
-| **Settings** | 6 ta tab: umumiy, email (SMTP), xavfsizlik (2FA toggle), bildirishnomalar, database, ko'rinish (ranglar) |
+- `POST /api/auth/{login,register}` — token qaytaradi
+- `GET /api/auth/me` — joriy foydalanuvchi
+- `GET /api/courses` · `/mine` · `/:id` · `POST /enroll`
+- `POST /api/lessons/:id/complete` — XP beradi
+- `GET /api/assignments/{mine,teaching}` · `POST /submit` · `grade`
+- `GET /api/users` · `/students` · `POST /api/users`
+- `GET /api/{notifications,achievements,analytics/*,system/stats}`
+- `POST /api/ai/chat` · `POST /api/code/run`
 
 ---
 
-## 🚀 O'rnatish va Ishga Tushirish
+## 🚀 Lokalda ishga tushirish
+
+**4 ta terminal:**
 
 ```bash
-# 1. Dependencies o'rnatish
-npm install
+# 1. Backend
+cd backend && npm install && npm run dev
 
-# 2. Dev server ishga tushirish
-npm run dev
+# 2. Student app
+cd apps/student && npm install && npm run dev     # 3000
 
-# 3. Brauzerda oching
-# http://localhost:3000
+# 3. Teacher app
+cd apps/teacher && npm install && npm run dev     # 3001
+
+# 4. Admin app
+cd apps/admin && npm install && npm run dev       # 3002
 ```
 
-### Demo Hisoblar
-| Rol | Email | Parol |
+Oldin `.env`lar:
+
+```bash
+# backend/.env
+PORT=8080
+JWT_SECRET=dev-secret-change-in-prod
+CORS_ORIGINS=*
+
+# apps/<role>/.env.local
+NEXT_PUBLIC_API_URL=http://localhost:8080
+```
+
+---
+
+## 🌐 Deploy
+
+### Backend → Render
+
+1. GitHub repo'ga push
+2. render.com → **New +** → **Web Service**
+3. Root Directory: `backend`
+4. Env vars:
+   - `JWT_SECRET` (auto-generate)
+   - `CORS_ORIGINS` = 3 ta Vercel URL'i, vergul bilan
+5. Deploy → URL oling
+
+### 3 ta Vercel loyihasi
+
+Har birida **Root Directory**ni belgilang:
+
+| Loyiha | Root Directory | Env: NEXT_PUBLIC_API_URL |
 |---|---|---|
-| Talaba | `student@edu.uz` | `1234` |
-| O'qituvchi | `teacher@edu.uz` | `1234` |
-| Admin | `admin@edu.uz` | `1234` |
+| educode-student | `apps/student` | `https://educode-backend.onrender.com` |
+| educode-teacher | `apps/teacher` | (xuddi shunday) |
+| educode-admin | `apps/admin` | (xuddi shunday) |
 
-**Tezkor kirish**: Login sahifasidagi rang-rangli tugmalar orqali bir bosishda kirish mumkin.
-
----
-
-## 📊 Yaratilgan Sahifalar (27 ta)
-
-### Public (2)
-- [x] Landing page (`/`) — hero, features, methodology, courses, roles, testimonials, CTA
-- [x] Login (`/login`), Register (`/register`) — 2-step role selection
-
-### Student (8)
-- [x] Dashboard, Courses, Course Detail, Playground, Assignments, Portfolio, AI Assistant, Layout
-
-### Teacher (8)
-- [x] Dashboard, My Courses, Create Course Wizard, Students, Assignments, Analytics, Live Class, Layout
-
-### Admin (9)
-- [x] Dashboard, Users, Courses, Analytics, System, Logs, Security, Settings, Layout
+Vercel'da **Framework Preset** avtomatik Next.js aniqlaydi. Boshqa sozlama shart emas.
 
 ---
 
-## 🧠 Pedagogik Metodologiyalarning Amaldagi Tatbiqi
+## 🔑 Demo hisoblar
 
-| Metodologiya | Qanday amalga oshirilgan |
+| Email | Parol | Rol | Qaysi app'ga |
+|---|---|---|---|
+| student@edu.uz | 1234 | student | student app |
+| teacher@edu.uz | 1234 | teacher | teacher app |
+| admin@edu.uz | 1234 | admin | admin app |
+
+**Xavfsizlik:** Har app faqat o'z rolini qabul qiladi. Student app'ga teacher hisob bilan kirsangiz backend `403` qaytaradi.
+
+---
+
+## 📖 Pedagogik yondashuv
+
+| Metodologiya | Amaldagi tatbiq |
 |---|---|
-| **Microlearning** | Har dars 8-25 daqiqa, lock/unlock tizimi |
-| **Practice-First (70/30)** | Har mavzuda "practice" tipidagi dars, Playground bilan integratsiya |
-| **Immediate Feedback** | Quiz topshirishdan keyin darhol natija + tushuntirish |
-| **Adaptive Learning** | AI talabaning zaif joylarini aniqlab, shunga mos tavsiya beradi |
-| **Gamification** | XP system, 11 daraja, 10+ nishon, streak, leaderboard ready |
-| **Personalized Paths** | AI assistant har bir talaba progressini tahlil qiladi |
-| **Active Learning** | Interaktiv: quiz, code playground, AI chat, jonli dars |
-| **Continuous Assessment** | Har dars, topshiriq, testda baholash (yakuniy imtihon o'rniga) |
+| Microlearning | Darslar 8–25 daqiqa, lock/unlock |
+| Practice-First (70/30) | `practice` tipidagi dars + playground |
+| Immediate Feedback | Quiz javobidan keyin darhol izoh |
+| Adaptive Learning | AI zaif joylarni aniqlaydi va tavsiya beradi |
+| Gamifikatsiya | XP (10–50), 11 daraja, 10+ nishon, seriya (streak) |
+| Personalized Paths | `/api/analytics/ai-suggestions` har talaba uchun |
+| Active Learning | Quiz, playground, AI chat, jonli dars |
+| Continuous Assessment | Har dars, test, topshiriqda baholash |
 
 ---
 
-## 🔐 Xavfsizlik (Loyihalashtirilgan)
+## 🛡 Xavfsizlik
 
-- **Autentifikatsiya**: JWT + OAuth2 (Zustand persist demo)
-- **Avtorizatsiya**: Role-based routing (layouts redirect logic)
-- **2FA**: Admin uchun majburiy
-- **Parol siyosati**: 8+ belgi, raqam, simvol
-- **Rate limiting**: 100 req/min per IP
-- **SQL injection**: Parameterized queries
-- **XSS**: CSP headers
-- **HTTPS/TLS 1.3**: SSL A+ rating target
-- **Audit logs**: Barcha admin amallari
-- **Encrypted backups**: AES-256
+- **JWT** token (7 kun TTL) · `localStorage`'da
+- **bcrypt** (cost 8) parol hashlash
+- **Role-based auth**: `requireAuth` + `requireRole('teacher', 'admin')`
+- **CORS whitelist**: faqat 3 ta Vercel origin
+- **Parol talabi**: minimum 4 belgi (production: 8+)
 
----
+### Production uchun qo'shimchalar
 
-## 📈 Arxitektura Diagrammasi (Yuqori Daraja)
-
-```
-┌─────────────────────────────────────────────────┐
-│           Client (Next.js 14 SSR+CSR)           │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐      │
-│  │ Student  │  │ Teacher  │  │  Admin   │      │
-│  │  Panel   │  │  Panel   │  │  Panel   │      │
-│  └────┬─────┘  └────┬─────┘  └────┬─────┘      │
-└───────┼──────────────┼──────────────┼──────────┘
-        │              │              │
-        └──────────────┼──────────────┘
-                       ▼
-           ┌───────────────────────┐
-           │    API Gateway        │
-           │  (Node.js / Django)   │
-           └───┬───────┬───────┬───┘
-               │       │       │
-     ┌─────────┘       │       └─────────┐
-     ▼                 ▼                 ▼
-┌──────────┐    ┌──────────┐      ┌──────────┐
-│PostgreSQL│    │  Redis   │      │ Docker   │
-│  (main)  │    │ (cache)  │      │ Sandbox  │
-└──────────┘    └──────────┘      └──────────┘
-                       │
-                       ▼
-              ┌──────────────────┐
-              │  AI Service      │
-              │ (GPT-4/Claude)   │
-              └──────────────────┘
-```
-
----
-
-## 🎯 Keyingi Bosqichlar (Production uchun)
-
-### Backend
-- [ ] PostgreSQL schema (users, courses, lessons, submissions, ...)
-- [ ] REST API (Node.js/Express yoki Django REST)
-- [ ] WebSocket server (jonli dars uchun)
-- [ ] Docker sandbox servisi (izolatsiya qilingan kod bajarish)
-- [ ] AI API proxy (rate limiting bilan)
-
-### Frontend
-- [ ] Real API integratsiya (React Query / SWR)
-- [ ] WebSocket client (jonli dars, chat, notifications)
-- [ ] Monaco Editor real o'rnatish (playground)
-- [ ] Video player (HLS stream)
-- [ ] File upload (S3/Cloudinary)
-
-### DevOps
-- [ ] CI/CD pipeline (GitHub Actions)
-- [ ] Kubernetes manifests
-- [ ] CloudFlare CDN
-- [ ] Sentry (error tracking)
-- [ ] Datadog (APM)
-
-### Xususiyatlar
-- [ ] Plagiat aniqlash (MOSS integratsiya)
-- [ ] Sertifikat PDF generatsiyasi
-- [ ] Tarjima (ru/en)
-- [ ] Mobile app (React Native)
-- [ ] Offline rejim (PWA)
+- [ ] `express-rate-limit` — brute force himoya
+- [ ] `helmet` — security headers
+- [ ] HTTPS-only cookie (JWT'ni localStorage'dan chiqarish)
+- [ ] 2FA adminlar uchun
+- [ ] Refresh token rotation
+- [ ] Prisma + PostgreSQL
 
 ---
 
 ## 📝 Development Log
 
-### Sessiya 2 — 2026-04-24
-- ✅ Dizaynni "AI-yasama" ko'rinishidan tozalash (subtle keyingi bosqich):
-  - Landing: "AI bilan kuchaytirilgan" marketing rozetkasi olib tashlandi
-  - Landing: mesh-gradient glow fonlari olib tashlandi (tekis dark fonlar bilan almashtirildi)
-  - Landing: hero'dagi gradient matn (`text-gradient-accent`) oddiy oq matn bilan almashtirildi
-  - Landing: methodology bo'limidagi emojilar (⚡ 💬 🎯 📊) Check icon'ga almashtirildi
-  - Landing: role kartalaridagi emojilar (👨‍💻 👩‍🏫 ⚙️) olib tashlandi
-  - Landing: 5-yulduzli reytinglar testimonial'dan olib tashlandi (SaaS-vibe kamaytirish)
-  - Landing: "Bugunoq boshlang" accent-gradient CTA tekis card'ga o'zgartirildi
-  - Landing: kurslar katalogi — 6 ta bir xil gradient thumbnail o'rniga toza grid
-  - Landing: nav logo'dan "BookOpen + gradient" o'rniga oddiy "E" monogram
-  - Landing: ochiq eslatma qo'shildi (muallif, TATU BMI 2026, holat)
-  - Dashboard: student welcome'dan 👋 emoji olib tashlandi, gradient glow susaytirildi
-  - Dashboard: teacher welcome'dan "Bugun sizning N talabangiz faol" → aniqroq ma'lumot
-  - Typography: `Instrument Serif` display shrifti qo'shildi (font-display utility)
-- ✅ Sahifa sarlavhalarida sana (weekday) qatori qo'shildi — real sana formati
-- ✅ Stat'lar tabular-nums (hizalangan raqamlar) bilan formatlandi
+### Sessiya 4 — 2026-04-24 (Neon PostgreSQL + Prisma)
+- ✅ In-memory storage → **Prisma ORM + Neon PostgreSQL**
+- ✅ `backend/prisma/schema.prisma` — 10 model (User, Course, Lesson, Enrollment, LessonProgress, Assignment, Submission, Notification, Achievement, UserAchievement, ActivityLog)
+- ✅ `backend/prisma/seed.ts` — demo ma'lumotlarni DB'ga yuklash
+- ✅ Barcha 6 ta route (auth, users, courses, lessons, assignments, misc) Prisma query'lariga o'tkazildi:
+  - `db.users.find(u => u.id === x)` → `await prisma.user.findUnique({ where: { id } })`
+  - `db.courses.filter(...)` → `await prisma.course.findMany({ where: {...} })`
+  - Relations bilan JOIN — `include: { instructor: true, enrollments: true }`
+  - Cascade delete — `onDelete: Cascade`
+  - Indexlar — `@@index([role])`, `@@index([email])` va h.k.
+- ✅ `npm run db:push` Neon DB'ga schema yuklandi
+- ✅ `npm run db:seed` 12 user, 6 course, 10 lesson, 7 enrollment, 5 assignment, 3 submission, 3 notification, 8 achievement yuklandi
+- ✅ Login, courses, achievements, users, system stats endpoint'lari Neon DB'dan real data qaytaradi
+- ✅ `render.yaml` `prisma db push` ni build command'ga qo'shadi
+- ✅ Prisma Studio: `npm run db:studio` — brauzerda DB tahrir qilish
 
-### Sessiya 1 — 2026-04-23
-- ✅ Loyiha skeleti (Next.js 14 + TypeScript + Tailwind)
-- ✅ Design system (zanjirdagi ranglar, tipografiya, komponentlar)
-- ✅ Landing page (hero, features, courses, testimonials, CTA)
-- ✅ Auth (login + register)
-- ✅ Student panel (7 sahifa)
-- ✅ Teacher panel (7 sahifa)
-- ✅ Admin panel (8 sahifa)
-- ✅ Mock data (6 course, 10 lesson, 8 student, 5 assignment, 10 achievement)
-- ✅ Zustand auth store (persist)
-- ✅ CLAUDE.md hujjat
-- ✅ `(student)/`, `(teacher)/`, `(admin)/` route group'lari oddiy papka ga o'zgartirildi (URL to'g'ri ishlashi uchun)
-- ✅ Dependencies o'rnatildi (npm install — 428 paket)
-- ✅ Barcha 27 sahifa HTTP 200 qaytaradi (tekshirilgan)
-- ✅ TypeScript type check muvaffaqiyatli o'tdi
+### Sessiya 3 — 2026-04-24 (Monorepo va backend)
+- ✅ Monorepo tuzilmasi: `backend/` + `apps/student,teacher,admin/`
+- ✅ **Backend (Render-ready)**:
+  - Express + TypeScript + JWT + bcrypt + CORS + Morgan
+  - In-memory db.ts (12 user, 6 course, 10 lesson, 5 assignment, 8 achievement)
+  - 7 ta route guruh: auth, users, courses, lessons, assignments, misc
+  - `render.yaml` blueprint
+  - Role-based middleware (`requireRole('admin', 'super_admin')`)
+  - `/api/health` endpoint
+- ✅ **3 ta frontend app (Vercel-ready)**:
+  - Har biri mustaqil `package.json`, port 3000/3001/3002
+  - `api.ts` — `NEXT_PUBLIC_API_URL` orqali ulanish
+  - `store.ts` — Zustand + backend login, `expectedRole` tekshiruv
+  - `(app)/` route group — protected sahifalar
+  - Avtomatik rol tekshiruvi (student app'da teacher kira olmaydi)
+  - `vercel.json` — deploy config
+- ✅ Barcha sahifalar HTTP 200 qaytaradi, TypeScript xatosiz
+- ✅ Login endpoint backend bilan to'g'ri ishlashi test qilindi
+- ✅ Rol kesishi (teacher login student app'da) — backend 403 qaytaradi
+- ✅ CSS: katak (grid) naqsh butun saytda, `bg-app` utility
 
-**Jami:** 27 ta sahifa, ~4200 qator TypeScript kod, 100% responsive, to'liq ishlaydigan.
+### Sessiya 2 — 2026-04-24 (Dizayn tozalash)
+- AI-yasama tomonlar olib tashlandi (emoji, mesh gradient, marketing badge'lar)
+- `font-display` (Instrument Serif) qo'shildi
+- "ICT" → "AKT" o'zgartirildi
 
----
-
-## 👤 Muallif va Litsenziya
-
-**Durdona** — TATU 4-kurs BMI
-**Rahbar:** [Ilmiy rahbar]
-**Yili:** 2026
-**Universitet:** Toshkent Axborot Texnologiyalari Universiteti (TATU)
+### Sessiya 1 — 2026-04-23 (Monolit prototip)
+- Next.js 14 + Tailwind monolit loyihasi
+- 27 sahifa, 3 ta rol paneli
+- Mock data bilan to'liq UI
 
 ---
 
 ## 📞 Yordam
 
-Savollar yoki takliflar bo'lsa, docs dagi boshqa fayllarni ko'ring yoki `/ai-assistant` orqali platformaning o'zida so'rang.
+Savollar uchun: `/ai` sahifasidagi AI yordamchiga murojaat qiling yoki CLAUDE.md'ni qayta o'qing.
