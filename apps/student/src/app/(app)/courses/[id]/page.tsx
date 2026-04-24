@@ -1,10 +1,10 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import {
-  ChevronLeft, Play, Lock, CheckCircle2, Clock, BookOpen, Users,
-  Star, Code2, FileQuestion, FileText, Zap, Brain, ChevronDown, ChevronUp
+  ChevronLeft, Play, Lock, CheckCircle2, Clock, BookOpen,
+  Code2, FileQuestion, FileText, Brain
 } from 'lucide-react'
 import { api } from '@/lib/api'
 import { useApi } from '@/lib/useApi'
@@ -40,7 +40,7 @@ export default function CourseDetailPage() {
   const { data: course, loading } = useApi(() => api.course(String(id)), [id])
   const lessons: any[] = course?.lessons || []
   const [activeLesson, setActiveLesson] = useState<string | null>(null)
-  const [quizActive, setQuizActive] = useState(false)
+  const [quizActive] = useState(false)
   const [quizAnswers, setQuizAnswers] = useState<Record<number, number>>({})
   const [quizSubmitted, setQuizSubmitted] = useState(false)
   const [aiChat, setAiChat] = useState<{role: 'user'|'ai'; text: string}[]>([
@@ -48,12 +48,13 @@ export default function CourseDetailPage() {
   ])
   const [aiInput, setAiInput] = useState('')
 
-  // Auto-select first unlocked unfinished lesson
-  useState(() => {
-    const first = lessons.find((l: any) => !l.completed && !l.locked)
-    if (first && !activeLesson) setActiveLesson(first.id)
-    return null
-  })
+  // Auto-select first unlocked unfinished lesson (yoki umuman birinchi dars)
+  useEffect(() => {
+    if (lessons.length > 0 && !activeLesson) {
+      const firstUnfinished = lessons.find((l: any) => !l.completed && !l.locked)
+      setActiveLesson(firstUnfinished?.id || lessons[0].id)
+    }
+  }, [lessons, activeLesson])
 
   if (loading) return (
     <div className="flex items-center justify-center h-64">
@@ -178,26 +179,27 @@ export default function CourseDetailPage() {
                   <div className="badge-amber flex-shrink-0">+{currentLesson.xpReward} XP</div>
                 </div>
 
-                {/* Video Player */}
-                {currentLesson.type === 'video' && (
-                  currentLesson.videoUrl ? (
-                    <div className="bg-black rounded-xl aspect-video overflow-hidden mb-4 border border-[#1E1E24]">
-                      <iframe
-                        className="w-full h-full"
-                        src={currentLesson.videoUrl}
-                        title={currentLesson.title}
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        allowFullScreen
-                      />
+                {/* Video Player — har qanday darsda agar videoUrl bo'lsa */}
+                {currentLesson.videoUrl && (
+                  <div className="bg-black rounded-xl aspect-video overflow-hidden mb-4 border border-[#1E1E24]">
+                    <iframe
+                      className="w-full h-full"
+                      src={currentLesson.videoUrl}
+                      title={currentLesson.title}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                    />
+                  </div>
+                )}
+
+                {/* Video type bolsu-yu lekin URL yo'q bo'lsa — placeholder */}
+                {currentLesson.type === 'video' && !currentLesson.videoUrl && (
+                  <div className="bg-[#0D0D10] rounded-xl aspect-video flex flex-col items-center justify-center border border-[#1E1E24] mb-4">
+                    <div className="w-16 h-16 rounded-full bg-accent-600/20 border border-accent-600/30 flex items-center justify-center mb-3">
+                      <Play className="w-7 h-7 text-accent-400 ml-1" />
                     </div>
-                  ) : (
-                    <div className="bg-[#0D0D10] rounded-xl aspect-video flex flex-col items-center justify-center border border-[#1E1E24] relative overflow-hidden mb-4">
-                      <div className="w-16 h-16 rounded-full bg-accent-600/20 border border-accent-600/30 flex items-center justify-center mb-3">
-                        <Play className="w-7 h-7 text-accent-400 ml-1" />
-                      </div>
-                      <p className="text-sm text-base-500">Video hali yuklanmagan</p>
-                    </div>
-                  )
+                    <p className="text-sm text-base-500">Video hali yuklanmagan</p>
+                  </div>
                 )}
 
                 {/* Text Content */}
