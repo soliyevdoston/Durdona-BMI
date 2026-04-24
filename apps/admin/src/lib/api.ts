@@ -3,7 +3,7 @@
  * NEXT_PUBLIC_API_URL env var orqali backend manzilini o'zgartiring.
  */
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://educode-backend.onrender.com'
 
 type Method = 'GET' | 'POST' | 'PATCH' | 'DELETE'
 
