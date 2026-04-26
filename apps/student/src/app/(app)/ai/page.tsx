@@ -5,10 +5,10 @@ import { useAuthStore } from '@/lib/store'
 import { api } from '@/lib/api'
 
 const SUGGESTED = [
-  { icon: Code2, text: 'Python\'da rekursiyani tushuntirib bering', color: 'text-sky-400' },
-  { icon: BookOpen, text: 'SQL JOIN turlari qanday?', color: 'text-emerald-400' },
-  { icon: Lightbulb, text: 'OOP prinsiplarini misollarda', color: 'text-amber-400' },
-  { icon: Brain, text: 'Mening zaif joylarimni tahlil qiling', color: 'text-accent-400' },
+  { icon: Code2, text: 'Python\'da rekursiyani tushuntirib bering', color: 'text-base-500' },
+  { icon: BookOpen, text: 'SQL JOIN turlari qanday?', color: 'text-base-500' },
+  { icon: Lightbulb, text: 'OOP prinsiplarini misollarda', color: 'text-base-500' },
+  { icon: Brain, text: 'Mening zaif joylarimni tahlil qiling', color: 'text-base-500' },
 ]
 
 const AI_RESPONSES: Record<string, string> = {
@@ -16,7 +16,7 @@ const AI_RESPONSES: Record<string, string> = {
   recursive: "**Rekursiya** — bu funksiyaning o'zini o'zidan chaqirishi.\n\n```python\ndef faktorial(n):\n    if n <= 1:\n        return 1\n    return n * faktorial(n - 1)\n\nprint(faktorial(5))  # 120\n```\n\n**Muhim nuqtalar:**\n1. **Base case** — to'xtash sharti bo'lishi shart\n2. **Recursive case** — masalani kichraytirish\n3. Stack overflow'dan ehtiyot bo'ling\n\nHar rekursiv yechim iterativ (sikl) yechimga ega. Rekursiya kod o'qilishini yaxshilaydi, lekin xotira ko'p ishlatadi.",
   sql: "**SQL JOIN turlari:**\n\n• **INNER JOIN** — ikkala jadvalda mos keluvchi qatorlar\n• **LEFT JOIN** — chap jadvaldagi barcha qatorlar + o'ng mos keladigan\n• **RIGHT JOIN** — o'ng jadvaldagi barcha + chap mos keladigan\n• **FULL OUTER JOIN** — ikkala jadvaldagi barcha qatorlar\n\n```sql\nSELECT t.ism, k.kurs_nomi\nFROM talabalar t\nLEFT JOIN kurslar k\n  ON t.kurs_id = k.id;\n```\n\nKunning amaliyotida **INNER** va **LEFT JOIN** eng ko'p ishlatiladi.",
   oop: "**OOP prinsiplari (4 ta asosiy):**\n\n1. **Inkapsulyatsiya** — ma'lumotni yashirish\n2. **Merros** (Inheritance) — klasslar hierarchy'si\n3. **Polimorfizm** — bir metodning turli shakllari\n4. **Abstraksiya** — murakkablikni yashirish\n\n```python\nclass Hayvon:\n    def __init__(self, ism):\n        self.ism = ism\n    def ovoz(self):\n        pass\n\nclass It(Hayvon):\n    def ovoz(self):\n        return f\"{self.ism}: Vov-vov!\"\n```\n\nHar bir prinsip kodni toza, qayta ishlatiladigan va kengaytiriladigan qiladi.",
-  analiz: "**Sizning o'qish profilingiz tahlili:**\n\n✅ **Kuchli tomonlar:**\n• Sikllar va shartli operatorlar — 95%\n• Ro'yxatlar bilan ishlash — 89%\n• Funksiyalar yaratish — 87%\n\n⚠️ **Rivojlantirish kerak:**\n• **Rekursiya** — 54% (o'rtacha)\n• **OOP klasslari** — 48% (zaif)\n• **Istisnolar** (try/except) — 61%\n\n📊 **Tavsiyalar:**\n1. Keyingi 5 darsni rekursiyaga ajrating\n2. Kichik OOP loyihasi qiling (Bank tizimi, masalan)\n3. Xatolar bilan ishlashni ko'proq mashq qiling\n\n💡 **Yaqin maqsad:** Python kursini 85%+ bilan tugatish",
+  analiz: "**Sizning o'qish profilingiz tahlili:**\n\n**Kuchli tomonlar:**\n• Sikllar va shartli operatorlar — 95%\n• Ro'yxatlar bilan ishlash — 89%\n• Funksiyalar yaratish — 87%\n\n**Rivojlantirish kerak:**\n• **Rekursiya** — 54% (o'rtacha)\n• **OOP klasslari** — 48% (zaif)\n• **Istisnolar** (try/except) — 61%\n\n**Tavsiyalar:**\n1. Keyingi 5 darsni rekursiyaga ajrating\n2. Kichik OOP loyihasi qiling (Bank tizimi, masalan)\n3. Xatolar bilan ishlashni ko'proq mashq qiling\n\n**Yaqin maqsad:** Python kursini 85%+ bilan tugatish",
 }
 
 function detectResponse(msg: string): string {
@@ -68,7 +68,7 @@ export default function AIAssistantPage() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'ai',
-      content: `Salom, ${user?.name.split(' ')[0]}! 👋\n\nMen sizning shaxsiy AI o'qituvchi yordamchingizman. Men sizga quyidagilarda yordam bera olaman:\n\n• Tushunchalarni tushuntirish\n• Kod xatolarini tahlil qilish\n• Shaxsiy tavsiyalar berish\n• O'quv yo'lingizni optimallashtirish\n\nSavol bering yoki quyidagi tavsiyalardan birini tanlang.`,
+      content: `Salom, ${user?.name.split(' ')[0]}!\n\nMen sizning shaxsiy AI o'qituvchi yordamchingizman. Men sizga quyidagilarda yordam bera olaman:\n\n• Tushunchalarni tushuntirish\n• Kod xatolarini tahlil qilish\n• Shaxsiy tavsiyalar berish\n• O'quv yo'lingizni optimallashtirish\n\nSavol bering yoki quyidagi tavsiyalardan birini tanlang.`,
       time: new Date().toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' }),
     },
   ])
@@ -112,15 +112,15 @@ export default function AIAssistantPage() {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className="relative">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent-600 to-sky-600 flex items-center justify-center shadow-lg shadow-accent-600/20">
-              <Brain className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 rounded-xl bg-[#1A1A1F] border border-[#27272A] flex items-center justify-center">
+              <Brain className="w-5 h-5 text-base-400" />
             </div>
-            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-base-950" />
+            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-base-600 border-2 border-base-950" />
           </div>
           <div>
             <h1 className="text-lg font-bold text-base-100">AI Yordamchi</h1>
             <p className="text-xs text-base-500 flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              <span className="w-1.5 h-1.5 rounded-full bg-base-500" />
               Faol · ChatGPT-4 asosida
             </p>
           </div>
@@ -139,12 +139,9 @@ export default function AIAssistantPage() {
         <div ref={chatRef} className="flex-1 overflow-y-auto p-5 space-y-5">
           {messages.map((msg, i) => (
             <div key={i} className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''} animate-fade-in`}>
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0
-                ${msg.role === 'ai'
-                  ? 'bg-gradient-to-br from-accent-600 to-sky-600 shadow-lg shadow-accent-600/20'
-                  : 'bg-[#1A1A1F] border border-[#27272A]'}`}>
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 bg-[#1A1A1F] border border-[#27272A]">
                 {msg.role === 'ai'
-                  ? <Bot className="w-4 h-4 text-white" />
+                  ? <Bot className="w-4 h-4 text-base-500" />
                   : <span className="text-xs font-bold text-base-400">{user?.avatar}</span>
                 }
               </div>
@@ -162,8 +159,8 @@ export default function AIAssistantPage() {
           ))}
           {typing && (
             <div className="flex gap-3 animate-fade-in">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-accent-600 to-sky-600 flex items-center justify-center flex-shrink-0">
-                <Bot className="w-4 h-4 text-white" />
+              <div className="w-8 h-8 rounded-xl bg-[#1A1A1F] border border-[#27272A] flex items-center justify-center flex-shrink-0">
+                <Bot className="w-4 h-4 text-base-500" />
               </div>
               <div className="px-4 py-3 rounded-2xl rounded-tl-sm bg-[#1A1A1F]">
                 <div className="flex gap-1">

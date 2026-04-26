@@ -67,7 +67,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
         {/* XP Bar */}
         <div className="space-y-1.5">
           <div className="flex justify-between text-xs text-base-600">
-            <span className="flex items-center gap-1"><Star className="w-3 h-3 text-amber-400" /> Daraja {level}</span>
+            <span className="flex items-center gap-1"><Star className="w-3 h-3 text-base-500" /> Daraja {level}</span>
             <span>{current}/{required} XP</span>
           </div>
           <div className="progress-bar">
@@ -75,7 +75,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
           </div>
         </div>
         {/* Streak */}
-        <div className="flex items-center gap-1.5 mt-2.5 text-xs text-amber-400">
+        <div className="flex items-center gap-1.5 mt-2.5 text-xs text-base-500">
           <Flame className="w-3.5 h-3.5" />
           <span className="font-medium">{user.streak} kunlik seriya</span>
         </div>

@@ -1,18 +1,19 @@
 'use client'
 import Link from 'next/link'
-import { Plus, Users, Star, MoreVertical, Edit, Copy, Trash2, Eye, BookOpen, Clock } from 'lucide-react'
+import type { ElementType } from 'react'
+import { Plus, Users, Star, MoreVertical, Edit, Copy, Trash2, Eye, BookOpen, Clock, Code2, Globe, Database, Network, GitBranch, Shield } from 'lucide-react'
 import { useState } from 'react'
 import { api } from '@/lib/api'
 import { useApi } from '@/lib/useApi'
 import { getDifficultyColor, getDifficultyLabel } from '@/lib/utils'
 
-const THUMB_MAP: Record<string, { emoji: string; color: string }> = {
-  python: { emoji: '🐍', color: 'from-blue-700 to-cyan-700' },
-  web: { emoji: '🌐', color: 'from-orange-700 to-amber-700' },
-  database: { emoji: '🗄️', color: 'from-emerald-700 to-teal-700' },
-  network: { emoji: '🔗', color: 'from-violet-700 to-purple-700' },
-  algo: { emoji: '🧠', color: 'from-rose-700 to-pink-700' },
-  security: { emoji: '🔒', color: 'from-slate-700 to-zinc-700' },
+const THUMB_MAP: Record<string, { icon: ElementType; color: string }> = {
+  python: { icon: Code2, color: 'from-[#1E1E24] to-[#141418]' },
+  web: { icon: Globe, color: 'from-[#1E1E24] to-[#141418]' },
+  database: { icon: Database, color: 'from-[#1E1E24] to-[#141418]' },
+  network: { icon: Network, color: 'from-[#1E1E24] to-[#141418]' },
+  algo: { icon: GitBranch, color: 'from-[#1E1E24] to-[#141418]' },
+  security: { icon: Shield, color: 'from-[#1E1E24] to-[#141418]' },
 }
 
 export default function TeacherCoursesPage() {
@@ -57,7 +58,7 @@ export default function TeacherCoursesPage() {
       {/* Courses Grid */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
         {myCourses.map((course: any) => {
-          const thumb = THUMB_MAP[course.thumbnail] || { emoji: '📚', color: 'from-base-700 to-base-600' }
+          const thumb = THUMB_MAP[course.thumbnail] || { icon: BookOpen, color: 'from-base-700 to-base-600' }
           return (
             <div key={course.id} className="card hover:border-sky-600/30 transition-all duration-300 overflow-hidden relative">
               {/* Menu */}
@@ -80,9 +81,8 @@ export default function TeacherCoursesPage() {
                 </div>
               )}
 
-              <div className={`h-32 bg-gradient-to-br ${thumb.color} flex items-center justify-center text-4xl relative`}>
-                <span>{thumb.emoji}</span>
-                <div className="absolute inset-0 bg-black/20" />
+              <div className={`h-32 bg-gradient-to-br ${thumb.color} flex items-center justify-center relative border-b border-[#27272A]`}>
+                <thumb.icon className="w-12 h-12 text-base-600" />
               </div>
 
               <div className="p-5">
@@ -106,8 +106,8 @@ export default function TeacherCoursesPage() {
 
                 <div className="flex items-center justify-between pt-4">
                   <div className="flex items-center gap-1">
-                    <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                    <span className="text-xs text-amber-400 font-medium">{course.rating}</span>
+                    <Star className="w-3.5 h-3.5 text-base-500" />
+                    <span className="text-xs text-base-400 font-medium">{course.rating}</span>
                     <span className="text-xs text-base-600">({course.enrolled} baho)</span>
                   </div>
                   <div className="flex gap-1.5">

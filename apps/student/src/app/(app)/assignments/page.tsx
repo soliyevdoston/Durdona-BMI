@@ -28,9 +28,9 @@ const STATUS_CONFIG = {
   late:      { label: 'Kechikdi', color: 'badge-rose', icon: XCircle },
 }
 const TYPE_CONFIG = {
-  coding:  { label: 'Kod', icon: Code2, color: 'text-sky-400' },
-  quiz:    { label: 'Test', icon: FileQuestion, color: 'text-amber-400' },
-  project: { label: 'Loyiha', icon: FolderGit2, color: 'text-accent-400' },
+  coding:  { label: 'Kod', icon: Code2, color: 'text-base-500' },
+  quiz:    { label: 'Test', icon: FileQuestion, color: 'text-base-500' },
+  project: { label: 'Loyiha', icon: FolderGit2, color: 'text-base-500' },
 }
 
 function AssignmentCard({ a, onOpen }: { a: Assignment; onOpen: () => void }) {
@@ -184,14 +184,14 @@ export default function AssignmentsPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Kutilmoqda', value: pending, color: 'text-amber-400', icon: Clock },
-          { label: 'Topshirildi', value: submitted, color: 'text-sky-400', icon: CheckCircle2 },
-          { label: 'Baholandi', value: graded, color: 'text-emerald-400', icon: Star },
-          { label: "O'rtacha Ball", value: avgGrade.toFixed(0), color: 'text-accent-400', icon: AlertCircle },
+          { label: 'Kutilmoqda', value: pending, icon: Clock },
+          { label: 'Topshirildi', value: submitted, icon: CheckCircle2 },
+          { label: 'Baholandi', value: graded, icon: Star },
+          { label: "O'rtacha Ball", value: avgGrade.toFixed(0), icon: AlertCircle },
         ].map((s) => (
           <div key={s.label} className="stat-card">
-            <s.icon className={`w-4 h-4 ${s.color} mb-2`} />
-            <div className={`text-2xl font-bold ${s.color}`}>{s.value}</div>
+            <s.icon className="w-4 h-4 text-base-500 mb-2" />
+            <div className="text-2xl font-bold text-base-100">{s.value}</div>
             <div className="text-xs text-base-600">{s.label}</div>
           </div>
         ))}

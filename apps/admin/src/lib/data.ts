@@ -261,16 +261,16 @@ export interface Achievement {
 }
 
 export const ACHIEVEMENTS: Achievement[] = [
-  { id: 'ach-001', title: 'Birinchi Qadam', description: 'Birinchi darsni tugatdi', icon: '🚀', earned: true, earnedAt: '2024-09-05', xpReward: 50, category: 'progress' },
-  { id: 'ach-002', title: '7 Kunlik Seriya', description: '7 kun ketma-ket o\'qidi', icon: '🔥', earned: true, earnedAt: '2024-09-12', xpReward: 100, category: 'streak' },
-  { id: 'ach-003', title: '12 Kunlik Seriya', description: '12 kun ketma-ket o\'qidi', icon: '⚡', earned: true, earnedAt: '2026-04-23', xpReward: 150, category: 'streak' },
-  { id: 'ach-004', title: 'Kod Yozuvchi', description: '10 ta kod topshiriqni bajardi', icon: '💻', earned: true, earnedAt: '2025-01-15', xpReward: 200, category: 'coding' },
-  { id: 'ach-005', title: 'Testchi', description: '20 ta testdan o\'tdi', icon: '✅', earned: true, earnedAt: '2025-02-20', xpReward: 150, category: 'quiz' },
-  { id: 'ach-006', title: 'Loyiha Ustasi', description: '3 ta katta loyiha topshirdi', icon: '🏗️', earned: false, xpReward: 500, category: 'project' },
-  { id: 'ach-007', title: 'AI do\'stim', description: 'AI assistant bilan 50 ta suhbat', icon: '🤖', earned: false, xpReward: 200, category: 'ai' },
-  { id: 'ach-008', title: 'Mukammal Baho', description: 'Bitta darsda 100/100 oldi', icon: '💯', earned: false, xpReward: 300, category: 'grade' },
-  { id: 'ach-009', title: 'O\'qimishli', description: '5 ta kursga yozildi', icon: '📚', earned: false, xpReward: 250, category: 'enrollment' },
-  { id: 'ach-010', title: 'Birinchi Kurs', description: 'Birinchi kursni to\'liq tugatdi', icon: '🎓', earned: false, xpReward: 1000, category: 'completion' },
+  { id: 'ach-001', title: 'Birinchi Qadam', description: 'Birinchi darsni tugatdi', icon: 'rocket', earned: true, earnedAt: '2024-09-05', xpReward: 50, category: 'progress' },
+  { id: 'ach-002', title: '7 Kunlik Seriya', description: '7 kun ketma-ket o\'qidi', icon: 'fire', earned: true, earnedAt: '2024-09-12', xpReward: 100, category: 'streak' },
+  { id: 'ach-003', title: '12 Kunlik Seriya', description: '12 kun ketma-ket o\'qidi', icon: 'bolt', earned: true, earnedAt: '2026-04-23', xpReward: 150, category: 'streak' },
+  { id: 'ach-004', title: 'Kod Yozuvchi', description: '10 ta kod topshiriqni bajardi', icon: 'code', earned: true, earnedAt: '2025-01-15', xpReward: 200, category: 'coding' },
+  { id: 'ach-005', title: 'Testchi', description: '20 ta testdan o\'tdi', icon: 'check', earned: true, earnedAt: '2025-02-20', xpReward: 150, category: 'quiz' },
+  { id: 'ach-006', title: 'Loyiha Ustasi', description: '3 ta katta loyiha topshirdi', icon: 'hammer', earned: false, xpReward: 500, category: 'project' },
+  { id: 'ach-007', title: 'AI do\'stim', description: 'AI assistant bilan 50 ta suhbat', icon: 'bot', earned: false, xpReward: 200, category: 'ai' },
+  { id: 'ach-008', title: 'Mukammal Baho', description: 'Bitta darsda 100/100 oldi', icon: 'percent', earned: false, xpReward: 300, category: 'grade' },
+  { id: 'ach-009', title: 'O\'qimishli', description: '5 ta kursga yozildi', icon: 'book', earned: false, xpReward: 250, category: 'enrollment' },
+  { id: 'ach-010', title: 'Birinchi Kurs', description: 'Birinchi kursni to\'liq tugatdi', icon: 'graduation', earned: false, xpReward: 1000, category: 'completion' },
 ]
 
 export const ANALYTICS_DATA = {

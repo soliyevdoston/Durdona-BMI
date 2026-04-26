@@ -1,18 +1,18 @@
 'use client'
 import { useState } from 'react'
 import {
-  Search, Filter, Plus, MoreVertical, Edit, Trash2, Ban, Shield,
-  UserPlus, Mail, Download, Users, UserCheck, UserX, Crown
+  Search, MoreVertical, Edit, Trash2, Ban, Shield, ShieldCheck,
+  UserPlus, Mail, Download, Users, GraduationCap, BookOpen, Crown
 } from 'lucide-react'
 import { api } from '@/lib/api'
 import { useApi } from '@/lib/useApi'
 import { formatDate } from '@/lib/utils'
 
 const ROLE_CONFIG = {
-  student: { label: 'Talaba', color: 'badge-accent', icon: '👨‍💻' },
-  teacher: { label: "O'qituvchi", color: 'badge-sky', icon: '👩‍🏫' },
-  admin: { label: 'Admin', color: 'badge-emerald', icon: '🛡️' },
-  super_admin: { label: 'Super Admin', color: 'badge bg-amber-500/10 text-amber-400 border border-amber-500/20', icon: '👑' },
+  student: { label: 'Talaba', color: 'badge-accent', Icon: GraduationCap },
+  teacher: { label: "O'qituvchi", color: 'badge-sky', Icon: BookOpen },
+  admin: { label: 'Admin', color: 'badge-emerald', Icon: ShieldCheck },
+  super_admin: { label: 'Super Admin', color: 'badge bg-amber-500/10 text-amber-400 border border-amber-500/20', Icon: Crown },
 }
 
 export default function AdminUsersPage() {
@@ -69,17 +69,17 @@ export default function AdminUsersPage() {
           <div className="text-xs text-base-600">Jami</div>
         </div>
         <div className="stat-card">
-          <div className="text-2xl mb-1">👨‍💻</div>
+          <GraduationCap className="w-4 h-4 text-accent-400 mb-2" />
           <div className="text-2xl font-bold text-accent-400">{stats.students}</div>
           <div className="text-xs text-base-600">Talabalar</div>
         </div>
         <div className="stat-card">
-          <div className="text-2xl mb-1">👩‍🏫</div>
+          <BookOpen className="w-4 h-4 text-sky-400 mb-2" />
           <div className="text-2xl font-bold text-sky-400">{stats.teachers}</div>
           <div className="text-xs text-base-600">O'qituvchilar</div>
         </div>
         <div className="stat-card">
-          <div className="text-2xl mb-1">🛡️</div>
+          <ShieldCheck className="w-4 h-4 text-emerald-400 mb-2" />
           <div className="text-2xl font-bold text-emerald-400">{stats.admins}</div>
           <div className="text-xs text-base-600">Adminlar</div>
         </div>
@@ -144,7 +144,7 @@ export default function AdminUsersPage() {
                     </td>
                     <td className="px-4 py-3">
                       <span className={rc.color}>
-                        <span className="text-base">{rc.icon}</span> {rc.label}
+                        <rc.Icon className="w-3.5 h-3.5" /> {rc.label}
                       </span>
                     </td>
                     <td className="px-4 py-3">

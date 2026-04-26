@@ -55,8 +55,9 @@ async function main() {
   ])
   console.log(`  ✓ ${courses.length} kurs yaratildi`)
 
-  // LESSONS (Python kursi uchun — YouTube video URL'lar bilan)
+  // LESSONS — barcha 6 kurs uchun video URL'lar bilan
   const lessons = [
+    // c-001: Python
     { id: 'l-001', courseId: 'c-001', title: "Python nima va nima uchun?", duration: '8 daq', type: 'video', order: 1, xpReward: 10, videoUrl: 'https://www.youtube.com/embed/kqtD5dpn9C8' },
     { id: 'l-002', courseId: 'c-001', title: "O'rnatish va muhit sozlash", duration: '12 daq', type: 'text', order: 2, xpReward: 10, videoUrl: null },
     { id: 'l-003', courseId: 'c-001', title: 'Birinchi dastur: Hello World', duration: '15 daq', type: 'practice', order: 3, xpReward: 20, videoUrl: null },
@@ -67,6 +68,37 @@ async function main() {
     { id: 'l-008', courseId: 'c-001', title: 'Funksiyalar', duration: '25 daq', type: 'video', order: 8, xpReward: 20, videoUrl: 'https://www.youtube.com/embed/9Os0o3wzS_I' },
     { id: 'l-009', courseId: 'c-001', title: "Ro'yxatlar (Lists)", duration: '20 daq', type: 'practice', order: 9, xpReward: 25, videoUrl: 'https://www.youtube.com/embed/ohCDWZgNIU0' },
     { id: 'l-010', courseId: 'c-001', title: "Lug'atlar (Dictionaries)", duration: '20 daq', type: 'video', order: 10, xpReward: 20, videoUrl: 'https://www.youtube.com/embed/daefaLgNkw0' },
+    // c-002: Web Dasturlash
+    { id: 'l-011', courseId: 'c-002', title: 'HTML asoslari: teg va atributlar', duration: '12 daq', type: 'video', order: 1, xpReward: 10, videoUrl: 'https://www.youtube.com/embed/qz0aGYrrlhU' },
+    { id: 'l-012', courseId: 'c-002', title: 'CSS: selektorlar va xossalar', duration: '15 daq', type: 'video', order: 2, xpReward: 15, videoUrl: 'https://www.youtube.com/embed/yfoY53QXEnI' },
+    { id: 'l-013', courseId: 'c-002', title: 'Flexbox va Grid layout', duration: '20 daq', type: 'video', order: 3, xpReward: 15, videoUrl: 'https://www.youtube.com/embed/K74l26pE4YA' },
+    { id: 'l-014', courseId: 'c-002', title: 'JavaScript: asosiy tushunchalar', duration: '18 daq', type: 'video', order: 4, xpReward: 20, videoUrl: 'https://www.youtube.com/embed/W6NZfCO5SIk' },
+    { id: 'l-015', courseId: 'c-002', title: 'DOM manipulyatsiya', duration: '22 daq', type: 'practice', order: 5, xpReward: 25, videoUrl: null },
+    { id: 'l-016', courseId: 'c-002', title: 'Web loyiha: portfolio sahifasi', duration: '30 daq', type: 'practice', order: 6, xpReward: 40, videoUrl: null },
+    // c-003: SQL
+    { id: 'l-017', courseId: 'c-003', title: "SQL nima? Ma'lumotlar bazasi asoslari", duration: '10 daq', type: 'video', order: 1, xpReward: 10, videoUrl: 'https://www.youtube.com/embed/HXV3zeQKqGY' },
+    { id: 'l-018', courseId: 'c-003', title: 'SELECT so\'rovi va filtrlar', duration: '15 daq', type: 'video', order: 2, xpReward: 15, videoUrl: 'https://www.youtube.com/embed/9Pzj7Aj25lw' },
+    { id: 'l-019', courseId: 'c-003', title: 'JOIN turlari: INNER, LEFT, RIGHT', duration: '20 daq', type: 'video', order: 3, xpReward: 20, videoUrl: 'https://www.youtube.com/embed/9yeOJ0ZMUYw' },
+    { id: 'l-020', courseId: 'c-003', title: 'Jadvallar yaratish va o\'zgartirish', duration: '18 daq', type: 'practice', order: 4, xpReward: 25, videoUrl: null },
+    { id: 'l-021', courseId: 'c-003', title: 'SQL testi', duration: '10 daq', type: 'quiz', order: 5, xpReward: 30, videoUrl: null },
+    // c-004: Tarmoqlar
+    { id: 'l-022', courseId: 'c-004', title: 'OSI modeli: 7 qatlam', duration: '14 daq', type: 'video', order: 1, xpReward: 10, videoUrl: 'https://www.youtube.com/embed/vv4y_uOneC0' },
+    { id: 'l-023', courseId: 'c-004', title: 'TCP/IP protokol to\'plami', duration: '16 daq', type: 'video', order: 2, xpReward: 15, videoUrl: 'https://www.youtube.com/embed/keeqnciDVjo' },
+    { id: 'l-024', courseId: 'c-004', title: 'IP manzillash va subnetting', duration: '20 daq', type: 'video', order: 3, xpReward: 20, videoUrl: 'https://www.youtube.com/embed/s_gy7bKioR4' },
+    { id: 'l-025', courseId: 'c-004', title: 'Tarmoq xavfsizligi asoslari', duration: '18 daq', type: 'text', order: 4, xpReward: 15, videoUrl: null },
+    { id: 'l-026', courseId: 'c-004', title: 'Tarmoqlar testi', duration: '10 daq', type: 'quiz', order: 5, xpReward: 30, videoUrl: null },
+    // c-005: Algoritmlar
+    { id: 'l-027', courseId: 'c-005', title: "Big-O notatsiya va murakkablik tahlili", duration: '15 daq', type: 'video', order: 1, xpReward: 15, videoUrl: 'https://www.youtube.com/embed/Mo4vesaut8g' },
+    { id: 'l-028', courseId: 'c-005', title: 'Saralash algoritmlari: Bubble, Selection', duration: '20 daq', type: 'video', order: 2, xpReward: 20, videoUrl: 'https://www.youtube.com/embed/g-PGLbMth_g' },
+    { id: 'l-029', courseId: 'c-005', title: 'Binary Search algoritmi', duration: '18 daq', type: 'video', order: 3, xpReward: 20, videoUrl: 'https://www.youtube.com/embed/P3YID7liBug' },
+    { id: 'l-030', courseId: 'c-005', title: 'Stack va Queue tuzilmalari', duration: '22 daq', type: 'practice', order: 4, xpReward: 25, videoUrl: null },
+    { id: 'l-031', courseId: 'c-005', title: "DSA testi", duration: '10 daq', type: 'quiz', order: 5, xpReward: 35, videoUrl: null },
+    // c-006: Kiberxavfsizlik
+    { id: 'l-032', courseId: 'c-006', title: "Kiberxavfsizlikka kirish", duration: '12 daq', type: 'video', order: 1, xpReward: 10, videoUrl: 'https://www.youtube.com/embed/inWWhr5tnEA' },
+    { id: 'l-033', courseId: 'c-006', title: "Shifrlash asoslari: simmetrik va asimmetrik", duration: '18 daq', type: 'video', order: 2, xpReward: 20, videoUrl: 'https://www.youtube.com/embed/AQDCe585Lnc' },
+    { id: 'l-034', courseId: 'c-006', title: "OWASP Top 10 zaifliklar", duration: '20 daq', type: 'video', order: 3, xpReward: 20, videoUrl: 'https://www.youtube.com/embed/rWHvp7rUka8' },
+    { id: 'l-035', courseId: 'c-006', title: "Parollar va autentifikatsiya", duration: '16 daq', type: 'text', order: 4, xpReward: 15, videoUrl: null },
+    { id: 'l-036', courseId: 'c-006', title: "Xavfsizlik testi", duration: '10 daq', type: 'quiz', order: 5, xpReward: 35, videoUrl: null },
   ]
   for (const l of lessons) await prisma.lesson.create({ data: l })
   console.log(`  ✓ ${lessons.length} dars yaratildi`)
@@ -76,13 +108,13 @@ async function main() {
 
   // ENROLLMENTS
   await Promise.all([
-    prisma.enrollment.create({ data: { userId: 'u-001', courseId: 'c-001', progress: 65, completedLessons: 31 } }),
-    prisma.enrollment.create({ data: { userId: 'u-001', courseId: 'c-002', progress: 30, completedLessons: 18 } }),
-    prisma.enrollment.create({ data: { userId: 'u-001', courseId: 'c-003', progress: 10, completedLessons: 4 } }),
-    prisma.enrollment.create({ data: { userId: 's-002', courseId: 'c-001', progress: 45, completedLessons: 22 } }),
-    prisma.enrollment.create({ data: { userId: 's-003', courseId: 'c-001', progress: 89, completedLessons: 43 } }),
-    prisma.enrollment.create({ data: { userId: 's-004', courseId: 'c-001', progress: 18, completedLessons: 9 } }),
-    prisma.enrollment.create({ data: { userId: 's-005', courseId: 'c-002', progress: 58, completedLessons: 35 } }),
+    prisma.enrollment.create({ data: { userId: 'u-001', courseId: 'c-001', progress: 60, completedLessons: 6 } }),
+    prisma.enrollment.create({ data: { userId: 'u-001', courseId: 'c-002', progress: 33, completedLessons: 2 } }),
+    prisma.enrollment.create({ data: { userId: 'u-001', courseId: 'c-003', progress: 20, completedLessons: 1 } }),
+    prisma.enrollment.create({ data: { userId: 's-002', courseId: 'c-001', progress: 40, completedLessons: 4 } }),
+    prisma.enrollment.create({ data: { userId: 's-003', courseId: 'c-001', progress: 80, completedLessons: 8 } }),
+    prisma.enrollment.create({ data: { userId: 's-004', courseId: 'c-001', progress: 10, completedLessons: 1 } }),
+    prisma.enrollment.create({ data: { userId: 's-005', courseId: 'c-002', progress: 50, completedLessons: 3 } }),
   ])
   console.log('  ✓ enrollments yaratildi')
 

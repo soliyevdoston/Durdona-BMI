@@ -63,15 +63,6 @@ export function getDifficultyColor(diff: string): string {
   }
 }
 
-const ICON_MAP: Record<string, string> = {
-  rocket: '🚀', fire: '🔥', bolt: '⚡', code: '💻', check: '✅',
-  hammer: '🏗️', bot: '🤖', percent: '💯', book: '📚', trophy: '🏆',
-  star: '⭐', graduation: '🎓',
-}
-
-export function iconEmoji(icon: string): string {
-  return ICON_MAP[icon] || icon
-}
 
 export function getDifficultyLabel(diff: string): string {
   switch (diff) {

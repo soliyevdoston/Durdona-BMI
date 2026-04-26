@@ -1,9 +1,12 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
+import type { ElementType } from 'react'
 import {
-  Flame, Target, ChevronRight, Brain, BookOpen, CheckCircle2, Circle,
-  Zap, Trophy, ArrowRight, BarChart3, Calendar
+  Flame, Target, ChevronRight, Brain, BookOpen, CheckCircle2, CheckCircle, Circle,
+  Zap, Trophy, ArrowRight, BarChart3, Calendar,
+  Globe, Database, Network, GitBranch, Shield, Code2,
+  Rocket, Wrench, Bot, Award, GraduationCap, Star
 } from 'lucide-react'
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer
@@ -11,7 +14,17 @@ import {
 import { useAuthStore } from '@/lib/store'
 import { api } from '@/lib/api'
 import { useApi } from '@/lib/useApi'
-import { getLevelFromXP, getRankLabel, formatDate, iconEmoji } from '@/lib/utils'
+import { getLevelFromXP, getRankLabel, formatDate } from '@/lib/utils'
+
+const ACH_ICONS: Record<string, ElementType> = {
+  rocket: Rocket, fire: Flame, bolt: Zap, code: Code2, check: CheckCircle,
+  hammer: Wrench, bot: Bot, percent: Award, book: BookOpen, graduation: GraduationCap,
+  trophy: Trophy, star: Star,
+}
+function AchIcon({ icon }: { icon: string }) {
+  const Icon = ACH_ICONS[icon] || Award
+  return <Icon className="w-4 h-4 text-base-500" />
+}
 
 const TODAY_TASKS = [
   { id: 1, text: 'Python: Sikllar darsini tugatish', done: false, xp: 25, type: 'lesson' },
@@ -112,7 +125,7 @@ export default function StudentDashboard() {
         <div className="stat-card">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs text-base-500 uppercase tracking-wider">Kurslar</span>
-            <BookOpen className="w-4 h-4 text-accent-400" />
+            <BookOpen className="w-4 h-4 text-base-500" />
           </div>
           <div className="text-2xl font-bold text-base-100">{activeCourses.length}</div>
           <div className="text-xs text-base-500">Faol kurslar</div>
@@ -120,15 +133,15 @@ export default function StudentDashboard() {
         <div className="stat-card">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs text-base-500 uppercase tracking-wider">Topshiriqlar</span>
-            <Target className="w-4 h-4 text-amber-400" />
+            <Target className="w-4 h-4 text-base-500" />
           </div>
           <div className="text-2xl font-bold text-base-100">{pendingAssignments.length}</div>
-          <div className="text-xs text-amber-500">Kutilmoqda</div>
+          <div className="text-xs text-base-500">Kutilmoqda</div>
         </div>
         <div className="stat-card">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs text-base-500 uppercase tracking-wider">Yutuqlar</span>
-            <Trophy className="w-4 h-4 text-amber-400" />
+            <Trophy className="w-4 h-4 text-base-500" />
           </div>
           <div className="text-2xl font-bold text-base-100">{earnedAchievements.length}/{totalAchievements}</div>
           <div className="text-xs text-base-500">Nishonlar</div>
@@ -136,10 +149,10 @@ export default function StudentDashboard() {
         <div className="stat-card">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs text-base-500 uppercase tracking-wider">Bugungi</span>
-            <Zap className="w-4 h-4 text-emerald-400" />
+            <Zap className="w-4 h-4 text-base-500" />
           </div>
           <div className="text-2xl font-bold text-base-100">{completedTasks}/{tasks.length}</div>
-          <div className="text-xs text-emerald-500">Vazifalar bajarildi</div>
+          <div className="text-xs text-base-500">Vazifalar bajarildi</div>
         </div>
       </div>
 
@@ -162,11 +175,14 @@ export default function StudentDashboard() {
                 return (
                   <Link key={course.id} href={`/courses/${course.id}`}
                     className="flex items-center gap-4 p-3 rounded-xl hover:bg-[#1A1A1F] transition-colors group">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0
-                      ${course.thumbnail === 'python' ? 'bg-blue-600/20 text-blue-400' :
-                        course.thumbnail === 'web' ? 'bg-orange-600/20 text-orange-400' :
-                        'bg-emerald-600/20 text-emerald-400'}`}>
-                      {course.thumbnail === 'python' ? '🐍' : course.thumbnail === 'web' ? '🌐' : '🗄️'}
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-[#1A1A1F] border border-[#27272A] text-base-500">
+                      {course.thumbnail === 'python' ? <Code2 className="w-5 h-5" /> :
+                       course.thumbnail === 'web' ? <Globe className="w-5 h-5" /> :
+                       course.thumbnail === 'database' ? <Database className="w-5 h-5" /> :
+                       course.thumbnail === 'network' ? <Network className="w-5 h-5" /> :
+                       course.thumbnail === 'algo' ? <GitBranch className="w-5 h-5" /> :
+                       course.thumbnail === 'security' ? <Shield className="w-5 h-5" /> :
+                       <BookOpen className="w-5 h-5" />}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-medium text-base-200 group-hover:text-base-100 truncate">{course.title}</div>
@@ -225,7 +241,7 @@ export default function StudentDashboard() {
                 <button key={task.id} onClick={() => toggleTask(task.id)}
                   className="w-full flex items-start gap-3 p-2.5 rounded-xl hover:bg-[#1A1A1F] transition-colors text-left group">
                   {task.done
-                    ? <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+                    ? <CheckCircle2 className="w-4 h-4 text-base-400 flex-shrink-0 mt-0.5" />
                     : <Circle className="w-4 h-4 text-base-600 flex-shrink-0 mt-0.5 group-hover:text-base-400" />
                   }
                   <div className="flex-1 min-w-0">
@@ -240,10 +256,10 @@ export default function StudentDashboard() {
           </div>
 
           {/* AI Tip */}
-          <div className="card p-5 border-accent-600/20">
+          <div className="card p-5">
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-lg bg-accent-600/20 flex items-center justify-center">
-                <Brain className="w-4 h-4 text-accent-400" />
+              <div className="w-8 h-8 rounded-lg bg-[#1A1A1F] border border-[#27272A] flex items-center justify-center">
+                <Brain className="w-4 h-4 text-base-500" />
               </div>
               <div>
                 <div className="text-xs font-semibold text-base-200">AI Tavsiyasi</div>
@@ -267,7 +283,9 @@ export default function StudentDashboard() {
             <div className="space-y-2">
               {earnedAchievements.slice(0, 4).map((ach: any) => (
                 <div key={ach.id} className="flex items-center gap-3 p-2 rounded-xl">
-                  <span className="text-2xl">{iconEmoji(ach.icon)}</span>
+                  <div className="w-8 h-8 rounded-lg bg-[#1A1A1F] border border-[#27272A] flex items-center justify-center flex-shrink-0">
+                    <AchIcon icon={ach.icon} />
+                  </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-xs font-medium text-base-200">{ach.title}</div>
                     <div className="text-xs text-base-600">{ach.description}</div>

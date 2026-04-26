@@ -1,20 +1,21 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
-import { Search, BookOpen, Users, Star, Clock, ChevronRight, Play } from 'lucide-react'
+import { Search, BookOpen, Users, Star, Clock, ChevronRight, Play, Code2, Globe, Database, Network, GitBranch, Shield } from 'lucide-react'
 import { api } from '@/lib/api'
 import { useApi } from '@/lib/useApi'
 import { getDifficultyColor, getDifficultyLabel } from '@/lib/utils'
 
 const CATEGORIES = ['Barchasi', 'Dasturlash', 'Web', 'Database', 'Tarmoq', 'Security']
 
-const THUMBNAIL_MAP: Record<string, { emoji: string; color: string }> = {
-  python: { emoji: '🐍', color: 'from-blue-700 to-cyan-700' },
-  web: { emoji: '🌐', color: 'from-orange-700 to-amber-700' },
-  database: { emoji: '🗄️', color: 'from-emerald-700 to-teal-700' },
-  network: { emoji: '🔗', color: 'from-violet-700 to-purple-700' },
-  algo: { emoji: '🧠', color: 'from-rose-700 to-pink-700' },
-  security: { emoji: '🔒', color: 'from-slate-700 to-zinc-700' },
+import type { ElementType } from 'react'
+const THUMBNAIL_MAP: Record<string, { icon: ElementType; color: string }> = {
+  python: { icon: Code2, color: 'from-[#1E1E24] to-[#141418]' },
+  web: { icon: Globe, color: 'from-[#1E1E24] to-[#141418]' },
+  database: { icon: Database, color: 'from-[#1E1E24] to-[#141418]' },
+  network: { icon: Network, color: 'from-[#1E1E24] to-[#141418]' },
+  algo: { icon: GitBranch, color: 'from-[#1E1E24] to-[#141418]' },
+  security: { icon: Shield, color: 'from-[#1E1E24] to-[#141418]' },
 }
 
 export default function CoursesPage() {
@@ -74,15 +75,14 @@ export default function CoursesPage() {
       {/* Grid */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
         {filtered.map((course: any) => {
-          const thumb = THUMBNAIL_MAP[course.thumbnail] || { emoji: '📚', color: 'from-base-700 to-base-600' }
+          const thumb = THUMBNAIL_MAP[course.thumbnail] || { icon: BookOpen, color: 'from-base-700 to-base-600' }
           const enrolled = (course.progress ?? 0) > 0
           return (
             <Link key={course.id} href={`/courses/${course.id}`}
               className="card hover:border-[#3F3F46] transition-all duration-300 group overflow-hidden block">
               {/* Thumbnail */}
-              <div className={`h-36 bg-gradient-to-br ${thumb.color} flex items-center justify-center text-5xl relative`}>
-                <span>{thumb.emoji}</span>
-                <div className="absolute inset-0 bg-black/20" />
+              <div className={`h-36 bg-gradient-to-br ${thumb.color} flex items-center justify-center relative border-b border-[#27272A]`}>
+                <thumb.icon className="w-14 h-14 text-base-600" />
                 {enrolled && (
                   <div className="absolute top-3 right-3 badge-emerald text-xs">
                     Yozilgan
@@ -117,8 +117,8 @@ export default function CoursesPage() {
                 {/* Rating & Difficulty */}
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-1">
-                    <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                    <span className="text-xs text-amber-400 font-medium">{course.rating}</span>
+                    <Star className="w-3.5 h-3.5 text-base-500" />
+                    <span className="text-xs text-base-400 font-medium">{course.rating}</span>
                   </div>
                   <span className={`text-xs font-medium ${getDifficultyColor(course.difficulty)}`}>
                     {getDifficultyLabel(course.difficulty)}

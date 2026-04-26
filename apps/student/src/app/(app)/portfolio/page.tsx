@@ -1,10 +1,24 @@
 'use client'
 import { useState } from 'react'
-import { Award, Star, Lock, Download, Share2, Trophy, Flame, Code2, BookOpen, Zap } from 'lucide-react'
+import type { ElementType } from 'react'
+import {
+  Award, Star, Lock, Download, Share2, Trophy, Flame, Code2, BookOpen, Zap,
+  Rocket, CheckCircle, Wrench, Bot, GraduationCap, Database, Network, GitBranch, Shield
+} from 'lucide-react'
 import { useAuthStore } from '@/lib/store'
 import { api } from '@/lib/api'
 import { useApi } from '@/lib/useApi'
-import { getLevelFromXP, getRankLabel, iconEmoji } from '@/lib/utils'
+import { getLevelFromXP, getRankLabel } from '@/lib/utils'
+
+const ACH_ICONS: Record<string, ElementType> = {
+  rocket: Rocket, fire: Flame, bolt: Zap, code: Code2, check: CheckCircle,
+  hammer: Wrench, bot: Bot, percent: Award, book: BookOpen, graduation: GraduationCap,
+  trophy: Trophy, star: Star,
+}
+function AchIcon({ icon, className }: { icon: string; className?: string }) {
+  const Icon = ACH_ICONS[icon] || Award
+  return <Icon className={className || 'w-5 h-5 text-base-500'} />
+}
 
 const CERTIFICATES = [
   { id: 'cert-1', title: 'Python Dasturlash Asoslari', date: '2025-03-15', score: 94, color: 'from-blue-700 to-cyan-700' },
@@ -51,10 +65,10 @@ export default function PortfolioPage() {
             <div className="flex items-center gap-2 mt-1 flex-wrap">
               <span className="badge-accent">{getRankLabel(level)}</span>
               <span className="badge bg-base-800 text-base-400 border border-base-700">
-                <Star className="w-3 h-3 text-amber-400" />{user.xp.toLocaleString()} XP
+                <Star className="w-3 h-3 text-base-500" />{user.xp.toLocaleString()} XP
               </span>
               <span className="badge bg-base-800 text-base-400 border border-base-700">
-                <Flame className="w-3 h-3 text-amber-400" />{user.streak} kunlik seriya
+                <Flame className="w-3 h-3 text-base-500" />{user.streak} kunlik seriya
               </span>
             </div>
             <div className="flex items-center gap-4 mt-3 text-sm text-base-500">
@@ -76,14 +90,14 @@ export default function PortfolioPage() {
         {/* Stats Row */}
         <div className="relative grid grid-cols-4 gap-3 mt-5 pt-5 border-t border-[#1E1E24]">
           {[
-            { label: 'Daraja', value: level, icon: Trophy, color: 'text-amber-400' },
-            { label: 'Jami XP', value: user.xp.toLocaleString(), icon: Zap, color: 'text-accent-400' },
-            { label: 'Kurslar', value: (courses || []).filter((c: any) => (c.progress ?? 0) > 0).length, icon: BookOpen, color: 'text-sky-400' },
-            { label: 'Loyihalar', value: PROJECTS.length, icon: Code2, color: 'text-emerald-400' },
+            { label: 'Daraja', value: level, icon: Trophy },
+            { label: 'Jami XP', value: user.xp.toLocaleString(), icon: Zap },
+            { label: 'Kurslar', value: (courses || []).filter((c: any) => (c.progress ?? 0) > 0).length, icon: BookOpen },
+            { label: 'Loyihalar', value: PROJECTS.length, icon: Code2 },
           ].map(s => (
             <div key={s.label} className="text-center">
-              <s.icon className={`w-5 h-5 ${s.color} mx-auto mb-1`} />
-              <div className={`text-xl font-bold ${s.color}`}>{s.value}</div>
+              <s.icon className="w-5 h-5 text-base-500 mx-auto mb-1" />
+              <div className="text-xl font-bold text-base-100">{s.value}</div>
               <div className="text-xs text-base-600">{s.label}</div>
             </div>
           ))}
@@ -112,7 +126,9 @@ export default function PortfolioPage() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {earned.map((ach) => (
                 <div key={ach.id} className="card p-4 flex items-start gap-3 hover:border-accent-600/30 transition-colors">
-                  <span className="text-3xl flex-shrink-0">{iconEmoji(ach.icon)}</span>
+                  <div className="w-10 h-10 rounded-xl bg-[#1A1A1F] border border-[#27272A] flex items-center justify-center flex-shrink-0">
+                    <AchIcon icon={ach.icon} />
+                  </div>
                   <div className="flex-1 min-w-0">
                     <div className="font-semibold text-sm text-base-100">{ach.title}</div>
                     <div className="text-xs text-base-500 mt-0.5">{ach.description}</div>
@@ -130,7 +146,9 @@ export default function PortfolioPage() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {notEarned.map((ach) => (
                 <div key={ach.id} className="card p-4 flex items-start gap-3 opacity-40">
-                  <span className="text-3xl flex-shrink-0 grayscale">{iconEmoji(ach.icon)}</span>
+                  <div className="w-10 h-10 rounded-xl bg-base-700/30 border border-base-700/30 flex items-center justify-center flex-shrink-0">
+                    <AchIcon icon={ach.icon} className="w-6 h-6 text-base-600" />
+                  </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-0.5">
                       <div className="font-semibold text-sm text-base-500">{ach.title}</div>
@@ -209,3 +227,4 @@ export default function PortfolioPage() {
     </div>
   )
 }
+
