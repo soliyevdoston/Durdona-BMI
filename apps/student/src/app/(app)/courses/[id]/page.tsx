@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import {
@@ -415,7 +415,7 @@ export default function CourseDetailPage() {
             <div className="mb-5">
               <h2 className="font-bold text-base-100 text-lg mb-1">{course.title}</h2>
               <div className="flex items-center gap-3 text-xs text-base-500 mb-3">
-                <span className="flex items-center gap-1"><BookOpen className="w-3 h-3" />{course.lessons} dars</span>
+                <span className="flex items-center gap-1"><BookOpen className="w-3 h-3" />{lessons.length} dars</span>
                 <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{course.duration}</span>
                 <span className={getDifficultyColor(course.difficulty)}>{getDifficultyLabel(course.difficulty)}</span>
               </div>
@@ -443,7 +443,7 @@ export default function CourseDetailPage() {
             {/* Lessons */}
             <div className="space-y-0.5 max-h-[60vh] overflow-y-auto no-scrollbar">
               {lessons.map((lesson: any, idx: number) => {
-                const Icon = TYPE_ICON[lesson.type]
+                const Icon = TYPE_ICON[lesson.type] || Play
                 const active = lesson.id === activeLesson
                 const isSkippable = skippableIdxs.has(idx)
                 return (
