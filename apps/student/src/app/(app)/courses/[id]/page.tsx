@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import {
   ChevronLeft, Play, Lock, CheckCircle2, Clock, BookOpen,
-  Code2, FileQuestion, FileText, Brain, Zap, X, SkipForward,
+  Code2, FileQuestion, FileText, Brain, X, SkipForward,
   Map, ArrowRight, Sparkles
 } from 'lucide-react'
 import { api } from '@/lib/api'
@@ -246,6 +246,94 @@ function DiagnosticQuiz({
   )
 }
 
+// ─── Diagnostic Intro Overlay ────────────────────────────────────────────────
+function DiagnosticIntro({
+  totalLessons,
+  onStart,
+  onSkip,
+}: {
+  totalLessons: number
+  onStart: () => void
+  onSkip: () => void
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-md" />
+
+      <div className="relative w-full max-w-md animate-scale-in">
+        <div className="card-elevated rounded-2xl shadow-[0_32px_80px_rgba(0,0,0,0.7)] overflow-hidden">
+          <div className="h-px bg-gradient-to-r from-transparent via-accent-600/50 to-transparent" />
+
+          <div className="p-7">
+            {/* Icon */}
+            <div className="w-14 h-14 rounded-2xl bg-[#111113] border border-[#27272A] flex items-center justify-center mb-5 animate-float">
+              <Sparkles className="w-6 h-6 text-base-400" />
+            </div>
+
+            {/* Title */}
+            <h2 className="text-xl font-bold text-base-100 mb-2">
+              Adaptiv O'quv Yo'li
+            </h2>
+            <p className="text-sm text-base-500 leading-relaxed mb-6">
+              Bilim darajangizni aniqlab, faqat kerakli darslarni ko'rsatamiz.
+              Allaqachon bilganlaringizni o'tkazib yuborasiz — vaqtingizni tejang.
+            </p>
+
+            {/* Steps */}
+            <div className="space-y-3 mb-6">
+              {[
+                { text: '10 ta qisqa savol — atigi 2 daqiqa', icon: Brain },
+                { text: "Bilgan mavzularingiz aniqlanadi", icon: CheckCircle2 },
+                { text: `${totalLessons} o'rniga faqat kerakli darslar`, icon: Map },
+              ].map(({ text, icon: Icon }, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-3 stagger-item animate-slide-in-left"
+                  style={{ animationDelay: `${100 + i * 80}ms`, animationFillMode: 'backwards' }}
+                >
+                  <div className="w-8 h-8 rounded-xl bg-[#111113] border border-[#1E1E24] flex items-center justify-center flex-shrink-0">
+                    <Icon className="w-3.5 h-3.5 text-base-600" />
+                  </div>
+                  <span className="text-sm text-base-400">{text}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Path preview */}
+            <div className="grid grid-cols-2 gap-3 mb-6">
+              <div className="bg-[#0D0D10] rounded-xl p-3 border border-[#1E1E24] text-center">
+                <div className="text-xs text-base-700 mb-1">Standart yo'l</div>
+                <div className="text-2xl font-bold text-base-700 line-through decoration-[#3F3F46]">{totalLessons}</div>
+                <div className="text-xs text-base-700">dars</div>
+              </div>
+              <div className="path-card-personal rounded-xl p-3 text-center">
+                <div className="text-xs text-base-500 mb-1">Sizning yo'lingiz</div>
+                <div className="text-2xl font-bold text-base-100">?</div>
+                <div className="text-xs text-base-600">dars</div>
+              </div>
+            </div>
+
+            {/* CTAs */}
+            <button
+              onClick={onStart}
+              className="w-full py-3 rounded-xl bg-[#1A1A1F] border border-[#27272A] hover:border-[#3F3F46] hover:bg-[#222229] text-sm font-semibold text-base-100 transition-all duration-200 flex items-center justify-center gap-2 group mb-2"
+            >
+              Diagnostikani Boshlash
+              <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+            </button>
+            <button
+              onClick={onSkip}
+              className="w-full py-2 text-xs text-base-700 hover:text-base-500 transition-colors"
+            >
+              O'tkazib yuborish
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ─── Personalized path comparison card ───────────────────────────────────────
 function PathComparisonCard({ standard, personal, saved }: { standard: number; personal: number; saved: number }) {
   const animPersonal = useCountUp(personal, 600)
@@ -394,6 +482,15 @@ export default function CourseDetailPage() {
 
   return (
     <div className="max-w-7xl mx-auto animate-fade-in">
+      {/* Diagnostic intro overlay — shows immediately on course open */}
+      {diagState === 'idle' && !loading && course && (
+        <DiagnosticIntro
+          totalLessons={lessons.length}
+          onStart={() => setDiagState('running')}
+          onSkip={() => setDiagState('done')}
+        />
+      )}
+
       {/* Diagnostic quiz overlay */}
       {diagState === 'running' && (
         <DiagnosticQuiz onComplete={diagComplete} onSkip={() => setDiagState('done')} />
@@ -502,42 +599,6 @@ export default function CourseDetailPage() {
 
         {/* ─── Right: Content ────────────────────────────────────────────── */}
         <div className="lg:col-span-2 space-y-4">
-
-          {/* Diagnostic invite banner */}
-          {diagState === 'idle' && lessons.length > 0 && (
-            <div className="card p-4 border-[#1E1E24] overflow-hidden relative animate-slide-in-right group hover:border-[#27272A] transition-all duration-300">
-              {/* Subtle background shimmer */}
-              <div className="absolute inset-0 bg-shimmer animate-shimmer opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-              <div className="relative flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-[#0D0D10] border border-[#1E1E24] flex items-center justify-center flex-shrink-0 animate-float">
-                  <Zap className="w-4 h-4 text-base-500" />
-                </div>
-                <div className="flex-1">
-                  <div className="text-sm font-semibold text-base-100 mb-0.5">
-                    Adaptiv O'quv Yo'li
-                  </div>
-                  <p className="text-xs text-base-600 leading-relaxed">
-                    10 savol · bilim darajangizni aniqlaymiz · keraksiz darslarni o'tkazib yuborasiz
-                  </p>
-                </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <button
-                    onClick={() => setDiagState('running')}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#1A1A1F] border border-[#27272A] hover:border-[#3F3F46] hover:bg-[#222229] text-xs text-base-200 transition-all duration-200 font-medium group/btn"
-                  >
-                    Boshlash
-                    <ArrowRight className="w-3 h-3 transition-transform duration-200 group-hover/btn:translate-x-0.5" />
-                  </button>
-                  <button
-                    onClick={() => setDiagState('done')}
-                    className="px-3 py-2 rounded-xl text-xs text-base-700 hover:text-base-500 transition-colors"
-                  >
-                    Keyinroq
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* Personalized path comparison card */}
           {diagState === 'done' && savedCount > 0 && (

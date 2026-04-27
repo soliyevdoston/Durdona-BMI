@@ -10,6 +10,7 @@ import { useAuthStore } from '@/lib/store'
 import { api } from '@/lib/api'
 import { useApi } from '@/lib/useApi'
 import { getLevelFromXP, getRankLabel } from '@/lib/utils'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 const NAV_ITEMS = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Bosh sahifa' },
@@ -42,9 +43,9 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
   const handleLogout = () => { logout(); router.push('/login') }
 
   const Sidebar = () => (
-    <aside className="flex flex-col h-full bg-[#0D0D10] border-r border-[#1E1E24]">
+    <aside className="flex flex-col h-full bg-[var(--sidebar-bg)] border-r border-[var(--border-muted)]">
       {/* Logo */}
-      <div className="p-5 border-b border-[#1E1E24]">
+      <div className="p-5 border-b border-[var(--border-muted)]">
         <Link href="/dashboard" className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-600 to-accent-500 flex items-center justify-center">
             <BookOpen className="w-4 h-4 text-white" />
@@ -54,7 +55,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
       </div>
 
       {/* User Profile Card */}
-      <div className="p-4 border-b border-[#1E1E24]">
+      <div className="p-4 border-b border-[var(--border-muted)]">
         <div className="flex items-center gap-3 mb-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent-600/30 to-accent-600/10 border border-accent-600/30 flex items-center justify-center text-sm font-bold text-accent-400">
             {user.avatar}
@@ -98,7 +99,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
       </nav>
 
       {/* Bottom */}
-      <div className="p-3 border-t border-[#1E1E24]">
+      <div className="p-3 border-t border-[var(--border-muted)]">
         <button onClick={handleLogout}
           className="nav-link w-full text-rose-500 hover:text-rose-400 hover:bg-rose-500/10">
           <LogOut className="w-4 h-4" />
@@ -128,7 +129,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Header */}
-        <header className="h-14 border-b border-[#1E1E24] bg-[#0D0D10]/80 backdrop-blur-sm flex items-center justify-between px-4 flex-shrink-0">
+        <header className="h-14 border-b border-[var(--border-muted)] bg-[var(--header-bg)] backdrop-blur-sm flex items-center justify-between px-4 flex-shrink-0">
           <button onClick={() => setMobileOpen(true)} className="lg:hidden btn-ghost p-2">
             <Menu className="w-5 h-5" />
           </button>
@@ -136,6 +137,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
             {NAV_ITEMS.find(n => pathname.startsWith(n.href))?.label || 'Dashboard'}
           </div>
           <div className="flex items-center gap-2 ml-auto">
+            <ThemeToggle />
             <div className="relative">
               <button onClick={() => setNotifOpen(!notifOpen)}
                 className="btn-ghost relative p-2 rounded-xl">
@@ -146,14 +148,14 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
               </button>
               {notifOpen && (
                 <div className="absolute right-0 top-full mt-2 w-80 card-elevated shadow-card-hover z-50 overflow-hidden animate-slide-up">
-                  <div className="flex items-center justify-between px-4 py-3 border-b border-[#27272A]">
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border)]">
                     <span className="text-sm font-semibold text-base-200">Bildirishnomalar</span>
                     <button onClick={() => setNotifOpen(false)}>
                       <X className="w-4 h-4 text-base-500" />
                     </button>
                   </div>
                   {notifList.map((n: any) => (
-                    <div key={n.id} className={`px-4 py-3 border-b border-[#1E1E24] hover:bg-[#222229] transition-colors ${!n.read ? 'bg-accent-600/5' : ''}`}>
+                    <div key={n.id} className={`px-4 py-3 border-b border-[var(--border-muted)] hover:bg-[var(--bg-overlay)] transition-colors ${!n.read ? 'bg-accent-600/5' : ''}`}>
                       <div className="flex items-start gap-2">
                         {!n.read && <div className="w-1.5 h-1.5 rounded-full bg-accent-500 mt-1.5 flex-shrink-0" />}
                         <div className={!n.read ? '' : 'ml-3.5'}>
