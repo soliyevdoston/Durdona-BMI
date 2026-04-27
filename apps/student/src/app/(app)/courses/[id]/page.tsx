@@ -407,10 +407,24 @@ export default function CourseDetailPage() {
     { role: 'ai', text: 'Salom! Men bu kurs bo\'yicha AI yordamchiman. Savol bering.' },
   ])
   const [aiInput, setAiInput] = useState('')
+  const [aiTyping, setAiTyping] = useState(false)
+  const [completing, setCompleting] = useState(false)
+  const [localCompleted, setLocalCompleted] = useState<Set<string>>(new Set())
+  const [practiceCode, setPracticeCode] = useState('for i in range(1, 11):\n    print(f"{i} ** 2 = {i**2}")')
+  const [practiceOutput, setPracticeOutput] = useState<string | null>(null)
+  const [practiceRunning, setPracticeRunning] = useState(false)
 
   // Diagnostic state
   const [diagState, setDiagState] = useState<'idle' | 'running' | 'done'>('idle')
   const [skippableIdxs, setSkippableIdxs] = useState<Set<number>>(new Set())
+
+  // Auto-enroll if not enrolled
+  useEffect(() => {
+    if (!id || !course) return
+    if (!course.enrollment) {
+      api.enroll(String(id)).catch(() => {})
+    }
+  }, [course, id])
 
   // Load saved diagnostic from localStorage
   useEffect(() => {
@@ -456,22 +470,49 @@ export default function CourseDetailPage() {
   )
 
   const currentLesson = lessons.find((l: any) => l.id === activeLesson)
-  const completedCount = lessons.filter(l => l.completed).length
-  const progress = Math.round((completedCount / lessons.length) * 100)
+  const completedCount = lessons.filter((l: any) => l.completed || localCompleted.has(l.id)).length
+  const progress = lessons.length ? Math.round((completedCount / lessons.length) * 100) : 0
 
-  const sendAiMessage = () => {
-    if (!aiInput.trim()) return
+  const sendAiMessage = async () => {
+    if (!aiInput.trim() || aiTyping) return
     const q = aiInput.trim()
     setAiChat(prev => [...prev, { role: 'user', text: q }])
     setAiInput('')
-    setTimeout(() => {
-      const responses = [
-        `"${q}" haqida tushuntiraman. Python'da bu juda muhim konsept bo'lib, amaliyotda keng qo'llaniladi. Masalan: \`for i in range(10): print(i)\``,
-        `Ajoyib savol! Bu mavzuni tushunish uchun avval asosiy tushunchalarni ko'rib chiqamiz. Sintaksisga e'tibor bering.`,
-        `Bu haqida ko'proq ma'lumot olish uchun keyingi darsni ham ko'ring. Siz juda yaxshi ilgarilamoqdasiz!`,
-      ]
-      setAiChat(prev => [...prev, { role: 'ai', text: responses[Math.floor(Math.random() * responses.length)] }])
-    }, 800)
+    setAiTyping(true)
+    try {
+      const { reply } = await api.aiChat(q)
+      setAiChat(prev => [...prev, { role: 'ai', text: reply }])
+    } catch {
+      setAiChat(prev => [...prev, {
+        role: 'ai',
+        text: `"${q}" bo'yicha tushuntiraman. Bu konsept Python'da amaliyotda keng qo'llaniladi. Keyingi darsda ham ko'rib chiqamiz.`,
+      }])
+    }
+    setAiTyping(false)
+  }
+
+  const handleCompleteLesson = async () => {
+    if (!currentLesson || completing) return
+    if (currentLesson.completed || localCompleted.has(currentLesson.id)) return
+    setCompleting(true)
+    try {
+      await api.completeLesson(currentLesson.id)
+      setLocalCompleted(prev => new Set([...prev, currentLesson.id]))
+    } catch (e: any) {
+      console.error('Lesson complete:', e.message)
+    }
+    setCompleting(false)
+  }
+
+  const runPracticeCode = async () => {
+    setPracticeRunning(true)
+    try {
+      const { output, duration } = await api.runCode(practiceCode, 'python')
+      setPracticeOutput(`${output}\n\n⏱ ${duration}ms`)
+    } catch {
+      setPracticeOutput("Backend ulanishda xatolik. Keyinroq urinib ko'ring.")
+    }
+    setPracticeRunning(false)
   }
 
   const submitQuiz = () => setQuizSubmitted(true)
@@ -556,7 +597,7 @@ export default function CourseDetailPage() {
 
                     {/* Status icon */}
                     <div className="flex-shrink-0 relative">
-                      {lesson.completed ? (
+                      {lesson.completed || localCompleted.has(lesson.id) ? (
                         <CheckCircle2 className="w-4 h-4 text-base-500" />
                       ) : lesson.locked ? (
                         <Lock className="w-4 h-4 text-base-700" />
@@ -574,7 +615,7 @@ export default function CourseDetailPage() {
                     <div className="flex-1 min-w-0">
                       <div className={`text-xs font-medium truncate transition-colors duration-200 ${
                         active ? 'text-base-100' :
-                        lesson.completed ? 'text-base-600' :
+                        (lesson.completed || localCompleted.has(lesson.id)) ? 'text-base-600' :
                         isSkippable ? 'text-base-700' :
                         'text-base-300'}`}>
                         {idx + 1}. {lesson.title}
@@ -693,27 +734,38 @@ export default function CourseDetailPage() {
                       </div>
                       <div className="px-4 pb-4">
                         <textarea
+                          value={practiceCode}
+                          onChange={e => setPracticeCode(e.target.value)}
                           className="w-full h-24 bg-[#111113] border border-[#1E1E24] rounded-lg p-3 text-xs code-font text-emerald-400 resize-none focus:outline-none focus:border-[#27272A] transition-colors"
-                          defaultValue={`for i in range(1, 11):\n    print(f"{i} ** 2 = {i**2}")`}
                         />
                         <div className="flex gap-2 mt-2">
-                          <button className="btn-primary text-xs py-1.5 px-4 flex items-center gap-1.5 hover:scale-[1.02] active:scale-[0.98] transition-transform">
-                            <Play className="w-3 h-3" /> Ishga tushirish
+                          <button
+                            onClick={runPracticeCode}
+                            disabled={practiceRunning}
+                            className="btn-primary text-xs py-1.5 px-4 flex items-center gap-1.5 hover:scale-[1.02] active:scale-[0.98] transition-transform disabled:opacity-50 disabled:scale-100"
+                          >
+                            {practiceRunning
+                              ? <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                              : <Play className="w-3 h-3" />}
+                            {practiceRunning ? 'Bajarilmoqda...' : 'Ishga tushirish'}
                           </button>
-                          <button className="btn-ghost text-xs py-1.5 px-3 flex items-center gap-1.5">
+                          <button
+                            onClick={() => sendAiMessage()}
+                            className="btn-ghost text-xs py-1.5 px-3 flex items-center gap-1.5"
+                          >
                             <Brain className="w-3 h-3" /> AI Tushuntirsin
                           </button>
                         </div>
                       </div>
                     </div>
-                    <div className="mt-3 bg-[#0D0D10] rounded-xl border border-[#1A2A1A] p-4">
-                      <div className="text-xs text-emerald-600 mb-2 flex items-center gap-1.5">
-                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60" /> Natija:
+                    {practiceOutput && (
+                      <div className="mt-3 bg-[#0D0D10] rounded-xl border border-[#1A2A1A] p-4 animate-fade-in">
+                        <div className="text-xs text-emerald-600 mb-2 flex items-center gap-1.5">
+                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60" /> Natija:
+                        </div>
+                        <pre className="text-xs code-font text-emerald-400/80 leading-relaxed whitespace-pre-wrap">{practiceOutput}</pre>
                       </div>
-                      <pre className="text-xs code-font text-emerald-400/80 leading-relaxed">
-                        {`1 ** 2 = 1\n4 ** 2 = 16\n9 ** 2 = 81\n...`}
-                      </pre>
-                    </div>
+                    )}
                   </div>
                 )}
 
@@ -775,10 +827,21 @@ export default function CourseDetailPage() {
                 )}
 
                 {/* Complete button */}
-                <button className="w-full btn-primary py-3 font-semibold flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99] transition-transform mt-2">
-                  <CheckCircle2 className="w-4 h-4" />
-                  Darsni tugatish (+{currentLesson.xpReward} XP)
-                </button>
+                {(() => {
+                  const isDone = currentLesson.completed || localCompleted.has(currentLesson.id)
+                  return (
+                    <button
+                      onClick={handleCompleteLesson}
+                      disabled={completing || isDone}
+                      className="w-full btn-primary py-3 font-semibold flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99] transition-transform mt-2 disabled:scale-100 disabled:cursor-not-allowed"
+                    >
+                      {completing
+                        ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        : <CheckCircle2 className={`w-4 h-4 ${isDone ? 'text-emerald-300' : ''}`} />}
+                      {isDone ? 'Bajarildi ✓' : completing ? 'Saqlanmoqda...' : `Darsni tugatish (+${currentLesson.xpReward} XP)`}
+                    </button>
+                  )
+                })()}
               </div>
 
               {/* AI Chat */}
@@ -807,13 +870,25 @@ export default function CourseDetailPage() {
                       </div>
                     </div>
                   ))}
+                  {aiTyping && (
+                    <div className="flex gap-2">
+                      <div className="w-7 h-7 rounded-lg bg-[#0D0D10] border border-[#1E1E24] flex items-center justify-center flex-shrink-0">
+                        <Brain className="w-3.5 h-3.5 text-base-600" />
+                      </div>
+                      <div className="px-3 py-2.5 rounded-xl bg-[#111113] border border-[#1E1E24] flex gap-1 items-center">
+                        {[0, 1, 2].map(i => (
+                          <div key={i} className="w-1 h-1 rounded-full bg-accent-500 animate-pulse" style={{ animationDelay: `${i * 150}ms` }} />
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <div className="flex gap-2">
                   <input value={aiInput} onChange={(e) => setAiInput(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && sendAiMessage()}
+                    onKeyDown={(e) => e.key === 'Enter' && !aiTyping && sendAiMessage()}
                     className="input text-xs flex-1" placeholder="Savol bering..." />
-                  <button onClick={sendAiMessage}
-                    className="btn-primary px-4 text-xs hover:scale-[1.04] active:scale-[0.96] transition-transform">
+                  <button onClick={sendAiMessage} disabled={aiTyping}
+                    className="btn-primary px-4 text-xs hover:scale-[1.04] active:scale-[0.96] transition-transform disabled:opacity-50 disabled:scale-100">
                     Yuborish
                   </button>
                 </div>

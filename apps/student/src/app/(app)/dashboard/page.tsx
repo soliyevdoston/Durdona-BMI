@@ -26,12 +26,6 @@ function AchIcon({ icon }: { icon: string }) {
   return <Icon className="w-4 h-4 text-base-500" />
 }
 
-const TODAY_TASKS = [
-  { id: 1, text: 'Python: Sikllar darsini tugatish', done: false, xp: 25, type: 'lesson' },
-  { id: 2, text: 'Kalkulyator topshirig\'ini topshirish', done: false, xp: 50, type: 'assignment' },
-  { id: 3, text: 'Web dasturlash: 3 darsni ko\'rish', done: true, xp: 30, type: 'lesson' },
-  { id: 4, text: 'SQL testidan o\'tish', done: true, xp: 40, type: 'quiz' },
-]
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
@@ -47,7 +41,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export default function StudentDashboard() {
   const { user } = useAuthStore()
-  const [tasks, setTasks] = useState(TODAY_TASKS)
+  const [doneTasks, setDoneTasks] = useState<Set<string>>(new Set())
 
   const { data: courses } = useApi(() => api.myCourses())
   const { data: assignments } = useApi(() => api.myAssignments())
@@ -63,11 +57,22 @@ export default function StudentDashboard() {
   const pendingAssignments = (assignments || []).filter((a: any) => a.status === 'pending')
   const earnedAchievements = (achievements || []).filter((a: any) => a.earned)
   const totalAchievements = (achievements || []).length
+  const tasks = pendingAssignments.slice(0, 5).map((a: any) => ({
+    id: String(a.id),
+    text: a.title,
+    done: doneTasks.has(String(a.id)),
+    xp: a.type === 'project' ? 100 : a.type === 'quiz' ? 40 : 50,
+    type: a.type,
+  }))
   const completedTasks = tasks.filter(t => t.done).length
-  const todayXP = tasks.filter(t => t.done).reduce((sum, t) => sum + t.xp, 0)
+  const todayXP = tasks.filter(t => t.done).reduce((sum: number, t: any) => sum + t.xp, 0)
   const aiTip = aiSuggestions?.[0] || ''
 
-  const toggleTask = (id: number) => setTasks(prev => prev.map(t => t.id === id ? { ...t, done: !t.done } : t))
+  const toggleTask = (id: string) => setDoneTasks(prev => {
+    const n = new Set(prev)
+    n.has(id) ? n.delete(id) : n.add(id)
+    return n
+  })
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 animate-fade-in">
@@ -237,6 +242,9 @@ export default function StudentDashboard() {
               <span className="text-xs text-base-500">{completedTasks}/{tasks.length}</span>
             </div>
             <div className="space-y-2">
+              {tasks.length === 0 && (
+                <p className="text-xs text-base-600 text-center py-3">Kutilayotgan topshiriqlar yo'q</p>
+              )}
               {tasks.map((task) => (
                 <button key={task.id} onClick={() => toggleTask(task.id)}
                   className="w-full flex items-start gap-3 p-2.5 rounded-xl hover:bg-[#1A1A1F] transition-colors text-left group">

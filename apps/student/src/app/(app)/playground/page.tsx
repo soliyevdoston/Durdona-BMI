@@ -41,6 +41,8 @@ export default function PlaygroundPage() {
   const [activeTab, setActiveTab] = useState<'output' | 'tests' | 'ai'>('output')
   const [langOpen, setLangOpen] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [aiAnalysis, setAiAnalysis] = useState<string | null>(null)
+  const [aiAnalyzing, setAiAnalyzing] = useState(false)
 
   const changeLang = (l: Lang) => {
     setLang(l)
@@ -61,9 +63,29 @@ export default function PlaygroundPage() {
     setRunning(false)
   }
 
-  const copyCode = () => {
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+  const copyCode = async () => {
+    try {
+      await navigator.clipboard.writeText(code)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      setCopied(false)
+    }
+  }
+
+  const analyzeCode = async () => {
+    setAiAnalyzing(true)
+    setAiAnalysis(null)
+    setActiveTab('ai')
+    try {
+      const { reply } = await api.aiChat(
+        `Quyidagi ${lang} kodini tahlil qiling. Xatolar, yaxshilash imkoniyatlari va vaqt murakkabligi haqida qisqacha yozing:\n\`\`\`\n${code}\n\`\`\``
+      )
+      setAiAnalysis(reply)
+    } catch {
+      setAiAnalysis(AI_FEEDBACK.join('\n\n'))
+    }
+    setAiAnalyzing(false)
   }
 
   const passCount = TEST_CASES.filter(t => t.status === 'pass').length
@@ -242,36 +264,41 @@ export default function PlaygroundPage() {
             {/* AI Analysis */}
             {activeTab === 'ai' && (
               <div className="space-y-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-7 h-7 rounded-lg bg-accent-600/20 flex items-center justify-center">
-                    <Brain className="w-4 h-4 text-accent-400" />
-                  </div>
-                  <div className="text-sm font-medium text-base-200">Kod Tahlili</div>
-                </div>
-                {AI_FEEDBACK.map((fb, i) => (
-                  <div key={i} className="flex items-start gap-2">
-                    <div className="w-5 h-5 rounded-full bg-accent-600/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span className="text-xs text-accent-400">{i + 1}</span>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-accent-600/20 flex items-center justify-center">
+                      <Brain className="w-4 h-4 text-accent-400" />
                     </div>
-                    <p className="text-xs text-base-400 leading-relaxed">{fb}</p>
+                    <div className="text-sm font-medium text-base-200">Kod Tahlili</div>
                   </div>
-                ))}
-
-                <div className="mt-4 p-3 rounded-xl bg-[#1A1A1F] border border-[#27272A]">
-                  <div className="text-xs text-base-500 mb-1">Tavsiya etilgan yaxshilash:</div>
-                  <pre className="text-xs code-font text-emerald-400 leading-relaxed">
-                    {`# Yaxshilangan versiya:
-maksimum = max(royxat) if royxat else None
-# yoki:
-[i*i for i in range(1, 11)]`}
-                  </pre>
+                  <button onClick={analyzeCode} disabled={aiAnalyzing}
+                    className="text-xs px-3 py-1.5 rounded-lg bg-accent-600/10 border border-accent-600/20 text-accent-400 hover:bg-accent-600/20 transition-colors disabled:opacity-50 flex items-center gap-1.5">
+                    {aiAnalyzing
+                      ? <><div className="w-3 h-3 border-2 border-accent-400/30 border-t-accent-400 rounded-full animate-spin" /> Tahlil qilinmoqda...</>
+                      : <><Zap className="w-3 h-3" /> AI Tahlil</>}
+                  </button>
                 </div>
 
-                <div className="flex gap-2">
-                  <div className="badge-emerald">Kod Sifati: A-</div>
-                  <div className="badge-sky">Vaqt: O(n)</div>
-                  <div className="badge-amber">Xotira: O(1)</div>
-                </div>
+                {aiAnalyzing && (
+                  <div className="flex items-center gap-3 py-8 justify-center text-sm text-base-500">
+                    <div className="w-4 h-4 border-2 border-accent-600/30 border-t-accent-600 rounded-full animate-spin" />
+                    Kod tahlil qilinmoqda...
+                  </div>
+                )}
+
+                {aiAnalysis && !aiAnalyzing && (
+                  <div className="text-xs text-base-400 leading-relaxed whitespace-pre-wrap animate-fade-in">
+                    {aiAnalysis}
+                  </div>
+                )}
+
+                {!aiAnalysis && !aiAnalyzing && (
+                  <div className="flex flex-col items-center justify-center py-10 text-center">
+                    <Brain className="w-10 h-10 text-base-800 mb-3" />
+                    <p className="text-sm text-base-600">Kodingizni AI tahlil qilsin</p>
+                    <p className="text-xs text-base-700 mt-1">Yuqoridagi tugmani bosing</p>
+                  </div>
+                )}
               </div>
             )}
           </div>

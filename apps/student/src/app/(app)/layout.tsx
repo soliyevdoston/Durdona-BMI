@@ -27,9 +27,17 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
   const { user, logout } = useAuthStore()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
+  const [readIds, setReadIds] = useState<Set<string>>(new Set())
   const { data: notifications } = useApi(() => api.notifications())
   const notifList = notifications || []
-  const unread = notifList.filter((n: any) => !n.read).length
+  const unread = notifList.filter((n: any) => !n.read && !readIds.has(n.id)).length
+
+  const handleNotifClick = (id: string, read: boolean) => {
+    if (!read && !readIds.has(id)) {
+      api.markNotificationRead(id).catch(() => {})
+      setReadIds(prev => new Set([...prev, id]))
+    }
+  }
 
   useEffect(() => {
     if (!user || user.role !== 'student') router.push('/login')
@@ -154,17 +162,22 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
                       <X className="w-4 h-4 text-base-500" />
                     </button>
                   </div>
-                  {notifList.map((n: any) => (
-                    <div key={n.id} className={`px-4 py-3 border-b border-[var(--border-muted)] hover:bg-[var(--bg-overlay)] transition-colors ${!n.read ? 'bg-accent-600/5' : ''}`}>
-                      <div className="flex items-start gap-2">
-                        {!n.read && <div className="w-1.5 h-1.5 rounded-full bg-accent-500 mt-1.5 flex-shrink-0" />}
-                        <div className={!n.read ? '' : 'ml-3.5'}>
-                          <div className="text-xs font-medium text-base-200">{n.title}</div>
-                          <div className="text-xs text-base-500 mt-0.5">{n.body}</div>
+                  {notifList.map((n: any) => {
+                    const isRead = n.read || readIds.has(n.id)
+                    return (
+                      <div key={n.id}
+                        onClick={() => handleNotifClick(n.id, n.read)}
+                        className={`px-4 py-3 border-b border-[var(--border-muted)] hover:bg-[var(--bg-overlay)] transition-colors cursor-pointer ${!isRead ? 'bg-accent-600/5' : ''}`}>
+                        <div className="flex items-start gap-2">
+                          {!isRead && <div className="w-1.5 h-1.5 rounded-full bg-accent-500 mt-1.5 flex-shrink-0" />}
+                          <div className={!isRead ? '' : 'ml-3.5'}>
+                            <div className="text-xs font-medium text-base-200">{n.title}</div>
+                            <div className="text-xs text-base-500 mt-0.5">{n.body}</div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               )}
             </div>

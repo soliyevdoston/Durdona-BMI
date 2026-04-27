@@ -88,15 +88,37 @@ function AssignmentCard({ a, onOpen }: { a: Assignment; onOpen: () => void }) {
   )
 }
 
-function SubmitModal({ assignment, onClose }: { assignment: Assignment; onClose: () => void }) {
+function SubmitModal({ assignment, onClose, onSuccess }: {
+  assignment: Assignment
+  onClose: () => void
+  onSuccess: () => void
+}) {
   const [submitted, setSubmitted] = useState(false)
   const [text, setText] = useState('')
+  const [comment, setComment] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const tp = TYPE_CONFIG[assignment.type]
   const TpIcon = tp.icon
 
+  const handleSubmit = async () => {
+    if (loading) return
+    const content = text.trim() || comment.trim() || '(topshiriq yuborildi)'
+    setLoading(true)
+    setError(null)
+    try {
+      await api.submitAssignment(assignment.id, content)
+      setSubmitted(true)
+      onSuccess()
+    } catch (e: any) {
+      setError(e.message || 'Xatolik yuz berdi. Qayta urinib ko\'ring.')
+    }
+    setLoading(false)
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={!loading ? onClose : undefined} />
       <div className="relative w-full max-w-lg card-elevated p-6 animate-slide-up shadow-card-hover">
         {!submitted ? (
           <>
@@ -133,24 +155,35 @@ function SubmitModal({ assignment, onClose }: { assignment: Assignment; onClose:
 
             <div className="mb-4">
               <label className="text-xs text-base-500 uppercase tracking-wider mb-2 block">Izoh (ixtiyoriy)</label>
-              <textarea className="input h-20 resize-none" placeholder="O'qituvchiga izoh..." />
+              <textarea value={comment} onChange={e => setComment(e.target.value)}
+                className="input h-20 resize-none" placeholder="O'qituvchiga izoh..." />
             </div>
 
+            {error && (
+              <div className="mb-3 text-xs text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-xl px-3 py-2">
+                {error}
+              </div>
+            )}
+
             <div className="flex gap-3">
-              <button onClick={onClose} className="btn-secondary flex-1 py-2.5">Bekor</button>
-              <button onClick={() => setSubmitted(true)} className="btn-primary flex-1 py-2.5 flex items-center justify-center gap-2">
-                <Upload className="w-4 h-4" /> Topshirish
+              <button onClick={onClose} disabled={loading} className="btn-secondary flex-1 py-2.5">Bekor</button>
+              <button onClick={handleSubmit} disabled={loading}
+                className="btn-primary flex-1 py-2.5 flex items-center justify-center gap-2 disabled:opacity-70">
+                {loading
+                  ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  : <Upload className="w-4 h-4" />}
+                {loading ? 'Yuborilmoqda...' : 'Topshirish'}
               </button>
             </div>
           </>
         ) : (
-          <div className="text-center py-6">
+          <div className="text-center py-6 animate-scale-in">
             <div className="w-16 h-16 rounded-full bg-emerald-500/15 flex items-center justify-center mx-auto mb-4">
               <CheckCircle2 className="w-8 h-8 text-emerald-400" />
             </div>
             <h2 className="text-xl font-bold text-base-100 mb-2">Topshirildi!</h2>
             <p className="text-sm text-base-500 mb-6">Ishingiz o'qituvchiga yuborildi. Baho kelganda xabardor qilinasiz.</p>
-            <div className="badge-emerald inline-flex">+25 XP qo'shildi</div>
+            <div className="badge-emerald inline-flex">Muvaffaqiyatli yuborildi</div>
             <button onClick={onClose} className="btn-secondary w-full mt-4 py-2.5">Yopish</button>
           </div>
         )}
@@ -163,7 +196,7 @@ export default function AssignmentsPage() {
   const [filter, setFilter] = useState<'all' | Assignment['status']>('all')
   const [selected, setSelected] = useState<Assignment | null>(null)
 
-  const { data, loading } = useApi(() => api.myAssignments())
+  const { data, loading, refetch } = useApi(() => api.myAssignments())
   const assignments: Assignment[] = data || []
 
   const filtered = filter === 'all' ? assignments : assignments.filter(a => a.status === filter)
@@ -219,7 +252,13 @@ export default function AssignmentsPage() {
         ))}
       </div>
 
-      {selected && <SubmitModal assignment={selected} onClose={() => setSelected(null)} />}
+      {selected && (
+        <SubmitModal
+          assignment={selected}
+          onClose={() => setSelected(null)}
+          onSuccess={() => { refetch(); }}
+        />
+      )}
     </div>
   )
 }
