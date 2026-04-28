@@ -2,38 +2,36 @@
 import Link from 'next/link'
 import {
   Users, BookOpen, FileText, Server, TrendingUp, Activity,
-  HardDrive, Cpu, Shield, AlertCircle, ChevronRight, Database,
-  UserPlus, DollarSign, Star, CheckCircle2, Zap
+  HardDrive, Cpu, Shield, AlertCircle, ChevronRight,
+  UserPlus, CheckCircle2, Zap
 } from 'lucide-react'
 import {
-  AreaChart, Area, LineChart, Line, PieChart, Pie, Cell,
+  AreaChart, Area, PieChart, Pie, Cell,
   XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend
 } from 'recharts'
 import { api } from '@/lib/api'
 import { useApi } from '@/lib/useApi'
 
-const REVENUE_DATA = [
-  { month: 'Yan', revenue: 12500, users: 156 },
-  { month: 'Fev', revenue: 14200, users: 182 },
-  { month: 'Mar', revenue: 16800, users: 214 },
-  { month: 'Apr', revenue: 19500, users: 245 },
-]
-
-const ROLE_DISTRIBUTION = [
-  { name: 'Talabalar', value: 1180 },
-  { name: "O'qituvchilar", value: 42 },
-  { name: 'Adminlar', value: 5 },
-  { name: 'Boshqalar', value: 20 },
-]
 const COLORS = ['#7C3AED', '#0EA5E9', '#10B981', '#F59E0B']
 
-const ACTIVITY_LOG = [
-  { id: 1, user: 'Azizbek K.', action: 'Kurs yakunladi', course: 'Python Asoslari', time: '2 daq oldin', icon: CheckCircle2, color: 'text-emerald-400' },
-  { id: 2, user: 'Dilnoza Y.', action: 'Yangi kurs yaratdi', course: 'Data Structures', time: '15 daq oldin', icon: BookOpen, color: 'text-sky-400' },
-  { id: 3, user: 'Bobur X.', action: 'Ro\'yxatdan o\'tdi', course: '', time: '1 soat oldin', icon: UserPlus, color: 'text-accent-400' },
-  { id: 4, user: 'Tizim', action: 'Backup muvaffaqiyatli', course: 'Database', time: '2 soat oldin', icon: Database, color: 'text-base-400' },
-  { id: 5, user: 'Malika T.', action: '50 XP topdi', course: 'Web Dasturlash', time: '3 soat oldin', icon: Zap, color: 'text-amber-400' },
-]
+function getLogIcon(action: string) {
+  if (action.includes('lesson') || action.includes('course')) return { icon: BookOpen, color: 'text-sky-400' }
+  if (action.includes('auth') || action.includes('register')) return { icon: UserPlus, color: 'text-accent-400' }
+  if (action.includes('xp') || action.includes('achievement')) return { icon: Zap, color: 'text-amber-400' }
+  if (action.includes('assignment') || action.includes('submit')) return { icon: FileText, color: 'text-emerald-400' }
+  if (action.includes('ai') || action.includes('code')) return { icon: CheckCircle2, color: 'text-purple-400' }
+  return { icon: Activity, color: 'text-base-400' }
+}
+
+function timeAgo(date: string) {
+  const diff = Date.now() - new Date(date).getTime()
+  const min = Math.floor(diff / 60000)
+  if (min < 1) return 'hozir'
+  if (min < 60) return `${min} daq oldin`
+  const h = Math.floor(min / 60)
+  if (h < 24) return `${h} soat oldin`
+  return `${Math.floor(h / 24)} kun oldin`
+}
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload?.length) {
@@ -58,7 +56,16 @@ export default function AdminDashboard() {
     totalUsers: 0, activeToday: 0, coursesTotal: 0, lessonsTotal: 0,
     assignmentsTotal: 0, avgCompletionRate: 0, avgRating: 0,
     serverLoad: 0, storageUsed: 0, uptime: 0,
+    roleCounts: { students: 0, teachers: 0, admins: 0 },
   }
+
+  const roleDistribution = [
+    { name: 'Talabalar', value: stats.roleCounts?.students || 0 },
+    { name: "O'qituvchilar", value: stats.roleCounts?.teachers || 0 },
+    { name: 'Adminlar', value: stats.roleCounts?.admins || 0 },
+  ].filter(r => r.value > 0)
+
+  const activityLog: any[] = logs || []
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 animate-fade-in">
@@ -189,8 +196,8 @@ export default function AdminDashboard() {
           </div>
           <ResponsiveContainer width="100%" height={200}>
             <PieChart>
-              <Pie data={ROLE_DISTRIBUTION} dataKey="value" cx="50%" cy="50%" outerRadius={70} innerRadius={40} paddingAngle={2}>
-                {ROLE_DISTRIBUTION.map((_, i) => (
+              <Pie data={roleDistribution} dataKey="value" cx="50%" cy="50%" outerRadius={70} innerRadius={40} paddingAngle={2}>
+                {roleDistribution.map((_, i) => (
                   <Cell key={i} fill={COLORS[i]} stroke="none" />
                 ))}
               </Pie>
@@ -198,7 +205,7 @@ export default function AdminDashboard() {
             </PieChart>
           </ResponsiveContainer>
           <div className="space-y-2 mt-2">
-            {ROLE_DISTRIBUTION.map((r, i) => (
+            {roleDistribution.map((r, i) => (
               <div key={r.name} className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full" style={{ background: COLORS[i] }} />
@@ -221,21 +228,25 @@ export default function AdminDashboard() {
             </Link>
           </div>
           <div className="space-y-2">
-            {ACTIVITY_LOG.map((log) => (
-              <div key={log.id} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-[#1A1A1F] transition-colors">
-                <div className={`w-8 h-8 rounded-lg bg-[#1A1A1F] flex items-center justify-center`}>
-                  <log.icon className={`w-4 h-4 ${log.color}`} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm text-base-200">
-                    <span className="font-medium">{log.user}</span>{' '}
-                    <span className="text-base-500">{log.action}</span>
-                    {log.course && <span className="text-base-400"> · {log.course}</span>}
+            {activityLog.length === 0 ? (
+              <p className="text-xs text-base-600 py-4 text-center">Faoliyat yo'q</p>
+            ) : activityLog.map((entry: any) => {
+              const { icon: Icon, color } = getLogIcon(entry.action)
+              return (
+                <div key={entry.id} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-[#1A1A1F] transition-colors">
+                  <div className="w-8 h-8 rounded-lg bg-[#1A1A1F] flex items-center justify-center">
+                    <Icon className={`w-4 h-4 ${color}`} />
                   </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm text-base-200">
+                      <span className="font-medium">{entry.user?.name || 'Tizim'}</span>{' '}
+                      <span className="text-base-500">{entry.action}</span>
+                    </div>
+                  </div>
+                  <span className="text-xs text-base-700 flex-shrink-0">{timeAgo(entry.createdAt)}</span>
                 </div>
-                <span className="text-xs text-base-700 flex-shrink-0">{log.time}</span>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
 

@@ -33,11 +33,11 @@ export default function RegisterPage() {
     <div className="min-h-screen bg-app flex items-center justify-center px-4">
       <div className="w-full max-w-md animate-slide-up">
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2">
+          <a href="https://educode-landing.vercel.app" className="inline-flex items-center gap-2">
             <div className="w-9 h-9 rounded-md bg-base-100 text-base-950 flex items-center justify-center font-semibold">E</div>
             <span className="text-lg font-medium text-base-100">EduCode</span>
             <span className="text-xs text-base-500 ml-1">· Admin</span>
-          </Link>
+          </a>
         </div>
 
         <div className="card p-8">

@@ -1,8 +1,8 @@
 'use client'
 import { useState } from 'react'
 import {
-  Search, MoreVertical, Edit, Trash2, Ban, Shield, ShieldCheck,
-  UserPlus, Mail, Download, Users, GraduationCap, BookOpen, Crown
+  Search, MoreVertical, Edit, Trash2, Shield, ShieldCheck,
+  UserPlus, Download, Users, GraduationCap, BookOpen, Crown, X, CheckCircle2
 } from 'lucide-react'
 import { api } from '@/lib/api'
 import { useApi } from '@/lib/useApi'
@@ -15,25 +15,102 @@ const ROLE_CONFIG = {
   super_admin: { label: 'Super Admin', color: 'badge bg-amber-500/10 text-amber-400 border border-amber-500/20', Icon: Crown },
 }
 
+function AddUserModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: () => void }) {
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [role, setRole] = useState('student')
+  const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [done, setDone] = useState(false)
+
+  const handleSubmit = async () => {
+    if (!name || !email || !password) { setError("Barcha maydonlar to'ldirilishi shart"); return }
+    setLoading(true); setError(null)
+    try {
+      await api.createUser({ name, email, password, role })
+      setDone(true)
+      onSuccess()
+    } catch (e: any) { setError(e.message) }
+    setLoading(false)
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={!loading ? onClose : undefined} />
+      <div className="relative w-full max-w-md card-elevated p-6 animate-slide-up">
+        {done ? (
+          <div className="text-center py-6">
+            <div className="w-14 h-14 rounded-full bg-emerald-500/15 flex items-center justify-center mx-auto mb-4">
+              <CheckCircle2 className="w-7 h-7 text-emerald-400" />
+            </div>
+            <h2 className="text-xl font-bold text-base-100 mb-2">Yaratildi!</h2>
+            <p className="text-sm text-base-500 mb-5">Foydalanuvchi muvaffaqiyatli qo'shildi.</p>
+            <button onClick={onClose} className="btn-secondary w-full py-2.5">Yopish</button>
+          </div>
+        ) : (
+          <>
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-xl font-bold text-base-100">Yangi Foydalanuvchi</h2>
+              <button onClick={onClose}><X className="w-5 h-5 text-base-500 hover:text-base-200" /></button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs text-base-500 uppercase tracking-wider mb-2 block">To'liq Ism *</label>
+                <input value={name} onChange={e => setName(e.target.value)} className="input" placeholder="Ism Familiya" />
+              </div>
+              <div>
+                <label className="text-xs text-base-500 uppercase tracking-wider mb-2 block">Email *</label>
+                <input value={email} onChange={e => setEmail(e.target.value)} className="input" type="email" placeholder="email@edu.uz" />
+              </div>
+              <div>
+                <label className="text-xs text-base-500 uppercase tracking-wider mb-2 block">Rol</label>
+                <select value={role} onChange={e => setRole(e.target.value)} className="input">
+                  <option value="student">Talaba</option>
+                  <option value="teacher">O'qituvchi</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-xs text-base-500 uppercase tracking-wider mb-2 block">Parol *</label>
+                <input value={password} onChange={e => setPassword(e.target.value)} className="input" type="password" placeholder="Kamida 4 ta belgi" />
+              </div>
+            </div>
+            {error && (
+              <div className="mt-3 text-xs text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-xl px-3 py-2">{error}</div>
+            )}
+            <div className="flex gap-3 mt-6">
+              <button onClick={onClose} disabled={loading} className="btn-secondary flex-1 py-2.5">Bekor</button>
+              <button onClick={handleSubmit} disabled={loading}
+                className="btn-primary bg-emerald-600 hover:bg-emerald-700 flex-1 py-2.5 flex items-center justify-center gap-2 disabled:opacity-70">
+                {loading ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <UserPlus className="w-4 h-4" />}
+                {loading ? 'Yaratilmoqda...' : 'Yaratish'}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export default function AdminUsersPage() {
   const [search, setSearch] = useState('')
   const [roleFilter, setRoleFilter] = useState<'all' | 'student' | 'teacher' | 'admin'>('all')
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all')
   const [menuOpen, setMenuOpen] = useState<string | null>(null)
   const [showAdd, setShowAdd] = useState(false)
+  const [deleting, setDeleting] = useState<string | null>(null)
 
-  const { data, loading } = useApi(() => api.users())
+  const { data, loading, refetch } = useApi(() => api.users())
   const ALL_USERS: any[] = (data || []).map((u: any) => ({
     ...u,
-    status: 'active',
     lastSeen: u.lastActive || u.joinedAt,
   }))
 
   const filtered = ALL_USERS.filter(u => {
     const matchSearch = u.name.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase())
     const matchRole = roleFilter === 'all' || u.role === roleFilter
-    const matchStatus = statusFilter === 'all' || u.status === statusFilter
-    return matchSearch && matchRole && matchStatus
+    return matchSearch && matchRole
   })
 
   const stats = {
@@ -43,8 +120,19 @@ export default function AdminUsersPage() {
     admins: ALL_USERS.filter(u => u.role === 'admin').length,
   }
 
+  const handleDelete = async (userId: string, userName: string) => {
+    if (!confirm(`"${userName}" ni o'chirishni tasdiqlaysizmi?`)) return
+    setDeleting(userId)
+    try {
+      await api.deleteUser(userId)
+      refetch()
+    } catch (e: any) { alert(e.message) }
+    setDeleting(null)
+    setMenuOpen(null)
+  }
+
   return (
-    <div className="max-w-7xl mx-auto space-y-6 animate-fade-in">
+    <div className="max-w-7xl mx-auto space-y-6 animate-fade-in" onClick={() => setMenuOpen(null)}>
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-base-100">Foydalanuvchilar</h1>
@@ -61,7 +149,6 @@ export default function AdminUsersPage() {
         </div>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="stat-card">
           <Users className="w-4 h-4 text-accent-400 mb-2" />
@@ -85,31 +172,20 @@ export default function AdminUsersPage() {
         </div>
       </div>
 
-      {/* Filters */}
       <div className="flex flex-col lg:flex-row gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-base-600" />
           <input value={search} onChange={(e) => setSearch(e.target.value)}
             className="input pl-10" placeholder="Ism yoki email bo'yicha qidirish..." />
         </div>
-        <div className="flex gap-2 flex-wrap">
-          <select value={roleFilter} onChange={(e) => setRoleFilter(e.target.value as any)}
-            className="input w-auto">
-            <option value="all">Barcha rollar</option>
-            <option value="student">Talabalar</option>
-            <option value="teacher">O'qituvchilar</option>
-            <option value="admin">Adminlar</option>
-          </select>
-          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as any)}
-            className="input w-auto">
-            <option value="all">Barcha holatlar</option>
-            <option value="active">Faol</option>
-            <option value="inactive">Nofaol</option>
-          </select>
-        </div>
+        <select value={roleFilter} onChange={(e) => setRoleFilter(e.target.value as any)} className="input w-auto">
+          <option value="all">Barcha rollar</option>
+          <option value="student">Talabalar</option>
+          <option value="teacher">O'qituvchilar</option>
+          <option value="admin">Adminlar</option>
+        </select>
       </div>
 
-      {/* Users Table */}
       <div className="card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -117,14 +193,17 @@ export default function AdminUsersPage() {
               <tr className="border-b border-[#1E1E24] bg-[#0D0D10]">
                 <th className="text-left px-4 py-3 text-xs text-base-500 uppercase tracking-wider font-medium">Foydalanuvchi</th>
                 <th className="text-left px-4 py-3 text-xs text-base-500 uppercase tracking-wider font-medium">Rol</th>
-                <th className="text-left px-4 py-3 text-xs text-base-500 uppercase tracking-wider font-medium">Holat</th>
+                <th className="text-left px-4 py-3 text-xs text-base-500 uppercase tracking-wider font-medium">XP</th>
                 <th className="text-left px-4 py-3 text-xs text-base-500 uppercase tracking-wider font-medium">Qo'shilgan</th>
                 <th className="text-left px-4 py-3 text-xs text-base-500 uppercase tracking-wider font-medium">Oxirgi faol</th>
                 <th className="text-right px-4 py-3 text-xs text-base-500 uppercase tracking-wider font-medium">Amal</th>
               </tr>
             </thead>
             <tbody>
-              {filtered.map((u) => {
+              {loading && (
+                <tr><td colSpan={6} className="text-center py-8 text-base-600 text-sm">Yuklanmoqda...</td></tr>
+              )}
+              {!loading && filtered.map((u) => {
                 const rc = (ROLE_CONFIG as any)[u.role] || ROLE_CONFIG.student
                 return (
                   <tr key={u.id} className="border-b border-[#1E1E24] hover:bg-[#1A1A1F]/50 transition-colors">
@@ -148,12 +227,7 @@ export default function AdminUsersPage() {
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <div className="flex items-center gap-1.5">
-                        <div className={`w-1.5 h-1.5 rounded-full ${u.status === 'active' ? 'bg-emerald-500' : 'bg-base-600'}`} />
-                        <span className={`text-xs ${u.status === 'active' ? 'text-emerald-400' : 'text-base-500'}`}>
-                          {u.status === 'active' ? 'Faol' : 'Nofaol'}
-                        </span>
-                      </div>
+                      <span className="text-sm font-medium text-amber-400">{(u.xp || 0).toLocaleString()}</span>
                     </td>
                     <td className="px-4 py-3">
                       <span className="text-xs text-base-500">{formatDate(u.joinedAt)}</span>
@@ -161,72 +235,40 @@ export default function AdminUsersPage() {
                     <td className="px-4 py-3">
                       <span className="text-xs text-base-500">{formatDate(u.lastSeen)}</span>
                     </td>
-                    <td className="px-4 py-3 text-right relative">
+                    <td className="px-4 py-3 text-right relative" onClick={e => e.stopPropagation()}>
                       <button onClick={() => setMenuOpen(menuOpen === u.id ? null : u.id)}
                         className="p-1.5 rounded-lg hover:bg-[#222229] text-base-500 hover:text-base-200 transition-colors">
                         <MoreVertical className="w-4 h-4" />
                       </button>
                       {menuOpen === u.id && (
                         <div className="absolute right-0 top-full mt-1 w-44 card-elevated shadow-card-hover z-20 py-1 text-left animate-slide-up">
-                          {[
-                            { icon: Mail, label: 'Xabar yuborish', color: 'text-base-300' },
-                            { icon: Edit, label: 'Tahrirlash', color: 'text-base-300' },
-                            { icon: Shield, label: 'Rol o\'zgartirish', color: 'text-sky-400' },
-                            { icon: Ban, label: 'Bloklash', color: 'text-amber-400' },
-                            { icon: Trash2, label: 'O\'chirish', color: 'text-rose-400' },
-                          ].map(a => (
-                            <button key={a.label} className={`w-full px-3 py-2 text-xs flex items-center gap-2 hover:bg-[#222229] ${a.color}`}>
-                              <a.icon className="w-3.5 h-3.5" /> {a.label}
-                            </button>
-                          ))}
+                          <button className="w-full px-3 py-2 text-xs flex items-center gap-2 hover:bg-[#222229] text-sky-400"
+                            onClick={() => { setMenuOpen(null) }}>
+                            <Shield className="w-3.5 h-3.5" /> Rol o'zgartirish
+                          </button>
+                          <button
+                            onClick={() => handleDelete(u.id, u.name)}
+                            disabled={deleting === u.id}
+                            className="w-full px-3 py-2 text-xs flex items-center gap-2 hover:bg-rose-500/10 text-rose-400 disabled:opacity-50">
+                            <Trash2 className="w-3.5 h-3.5" />
+                            {deleting === u.id ? "O'chirilmoqda..." : "O'chirish"}
+                          </button>
                         </div>
                       )}
                     </td>
                   </tr>
                 )
               })}
+              {!loading && filtered.length === 0 && (
+                <tr><td colSpan={6} className="text-center py-8 text-base-600 text-sm">Foydalanuvchi topilmadi</td></tr>
+              )}
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* Add User Modal */}
       {showAdd && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowAdd(false)} />
-          <div className="relative w-full max-w-md card-elevated p-6 animate-slide-up">
-            <h2 className="text-xl font-bold text-base-100 mb-5">Yangi Foydalanuvchi</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="text-xs text-base-500 uppercase tracking-wider mb-2 block">To'liq Ism</label>
-                <input className="input" placeholder="Ism Familiya" />
-              </div>
-              <div>
-                <label className="text-xs text-base-500 uppercase tracking-wider mb-2 block">Email</label>
-                <input className="input" type="email" placeholder="email@edu.uz" />
-              </div>
-              <div>
-                <label className="text-xs text-base-500 uppercase tracking-wider mb-2 block">Rol</label>
-                <select className="input">
-                  <option value="student">Talaba</option>
-                  <option value="teacher">O'qituvchi</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </div>
-              <div>
-                <label className="text-xs text-base-500 uppercase tracking-wider mb-2 block">Vaqtinchalik Parol</label>
-                <input className="input" type="text" placeholder="Avtomatik generatsiya qilinadi" />
-              </div>
-            </div>
-            <div className="flex gap-3 mt-6">
-              <button onClick={() => setShowAdd(false)} className="btn-secondary flex-1 py-2.5">Bekor</button>
-              <button onClick={() => setShowAdd(false)}
-                className="btn-primary bg-emerald-600 hover:bg-emerald-700 flex-1 py-2.5 flex items-center justify-center gap-2">
-                <UserPlus className="w-4 h-4" /> Yaratish
-              </button>
-            </div>
-          </div>
-        </div>
+        <AddUserModal onClose={() => setShowAdd(false)} onSuccess={refetch} />
       )}
     </div>
   )

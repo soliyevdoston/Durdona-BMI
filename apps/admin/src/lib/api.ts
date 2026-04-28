@@ -48,6 +48,9 @@ export const api = {
 
   // Lessons
   completeLesson: (id: string) => request<any>(`/api/lessons/${id}/complete`, { method: 'POST' }),
+  createLesson: (data: any) => request('/api/lessons', { method: 'POST', body: data }),
+  updateLesson: (id: string, data: any) => request(`/api/lessons/${id}`, { method: 'PATCH', body: data }),
+  deleteLesson: (id: string) => request(`/api/lessons/${id}`, { method: 'DELETE' }),
 
   // Assignments
   myAssignments: () => request<any[]>('/api/assignments/mine'),
@@ -57,6 +60,8 @@ export const api = {
   gradeSubmission: (id: string, grade: number, feedback?: string) =>
     request(`/api/assignments/submissions/${id}/grade`, { method: 'POST', body: { grade, feedback } }),
   createAssignment: (data: any) => request('/api/assignments', { method: 'POST', body: data }),
+  deleteAssignment: (id: string) => request(`/api/assignments/${id}`, { method: 'DELETE' }),
+  assignmentSubmissions: (id: string) => request<any[]>(`/api/assignments/${id}/submissions`),
 
   // Users
   users: (params?: { role?: string; q?: string }) => {

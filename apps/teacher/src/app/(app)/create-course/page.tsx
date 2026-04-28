@@ -5,6 +5,7 @@ import {
   ChevronLeft, Save, Eye, Plus, Video, FileText, Code2, FileQuestion,
   GripVertical, Trash2, CheckCircle2, Upload, Image, Tag, X
 } from 'lucide-react'
+import { api } from '@/lib/api'
 
 type LessonType = 'video' | 'text' | 'quiz' | 'practice'
 
@@ -34,6 +35,9 @@ export default function CreateCoursePage() {
     { id: '1', title: 'Kirish', type: 'video', duration: '10' },
   ])
   const [published, setPublished] = useState(false)
+  const [publishing, setPublishing] = useState(false)
+  const [publishError, setPublishError] = useState<string | null>(null)
+  const [createdCourseId, setCreatedCourseId] = useState<string | null>(null)
 
   const addTag = () => {
     if (tagInput.trim() && !tags.includes(tagInput.trim())) {
@@ -59,11 +63,14 @@ export default function CreateCoursePage() {
         </div>
         <h1 className="text-3xl font-bold text-base-100 mb-2">Kurs yaratildi!</h1>
         <p className="text-base-500 mb-8">Kursingiz muvaffaqiyatli yaratildi va talabalar uchun mavjud</p>
-        <div className="flex gap-3 justify-center">
+        <div className="flex gap-3 justify-center flex-wrap">
           <Link href="/courses" className="btn-secondary px-6">Kurslarga</Link>
-          <button onClick={() => { setPublished(false); setStep(1); setTitle(''); setDescription(''); setLessons([{ id: '1', title: 'Kirish', type: 'video', duration: '10' }]) }}
+          <button onClick={() => { setPublished(false); setStep(1); setTitle(''); setDescription(''); setCategory(''); setLessons([{ id: '1', title: 'Kirish', type: 'video', duration: '10' }]); setCreatedCourseId(null) }}
             className="btn-primary bg-sky-600 hover:bg-sky-700 px-6">Yana yaratish</button>
         </div>
+        {createdCourseId && (
+          <p className="mt-4 text-xs text-base-600">Kurs ID: <span className="text-base-400 font-mono">{createdCourseId}</span></p>
+        )}
       </div>
     )
   }
@@ -122,11 +129,11 @@ export default function CreateCoursePage() {
               <label className="text-xs text-base-500 uppercase tracking-wider mb-2 block">Kategoriya *</label>
               <select value={category} onChange={(e) => setCategory(e.target.value)} className="input">
                 <option value="">Tanlang...</option>
-                <option value="programming">Dasturlash</option>
-                <option value="web">Web Dasturlash</option>
-                <option value="database">Ma'lumotlar Bazasi</option>
-                <option value="network">Tarmoqlar</option>
-                <option value="security">Xavfsizlik</option>
+                <option value="Dasturlash">Dasturlash</option>
+                <option value="Web">Web Dasturlash</option>
+                <option value="Database">Ma'lumotlar Bazasi</option>
+                <option value="Tarmoq">Tarmoqlar</option>
+                <option value="Security">Xavfsizlik</option>
               </select>
             </div>
             <div>
@@ -284,11 +291,47 @@ export default function CreateCoursePage() {
           </div>
 
           <div className="flex gap-3">
-            <button onClick={() => setStep(2)} className="btn-secondary flex-1 py-3">Orqaga</button>
-            <button onClick={() => setPublished(true)}
-              className="btn-primary bg-emerald-600 hover:bg-emerald-700 flex-1 py-3 font-semibold flex items-center justify-center gap-2">
-              <CheckCircle2 className="w-4 h-4" /> Nashr etish
+            <button onClick={() => setStep(2)} disabled={publishing} className="btn-secondary flex-1 py-3">Orqaga</button>
+            <button
+              onClick={async () => {
+                setPublishing(true); setPublishError(null)
+                try {
+                  const THUMB: Record<string, string> = {
+                    'Dasturlash': 'python', 'Web': 'web', 'Database': 'database',
+                    'Tarmoq': 'network', 'Security': 'security',
+                  }
+                  const course = await api.createCourse({
+                    title, description, category,
+                    difficulty,
+                    tags,
+                    duration: `${Math.ceil(lessons.reduce((s, l) => s + Number(l.duration), 0) / 60) || 1} soat`,
+                    thumbnail: THUMB[category] || 'python',
+                  })
+                  setCreatedCourseId(course.id)
+                  for (let i = 0; i < lessons.length; i++) {
+                    const l = lessons[i]
+                    await api.createLesson({
+                      courseId: course.id,
+                      title: l.title,
+                      type: l.type,
+                      duration: `${l.duration} daqiqa`,
+                      xpReward: 20,
+                    })
+                  }
+                  setPublished(true)
+                } catch (e: any) { setPublishError(e.message) }
+                setPublishing(false)
+              }}
+              disabled={publishing}
+              className="btn-primary bg-emerald-600 hover:bg-emerald-700 flex-1 py-3 font-semibold flex items-center justify-center gap-2 disabled:opacity-70">
+              {publishing
+                ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                : <CheckCircle2 className="w-4 h-4" />}
+              {publishing ? 'Yaratilmoqda...' : 'Nashr etish'}
             </button>
+            {publishError && (
+              <div className="w-full text-xs text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-xl px-3 py-2 mt-1">{publishError}</div>
+            )}
           </div>
         </div>
       )}

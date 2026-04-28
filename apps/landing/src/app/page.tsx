@@ -1,13 +1,14 @@
 'use client'
+import { useState } from 'react'
 import {
   BookOpen, Code2, Brain, BarChart3, Shield, Users,
   ArrowRight, Check, GraduationCap, UserCog, ShieldCheck,
-  Terminal, Globe, Database, Network, Cpu
+  Terminal, Globe, Database, Network, Cpu, ChevronDown, LogIn, X
 } from 'lucide-react'
 
-const STUDENT_URL = process.env.NEXT_PUBLIC_STUDENT_URL || 'http://localhost:3001'
-const TEACHER_URL = process.env.NEXT_PUBLIC_TEACHER_URL || 'http://localhost:3002'
-const ADMIN_URL = process.env.NEXT_PUBLIC_ADMIN_URL || 'http://localhost:3003'
+const STUDENT_URL = process.env.NEXT_PUBLIC_STUDENT_URL || 'https://educode-student.vercel.app'
+const TEACHER_URL = process.env.NEXT_PUBLIC_TEACHER_URL || 'https://educode-teacher.vercel.app'
+const ADMIN_URL = process.env.NEXT_PUBLIC_ADMIN_URL || 'https://educode-admins.vercel.app'
 
 const STATS = [
   { label: 'Faol talaba', value: '1 240' },
@@ -68,6 +69,8 @@ const ACCENT: Record<string, { text: string; bg: string; border: string; hover: 
 }
 
 export default function LandingPage() {
+  const [loginOpen, setLoginOpen] = useState(false)
+
   return (
     <div className="min-h-screen bg-app">
       {/* NAV */}
@@ -82,7 +85,41 @@ export default function LandingPage() {
             <a href="#kurslar" className="hover:text-base-200 transition-colors">Kurslar</a>
             <a href="#panellar" className="hover:text-base-200 transition-colors">Panellar</a>
           </div>
-          <a href="#panellar" className="btn-primary text-sm">Boshlash</a>
+          <div className="relative">
+            <button onClick={() => setLoginOpen(!loginOpen)}
+              className="flex items-center gap-1.5 bg-white text-black hover:bg-gray-100 font-medium px-4 py-2 rounded-lg text-sm transition-colors">
+              <LogIn className="w-3.5 h-3.5" />
+              Kirish
+              <ChevronDown className={`w-3 h-3 transition-transform ${loginOpen ? 'rotate-180' : ''}`} />
+            </button>
+            {loginOpen && (
+              <div className="absolute right-0 top-full mt-2 w-56 bg-[#111113] border border-[#27272A] rounded-xl shadow-2xl overflow-hidden z-50">
+                <div className="flex items-center justify-between px-4 py-2.5 border-b border-[#1E1E24]">
+                  <span className="text-xs text-base-500 uppercase tracking-wider">Panel tanlang</span>
+                  <button onClick={() => setLoginOpen(false)}><X className="w-3 h-3 text-base-600" /></button>
+                </div>
+                {ROLES.map(r => {
+                  const a = ACCENT[r.accent]
+                  return (
+                    <a key={r.role} href={`${r.url}/login`} onClick={() => setLoginOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-[#1A1A1F] transition-colors group">
+                      <div className={`w-8 h-8 rounded-lg ${a.bg} border ${a.border} flex items-center justify-center flex-shrink-0`}>
+                        <r.icon className={`w-4 h-4 ${a.text}`} />
+                      </div>
+                      <div>
+                        <div className={`text-sm font-medium text-base-200 group-hover:${a.text} transition-colors`}>{r.role}</div>
+                        <div className="text-xs text-base-600">Panelga kirish</div>
+                      </div>
+                      <ArrowRight className="w-3 h-3 text-base-700 ml-auto group-hover:text-base-400" />
+                    </a>
+                  )
+                })}
+                <div className="px-4 py-2.5 border-t border-[#1E1E24] text-xs text-base-700">
+                  Demo: student@edu.uz · 1234
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </nav>
 
@@ -254,7 +291,7 @@ export default function LandingPage() {
             {ROLES.map((r) => {
               const a = ACCENT[r.accent]
               return (
-                <a key={r.role} href={r.url}
+                <a key={r.role} href={`${r.url}/login`}
                   className={`card p-7 flex flex-col transition-all duration-200 ${a.hover} group`}>
                   <div className={`w-12 h-12 rounded-xl ${a.bg} border ${a.border} flex items-center justify-center mb-5`}>
                     <r.icon className={`w-6 h-6 ${a.text}`} />

@@ -8,14 +8,22 @@ import { getDifficultyColor, getDifficultyLabel } from '@/lib/utils'
 export default function AdminCoursesPage() {
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('all')
+  const [deleting, setDeleting] = useState<string | null>(null)
 
-  const { data } = useApi(() => api.courses())
+  const { data, refetch } = useApi(() => api.courses())
   const courses: any[] = data || []
 
   const filtered = courses.filter(c =>
     c.title.toLowerCase().includes(search.toLowerCase()) &&
     (category === 'all' || c.category === category)
   )
+
+  const handleDelete = async (id: string, title: string) => {
+    if (!confirm(`"${title}" kursini o'chirishni tasdiqlaysizmi?`)) return
+    setDeleting(id)
+    try { await api.deleteCourse(id); refetch() } catch (e: any) { alert(e.message) }
+    setDeleting(null)
+  }
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 animate-fade-in">
@@ -38,7 +46,7 @@ export default function AdminCoursesPage() {
           <option value="Web">Web</option>
           <option value="Database">Database</option>
           <option value="Tarmoq">Tarmoq</option>
-          <option value="Security">Security</option>
+          <option value="Security">Xavfsizlik</option>
         </select>
       </div>
 
@@ -94,7 +102,12 @@ export default function AdminCoursesPage() {
                     <div className="flex items-center justify-end gap-1">
                       <button className="p-1.5 rounded-lg hover:bg-[#222229] text-base-500 hover:text-base-200"><Eye className="w-4 h-4" /></button>
                       <button className="p-1.5 rounded-lg hover:bg-[#222229] text-base-500 hover:text-base-200"><Edit className="w-4 h-4" /></button>
-                      <button className="p-1.5 rounded-lg hover:bg-rose-500/10 text-base-500 hover:text-rose-400"><Trash2 className="w-4 h-4" /></button>
+                      <button
+                        onClick={() => handleDelete(c.id, c.title)}
+                        disabled={deleting === c.id}
+                        className="p-1.5 rounded-lg hover:bg-rose-500/10 text-base-500 hover:text-rose-400 disabled:opacity-50">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
                   </td>
                 </tr>

@@ -35,19 +35,26 @@ const SKILLS_DATA = [
   { skill: 'Tarmoq', A: 55, B: 40 },
 ]
 
-const CATEGORY_DISTRIBUTION = [
-  { name: 'Dasturlash', value: 45 },
-  { name: 'Web', value: 28 },
-  { name: 'Database', value: 15 },
-  { name: 'Tarmoq', value: 8 },
-  { name: 'Xavfsizlik', value: 4 },
-]
-
 export default function TeacherAnalyticsPage() {
   const { data: growth } = useApi(() => api.growth())
   const { data: difficulty } = useApi(() => api.difficulty())
   const { data: weekly } = useApi(() => api.weekly())
   const { data: aiSuggestions } = useApi(() => api.aiSuggestions())
+  const { data: courses } = useApi(() => api.myCourses())
+  const { data: students } = useApi(() => api.students())
+
+  const categoryDistribution = Object.entries(
+    ((courses as any[]) || []).reduce((acc: Record<string, number>, c: any) => {
+      acc[c.category] = (acc[c.category] || 0) + 1
+      return acc
+    }, {})
+  ).map(([name, value]) => ({ name, value }))
+
+  const totalStudents = ((students as any[]) || []).length
+  const activeStudents = ((students as any[]) || []).filter((s: any) => {
+    if (!s.lastActive) return false
+    return Date.now() - new Date(s.lastActive).getTime() < 86400000 * 3
+  }).length
   return (
     <div className="max-w-7xl mx-auto space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
@@ -82,9 +89,9 @@ export default function TeacherAnalyticsPage() {
             <span className="text-xs text-base-500 uppercase tracking-wider">Faol Talaba</span>
             <Users className="w-4 h-4 text-sky-400" />
           </div>
-          <div className="text-3xl font-bold text-base-100">342</div>
-          <div className="text-xs text-emerald-400 flex items-center gap-1 mt-1">
-            <TrendingUp className="w-3 h-3" /> +12%
+          <div className="text-3xl font-bold text-base-100">{activeStudents}</div>
+          <div className="text-xs text-base-500 mt-1">
+            {totalStudents > 0 ? Math.round((activeStudents / totalStudents) * 100) : 0}% faollik
           </div>
         </div>
         <div className="stat-card">
@@ -189,8 +196,8 @@ export default function TeacherAnalyticsPage() {
           </div>
           <ResponsiveContainer width="100%" height={260}>
             <PieChart>
-              <Pie data={CATEGORY_DISTRIBUTION} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={90} innerRadius={50} paddingAngle={2}>
-                {CATEGORY_DISTRIBUTION.map((_, i) => (
+              <Pie data={categoryDistribution.length ? categoryDistribution : [{ name: 'Kurs yo\'q', value: 1 }]} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={90} innerRadius={50} paddingAngle={2}>
+                {(categoryDistribution.length ? categoryDistribution : [{ name: 'Kurs yo\'q', value: 1 }]).map((_, i) => (
                   <Cell key={i} fill={COLORS[i % COLORS.length]} stroke="none" />
                 ))}
               </Pie>

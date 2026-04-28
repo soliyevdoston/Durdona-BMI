@@ -118,6 +118,29 @@ router.post('/submissions/:id/grade', requireAuth, requireRole('teacher', 'admin
   res.json(updated)
 })
 
+// List submissions for an assignment
+router.get('/:id/submissions', requireAuth, requireRole('teacher', 'admin', 'super_admin'), async (req, res) => {
+  const assignment = await prisma.assignment.findUnique({ where: { id: req.params.id } })
+  if (!assignment) return res.status(404).json({ error: 'Topshiriq topilmadi' })
+  const submissions = await prisma.submission.findMany({
+    where: { assignmentId: req.params.id },
+    include: { user: { select: { name: true, avatar: true, email: true } } },
+    orderBy: { submittedAt: 'desc' },
+  })
+  res.json(submissions)
+})
+
+// Delete assignment
+router.delete('/:id', requireAuth, requireRole('teacher', 'admin', 'super_admin'), async (req, res) => {
+  try {
+    await prisma.assignment.delete({ where: { id: req.params.id } })
+    await log(req.user!.id, 'assignment.delete', { id: req.params.id })
+    res.json({ ok: true })
+  } catch {
+    res.status(404).json({ error: 'Topilmadi' })
+  }
+})
+
 // Create assignment
 router.post('/', requireAuth, requireRole('teacher', 'admin', 'super_admin'), async (req, res) => {
   const { title, courseId, description, dueDate, maxGrade, type } = req.body

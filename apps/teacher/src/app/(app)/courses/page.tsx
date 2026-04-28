@@ -18,8 +18,14 @@ const THUMB_MAP: Record<string, { icon: ElementType; color: string }> = {
 
 export default function TeacherCoursesPage() {
   const [menuOpen, setMenuOpen] = useState<string | null>(null)
-  const { data } = useApi(() => api.myCourses())
+  const { data, refetch } = useApi(() => api.myCourses())
   const myCourses: any[] = data || []
+
+  const handleDelete = async (id: string, title: string) => {
+    if (!confirm(`"${title}" kursini o'chirishni tasdiqlaysizmi?`)) return
+    try { await api.deleteCourse(id); refetch() } catch (e: any) { alert(e.message) }
+    setMenuOpen(null)
+  }
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 animate-fade-in">
@@ -50,7 +56,9 @@ export default function TeacherCoursesPage() {
         <div className="stat-card">
           <div className="text-xs text-base-500 uppercase tracking-wider mb-2">O'rtacha Reyting</div>
           <div className="text-2xl font-bold text-amber-400">
-            {(myCourses.reduce((s, c) => s + c.rating, 0) / myCourses.length).toFixed(1)}★
+            {myCourses.length > 0
+              ? (myCourses.reduce((s, c) => s + (c.rating || 0), 0) / myCourses.length).toFixed(1)
+              : '—'}★
           </div>
         </div>
       </div>
@@ -69,12 +77,13 @@ export default function TeacherCoursesPage() {
               {menuOpen === course.id && (
                 <div className="absolute top-12 right-3 z-20 w-48 card-elevated shadow-card-hover py-1 animate-slide-up">
                   {[
-                    { icon: Eye, label: 'Ko\'rish', color: 'text-base-300' },
-                    { icon: Edit, label: 'Tahrirlash', color: 'text-base-300' },
-                    { icon: Copy, label: 'Nusxalash', color: 'text-base-300' },
-                    { icon: Trash2, label: 'O\'chirish', color: 'text-rose-400' },
+                    { icon: Eye, label: "Ko'rish", color: 'text-base-300', action: () => setMenuOpen(null) },
+                    { icon: Edit, label: 'Tahrirlash', color: 'text-base-300', action: () => setMenuOpen(null) },
+                    { icon: Copy, label: 'Nusxalash', color: 'text-base-300', action: () => setMenuOpen(null) },
+                    { icon: Trash2, label: "O'chirish", color: 'text-rose-400', action: () => handleDelete(course.id, course.title) },
                   ].map((a) => (
-                    <button key={a.label} className={`w-full px-3 py-2 text-left text-xs flex items-center gap-2 hover:bg-[#222229] ${a.color}`}>
+                    <button key={a.label} onClick={a.action}
+                      className={`w-full px-3 py-2 text-left text-xs flex items-center gap-2 hover:bg-[#222229] ${a.color}`}>
                       <a.icon className="w-3.5 h-3.5" /> {a.label}
                     </button>
                   ))}

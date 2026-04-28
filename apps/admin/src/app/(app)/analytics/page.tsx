@@ -38,6 +38,8 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export default function AdminAnalyticsPage() {
   const { data: growth } = useApi(() => api.growth())
+  const { data: statsData } = useApi(() => api.systemStats())
+  const stats = statsData || { totalUsers: 0, avgCompletionRate: 0 }
   return (
     <div className="max-w-7xl mx-auto space-y-6 animate-fade-in">
       <div>
@@ -56,7 +58,7 @@ export default function AdminAnalyticsPage() {
         </div>
         <div className="stat-card">
           <Users className="w-4 h-4 text-accent-400 mb-2" />
-          <div className="text-2xl font-bold text-base-100">1,247</div>
+          <div className="text-2xl font-bold text-base-100">{stats.totalUsers.toLocaleString()}</div>
           <div className="text-xs text-emerald-400 flex items-center gap-1 mt-1">
             <TrendingUp className="w-3 h-3" /> +24%
           </div>
@@ -64,7 +66,7 @@ export default function AdminAnalyticsPage() {
         </div>
         <div className="stat-card">
           <Target className="w-4 h-4 text-sky-400 mb-2" />
-          <div className="text-2xl font-bold text-base-100">67%</div>
+          <div className="text-2xl font-bold text-base-100">{stats.avgCompletionRate}%</div>
           <div className="text-xs text-emerald-400 flex items-center gap-1 mt-1">
             <TrendingUp className="w-3 h-3" /> +8%
           </div>

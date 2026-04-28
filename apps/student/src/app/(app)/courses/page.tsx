@@ -55,8 +55,8 @@ export default function CoursesPage() {
     const matchCat = category === "Barchasi" || c.category === category;
     const matchFilter =
       filter === "all" ||
-      (filter === "enrolled" && (c.progress ?? 0) > 0) ||
-      (filter === "available" && (c.progress ?? 0) === 0);
+      (filter === "enrolled" && c.isEnrolled) ||
+      (filter === "available" && !c.isEnrolled);
     return matchSearch && matchCat && matchFilter;
   });
 
@@ -122,7 +122,7 @@ export default function CoursesPage() {
             icon: BookOpen,
             color: "from-base-700 to-base-600",
           };
-          const enrolled = (course.progress ?? 0) > 0;
+          const enrolled = course.isEnrolled;
           return (
             <Link
               key={course.id}
@@ -206,7 +206,7 @@ export default function CoursesPage() {
                     {enrolled ? (
                       <div className="flex items-center gap-2">
                         <div className="text-xs text-base-500">
-                          {course.progress}%
+                          {course.progress ?? 0}%
                         </div>
                         <Play className="w-4 h-4 text-accent-400" />
                       </div>
@@ -218,7 +218,7 @@ export default function CoursesPage() {
                     <div className="progress-bar mt-2.5">
                       <div
                         className="progress-fill"
-                        style={{ width: `${course.progress}%` }}
+                        style={{ width: `${course.progress ?? 0}%` }}
                       />
                     </div>
                   )}

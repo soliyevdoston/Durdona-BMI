@@ -133,13 +133,17 @@ router.get('/analytics/ai-suggestions', requireAuth, async (req, res) => {
 
 // System
 router.get('/system/stats', requireAuth, requireRole('admin', 'super_admin'), async (_req, res) => {
-  const [totalUsers, coursesTotal, lessonsTotal, assignmentsTotal, submissionsTotal, activeToday] = await Promise.all([
+  const [totalUsers, coursesTotal, lessonsTotal, assignmentsTotal, submissionsTotal, activeToday,
+    studentCount, teacherCount, adminCount] = await Promise.all([
     prisma.user.count(),
     prisma.course.count(),
     prisma.lesson.count(),
     prisma.assignment.count(),
     prisma.submission.count(),
     prisma.user.count({ where: { lastActive: { gte: new Date(Date.now() - 86400000) } } }),
+    prisma.user.count({ where: { role: 'student' } }),
+    prisma.user.count({ where: { role: 'teacher' } }),
+    prisma.user.count({ where: { role: { in: ['admin', 'super_admin'] } } }),
   ])
   res.json({
     totalUsers, activeToday, coursesTotal, lessonsTotal, assignmentsTotal, submissionsTotal,
@@ -148,6 +152,7 @@ router.get('/system/stats', requireAuth, requireRole('admin', 'super_admin'), as
     serverLoad: Math.round(20 + Math.random() * 40),
     storageUsed: Math.round(55 + Math.random() * 15),
     uptime: 99.97,
+    roleCounts: { students: studentCount, teachers: teacherCount, admins: adminCount },
   })
 })
 

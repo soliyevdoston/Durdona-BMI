@@ -66,4 +66,18 @@ app.listen(PORT, () => {
   console.log(`✓ Backend ishga tushdi: http://localhost:${PORT}`)
   console.log(`  CORS: ${corsOrigins.join(', ')}`)
   console.log(`  Health: /api/health`)
+
+  // Render free tier "uxlamaslik" uchun o'zini-o'zi ping qiladi
+  if (process.env.NODE_ENV === 'production' && process.env.RENDER_EXTERNAL_URL) {
+    const selfUrl = `${process.env.RENDER_EXTERNAL_URL}/api/health`
+    setInterval(async () => {
+      try {
+        const r = await fetch(selfUrl)
+        console.log(`[keep-alive] ping OK — ${new Date().toISOString()} (${r.status})`)
+      } catch (e) {
+        console.warn('[keep-alive] ping failed:', e)
+      }
+    }, 10 * 60 * 1000) // har 10 daqiqada
+    console.log(`  Keep-alive: har 10 daqiqada ${selfUrl} ping qilinadi`)
+  }
 })
