@@ -209,9 +209,9 @@ Vercel'da **Framework Preset** avtomatik Next.js aniqlaydi. Boshqa sozlama shart
 
 | Email | Parol | Rol | Qaysi app'ga |
 |---|---|---|---|
-| student@edu.uz | 1234 | student | student app |
-| teacher@edu.uz | 1234 | teacher | teacher app |
-| admin@edu.uz | 1234 | admin | admin app |
+| durdona@student.uz | 1234 | student | student app |
+| durdona@gmail.com | 1234 | teacher | teacher app |
+| durdona@admin.uz | 1234 | admin | admin app |
 
 **Xavfsizlik:** Har app faqat o'z rolini qabul qiladi. Student app'ga teacher hisob bilan kirsangiz backend `403` qaytaradi.
 

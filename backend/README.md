@@ -122,9 +122,9 @@ Schema: `backend/prisma/schema.prisma`
 
 | Email | Parol | Rol |
 |---|---|---|
-| `student@edu.uz` | `1234` | student |
-| `teacher@edu.uz` | `1234` | teacher |
-| `admin@edu.uz` | `1234` | admin |
+| `durdona@student.uz` | `1234` | student |
+| `durdona@gmail.com` | `1234` | teacher |
+| `durdona@admin.uz` | `1234` | admin |
 
 ## Arxitektura
 

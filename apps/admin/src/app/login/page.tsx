@@ -8,8 +8,8 @@ import { useAuthStore } from '@/lib/store'
 export default function LoginPage() {
   const router = useRouter()
   const login = useAuthStore((s) => s.login)
-  const [email, setEmail] = useState('admin@edu.uz')
-  const [password, setPassword] = useState('1234')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [showPass, setShowPass] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -74,7 +74,9 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <p className="text-center text-xs text-base-700 mt-6">Demo: <code className="code-font text-base-500">student@edu.uz / 1234</code></p>
+        <button type="button" onClick={() => { setEmail('durdona@admin.uz'); setPassword('1234') }} className="w-full text-center text-xs text-base-700 mt-6 hover:text-base-400 transition-colors">
+          Demo: <code className="code-font text-base-500">durdona@admin.uz / 1234</code>
+        </button>
       </div>
     </div>
   )
