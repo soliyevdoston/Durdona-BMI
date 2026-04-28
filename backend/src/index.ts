@@ -23,7 +23,7 @@ app.use(cors({
 app.use(express.json({ limit: '2mb' }))
 app.use(morgan('tiny'))
 
-// Health check (Render uchun)
+// Health check (Railway uchun)
 app.get('/api/health', (_req, res) => {
   res.json({
     status: 'ok',

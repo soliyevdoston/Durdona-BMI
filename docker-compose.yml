@@ -1,0 +1,25 @@
+services:
+  backend:
+    build: ./backend
+    container_name: educode-backend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./backend/.env
+    environment:
+      - NODE_ENV=production
+      - CORS_ORIGINS=https://educode-student.vercel.app,https://educode-teacher.vercel.app,https://educode-admins.vercel.app,https://educode-landing.vercel.app
+      - RENDER_EXTERNAL_URL=https://strangely-dropper-unawake.ngrok-free.dev
+
+  tunnel:
+    image: ngrok/ngrok:latest
+    container_name: educode-tunnel
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+    command: http backend:8080 --domain=${NGROK_DOMAIN} --log=stdout
+    ports:
+      - "4040:4040"

@@ -21,7 +21,7 @@ Har frontend app — **alohida Next.js loyihasi**. Barchasi bitta backend bilan 
 
 ```
 Vercel #1 (student.vercel.app) ──┐
-Vercel #2 (teacher.vercel.app) ──┼──→  Render (educode-backend.onrender.com)
+Vercel #2 (teacher.vercel.app) ──┼──→  Railway (durdona-bmi-production-bdaf.up.railway.app)
 Vercel #3 (admin.vercel.app)   ──┘
 ```
 
@@ -35,7 +35,7 @@ Vercel #3 (admin.vercel.app)   ──┘
 | **Frontend (×3)** | Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · Zustand · Recharts · Lucide |
 | **Ma'lumotlar** | In-memory (hozir) → PostgreSQL (keyingi bosqich) |
 | **Auth** | JWT (access token, 7 kun) + role-based routing |
-| **Hosting** | Render (backend) + Vercel (3 ta frontend) |
+| **Hosting** | Railway (backend) + Vercel (3 ta frontend) |
 
 ---
 
@@ -179,14 +179,16 @@ NEXT_PUBLIC_API_URL=http://localhost:8080
 
 ## 🌐 Deploy
 
-### Backend → Render
+### Backend → Railway
 
 1. GitHub repo'ga push
-2. render.com → **New +** → **Web Service**
+2. railway.app → **New Project** → **Deploy from GitHub repo**
 3. Root Directory: `backend`
-4. Env vars:
-   - `JWT_SECRET` (auto-generate)
+4. Variables:
+   - `DATABASE_URL` = Neon pooled URL
+   - `JWT_SECRET` (random 32+ belgi)
    - `CORS_ORIGINS` = 3 ta Vercel URL'i, vergul bilan
+   - `PORT` = `8080`
 5. Deploy → URL oling
 
 ### 3 ta Vercel loyihasi
@@ -195,7 +197,7 @@ Har birida **Root Directory**ni belgilang:
 
 | Loyiha | Root Directory | Env: NEXT_PUBLIC_API_URL |
 |---|---|---|
-| educode-student | `apps/student` | `https://educode-backend.onrender.com` |
+| educode-student | `apps/student` | `https://durdona-bmi-production-bdaf.up.railway.app` |
 | educode-teacher | `apps/teacher` | (xuddi shunday) |
 | educode-admin | `apps/admin` | (xuddi shunday) |
 

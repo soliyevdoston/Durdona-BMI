@@ -35,33 +35,31 @@ Server: `http://localhost:8080` · Health: `http://localhost:8080/api/health`
 | `npm run db:seed` | Demo ma'lumotlar bilan to'ldirish |
 | `npm run db:studio` | Prisma Studio (brauzerda DB ko'rish) |
 
-## Render'ga deploy qilish
+## Railway'ga deploy qilish
 
 ### 1. Neon DB URL oling
 
 [neon.tech](https://neon.tech) → loyihangiz → **Connection String** (Pooled)
 
-### 2. Render.com
+### 2. Railway.app
 
-1. [render.com](https://render.com) → **New +** → **Web Service**
+1. [railway.app](https://railway.app) → **New Project** → **Deploy from GitHub repo**
 2. Repo'ni tanlang, **Root Directory** = `backend`
-3. **Build Command**: `npm install && npm run build && npx prisma db push --accept-data-loss`
-4. **Start Command**: `npm start`
-5. **Environment Variables**:
+3. Railway avtomatik `Dockerfile` va `railway.json` ni topadi
+4. **Variables** (Settings → Variables):
    - `DATABASE_URL` = Neon pooled URL
-   - `JWT_SECRET` = auto-generate yoki o'zingiz
+   - `JWT_SECRET` = random 32+ belgili string
    - `CORS_ORIGINS` = Vercel URL'laringiz (vergul bilan)
    - `NODE_ENV` = `production`
-6. **Deploy** → URL oling
+   - `PORT` = `8080`
+5. **Deploy** → URL oling
 
 ### Seed faqat bir marta
 
-Dastlabki deploy'dan keyin (seed uchun) Render shell orqali:
+Dastlabki deploy'dan keyin (seed uchun) Railway shell orqali:
 ```bash
 npm run db:seed
 ```
-
-Yoki build command'ni shu marta `... && npm run db:seed` bilan o'zgartiring, keyin qaytaring.
 
 ## Database tuzilmasi
 
@@ -118,7 +116,7 @@ Schema: `backend/prisma/schema.prisma`
 - `GET /api/system/{stats,logs}` *[admin]*
 - `POST /api/ai/chat` *[auth]*
 - `POST /api/code/run` *[auth]*
-- `GET /api/health` (ochiq — Render health check)
+- `GET /api/health` (ochiq — Railway health check)
 
 ## Demo hisoblar (seed'dan keyin)
 

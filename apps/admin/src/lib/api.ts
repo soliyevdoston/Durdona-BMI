@@ -3,7 +3,7 @@
  * NEXT_PUBLIC_API_URL env var orqali backend manzilini o'zgartiring.
  */
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://educode-backend.onrender.com'
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://durdona-bmi-production-bdaf.up.railway.app'
 
 type Method = 'GET' | 'POST' | 'PATCH' | 'DELETE'
 

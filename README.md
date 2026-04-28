@@ -1,13 +1,13 @@
 # EduCode — AKT Virtual Sinf (Monorepo)
 
 TATU bitiruv malakaviy ishi, 2026.
-**5 ta mustaqil loyiha:** 1 ta backend (Render + Neon) + 4 ta frontend app (Vercel).
+**5 ta mustaqil loyiha:** 1 ta backend (Railway + Neon) + 4 ta frontend app (Vercel).
 
 ## 📁 Struktura
 
 ```
 Durdona BMI/
-├── backend/              → Render (Node + Express + Prisma + Neon Postgres)
+├── backend/              → Railway (Node + Express + Prisma + Neon Postgres)
 └── apps/
     ├── landing/          → Vercel deploy #1 (port 3000) — asosiy kirish sahifasi
     ├── student/          → Vercel deploy #2 (port 3001) — talaba paneli
@@ -23,7 +23,7 @@ Durdona BMI/
 ## 🚀 Lokalda ishga tushirish (5 terminal)
 
 ```bash
-# Terminal 1 — Backend (Render'dagisini ishlatish tavsiya etiladi,
+# Terminal 1 — Backend (Railway'dagisini ishlatish tavsiya etiladi,
 # lekin lokalda ham ishga tushirish mumkin)
 cd backend
 cp .env.example .env                 # DATABASE_URL ga Neon URL
@@ -49,9 +49,9 @@ Asosiy kirish: **http://localhost:3000** — landing sahifadan rol tanlaydi.
 
 ## 🌐 Deploy (production)
 
-### Backend → Render + Neon
+### Backend → Railway + Neon
 
-**Live URL:** `https://educode-backend.onrender.com`
+**Live URL:** `https://durdona-bmi-production-bdaf.up.railway.app`
 
 Batafsil: [backend/README.md](./backend/README.md)
 
@@ -62,14 +62,14 @@ Har biri **alohida Vercel loyiha** sifatida deploy qilinadi:
 | Loyiha | Root Directory | Env variables |
 |---|---|---|
 | educode-landing | `apps/landing` | `NEXT_PUBLIC_STUDENT_URL`, `NEXT_PUBLIC_TEACHER_URL`, `NEXT_PUBLIC_ADMIN_URL` |
-| educode-student | `apps/student` | `NEXT_PUBLIC_API_URL=https://educode-backend.onrender.com` |
-| educode-teacher | `apps/teacher` | `NEXT_PUBLIC_API_URL=https://educode-backend.onrender.com` |
-| educode-admin | `apps/admin` | `NEXT_PUBLIC_API_URL=https://educode-backend.onrender.com` |
+| educode-student | `apps/student` | `NEXT_PUBLIC_API_URL=https://durdona-bmi-production-bdaf.up.railway.app` |
+| educode-teacher | `apps/teacher` | `NEXT_PUBLIC_API_URL=https://durdona-bmi-production-bdaf.up.railway.app` |
+| educode-admin | `apps/admin` | `NEXT_PUBLIC_API_URL=https://durdona-bmi-production-bdaf.up.railway.app` |
 
 **Deploy tartibi:**
 1. Avval student/teacher/admin'ni deploy qiling → URL'larni oling
 2. Keyin landing'ni deploy qiling va env var'larga 3 ta URL'ni kiriting
-3. Render'da `CORS_ORIGINS`'ni 4 ta URL bilan yangilang
+3. Railway'da `CORS_ORIGINS`'ni 4 ta URL bilan yangilang
 
 ## 🔑 Demo hisoblar
 
