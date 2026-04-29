@@ -253,6 +253,30 @@ Vercel'da **Framework Preset** avtomatik Next.js aniqlaydi. Boshqa sozlama shart
 
 ## 📝 Development Log
 
+### Sessiya 6 — 2026-04-29 (Render → Railway migratsiya + demo hisoblar)
+- ✅ **Backend hosting: Render → Railway**
+  - Barcha `educode-backend.onrender.com` → `durdona-bmi-production-bdaf.up.railway.app`
+  - `backend/Dockerfile` — OpenSSL qo'shildi (`apk add openssl`), `prisma generate + tsc` build qadami
+  - `backend/railway.json` — Railway deploy konfiguratsiyasi yaratildi
+  - `backend/render.yaml` saqlanib qoldi (eski ref sifatida)
+- ✅ **Frontend API URL yangilandi** (3 ta app):
+  - `apps/{student,teacher,admin}/src/lib/api.ts` — fallback URL → Railway
+  - `apps/{student,teacher,admin}/.env.example` va `.env.local` fayllar yangilandi
+- ✅ **Demo hisoblar yangilandi** — `durdona@` formatga o'tkazildi:
+  - `durdona@student.uz / 1234` — student
+  - `durdona@gmail.com / 1234` — teacher
+  - `durdona@admin.uz / 1234` — admin
+  - Qo'shimcha talabalar: nilufar, bobur, shahlo, jasur, malika, sardor, zulfiya `@edu.uz`
+- ✅ **Login sahifalari** — inputlar bo'sh, "Demo" tugma bosilganda avtomatik to'ldiradi
+- ✅ **36 ta darsga real YouTube videolari** qo'shildi (31 ta video, 5 ta quiz null):
+  - Python: o'zbek tilida + Corey Schafer, Mosh
+  - Web: Web Dev Simplified, Traversy Media
+  - SQL: freeCodeCamp, Bro Code
+  - Tarmoqlar: TechTerms, NetworkChuck
+  - Algoritmlar: CS Dojo, HackerRank
+  - Kiberxavfsizlik: Simplilearn, Practical Networking
+- ✅ README.md, CLAUDE.md, backend/README.md — Render → Railway yangilandi
+
 ### Sessiya 5 — 2026-04-24 (4-chi app: landing)
 - ✅ Yangi `apps/landing/` app yaratildi — **asosiy kirish sahifasi**
 - ✅ Landing — rol-tanlovchi: Talaba / O'qituvchi / Admin kartochkalari
