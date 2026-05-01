@@ -60,7 +60,7 @@ export default function AdminDashboard() {
   }
 
   const roleDistribution = [
-    { name: 'Talabalar', value: stats.roleCounts?.students || 0 },
+    { name: "O'quvchilar", value: stats.roleCounts?.students || 0 },
     { name: "O'qituvchilar", value: stats.roleCounts?.teachers || 0 },
     { name: 'Adminlar', value: stats.roleCounts?.admins || 0 },
   ].filter(r => r.value > 0)

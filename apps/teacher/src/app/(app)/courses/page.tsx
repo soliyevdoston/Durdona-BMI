@@ -1,19 +1,19 @@
 'use client'
 import Link from 'next/link'
 import type { ElementType } from 'react'
-import { Plus, Users, Star, MoreVertical, Edit, Copy, Trash2, Eye, BookOpen, Clock, Code2, Globe, Database, Network, GitBranch, Shield } from 'lucide-react'
+import { Plus, Users, Star, MoreVertical, Edit, Copy, Trash2, Eye, BookOpen, Clock, Calculator, Zap, Atom, Leaf, Cpu, FileText } from 'lucide-react'
 import { useState } from 'react'
 import { api } from '@/lib/api'
 import { useApi } from '@/lib/useApi'
 import { getDifficultyColor, getDifficultyLabel } from '@/lib/utils'
 
 const THUMB_MAP: Record<string, { icon: ElementType; color: string }> = {
-  python: { icon: Code2, color: 'from-[#1E1E24] to-[#141418]' },
-  web: { icon: Globe, color: 'from-[#1E1E24] to-[#141418]' },
-  database: { icon: Database, color: 'from-[#1E1E24] to-[#141418]' },
-  network: { icon: Network, color: 'from-[#1E1E24] to-[#141418]' },
-  algo: { icon: GitBranch, color: 'from-[#1E1E24] to-[#141418]' },
-  security: { icon: Shield, color: 'from-[#1E1E24] to-[#141418]' },
+  math: { icon: Calculator, color: 'from-[#1E1E24] to-[#141418]' },
+  physics: { icon: Zap, color: 'from-[#1E1E24] to-[#141418]' },
+  chemistry: { icon: Atom, color: 'from-[#1E1E24] to-[#141418]' },
+  biology: { icon: Leaf, color: 'from-[#1E1E24] to-[#141418]' },
+  computer: { icon: Cpu, color: 'from-[#1E1E24] to-[#141418]' },
+  language: { icon: FileText, color: 'from-[#1E1E24] to-[#141418]' },
 }
 
 export default function TeacherCoursesPage() {
@@ -46,7 +46,7 @@ export default function TeacherCoursesPage() {
           <div className="text-2xl font-bold text-base-100">{myCourses.length}</div>
         </div>
         <div className="stat-card">
-          <div className="text-xs text-base-500 uppercase tracking-wider mb-2">Jami Talabalar</div>
+          <div className="text-xs text-base-500 uppercase tracking-wider mb-2">Jami O'quvchilar</div>
           <div className="text-2xl font-bold text-base-100">{myCourses.reduce((s, c) => s + c.enrolled, 0)}</div>
         </div>
         <div className="stat-card">
@@ -136,7 +136,7 @@ export default function TeacherCoursesPage() {
             <Plus className="w-6 h-6 text-sky-400" />
           </div>
           <p className="text-sm font-medium text-base-300">Yangi Kurs Yaratish</p>
-          <p className="text-xs text-base-600 mt-1">Talabalar uchun yangi kontent</p>
+          <p className="text-xs text-base-600 mt-1">O'quvchilar uchun yangi kontent</p>
         </Link>
       </div>
     </div>

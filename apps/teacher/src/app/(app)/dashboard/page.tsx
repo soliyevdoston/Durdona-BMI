@@ -58,7 +58,7 @@ export default function TeacherDashboard() {
           </p>
           <h1 className="text-2xl font-semibold text-base-100">Assalomu alaykum, {user.name.split(' ')[0]}.</h1>
           <p className="text-sm text-base-500 mt-1.5 max-w-lg">
-            Hozir <span className="text-base-300 tabular-nums">{activeStudents}</span> talaba faol,
+            Hozir <span className="text-base-300 tabular-nums">{activeStudents}</span> o'quvchi faol,
             <span className="text-base-300 tabular-nums"> {pendingGrading}</span> ish baholashni kutmoqda.
           </p>
         </div>
@@ -76,7 +76,7 @@ export default function TeacherDashboard() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="stat-card">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs text-base-500 uppercase tracking-wider">Talabalar</span>
+            <span className="text-xs text-base-500 uppercase tracking-wider">O'quvchilar</span>
             <Users className="w-4 h-4 text-sky-400" />
           </div>
           <div className="text-2xl font-bold text-base-100">{totalStudents}</div>
@@ -104,7 +104,7 @@ export default function TeacherDashboard() {
         </div>
         <div className="stat-card">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs text-base-500 uppercase tracking-wider">Xavfli Talaba</span>
+            <span className="text-xs text-base-500 uppercase tracking-wider">Xavfli O'quvchi</span>
             <AlertTriangle className="w-4 h-4 text-rose-400" />
           </div>
           <div className="text-2xl font-bold text-rose-400">{atRisk.length}</div>
@@ -116,7 +116,7 @@ export default function TeacherDashboard() {
       <div className="grid lg:grid-cols-2 gap-5">
         <div className="card p-5">
           <div className="flex items-center justify-between mb-5">
-            <h2 className="section-title">Talabalar Dinamikasi</h2>
+            <h2 className="section-title">O'quvchilar Dinamikasi</h2>
             <span className="text-xs text-base-600">So'nggi 8 oy</span>
           </div>
           <ResponsiveContainer width="100%" height={220}>
@@ -136,7 +136,7 @@ export default function TeacherDashboard() {
         <div className="card p-5">
           <div className="flex items-center justify-between mb-5">
             <h2 className="section-title">Mavzu Qiyinligi</h2>
-            <span className="text-xs text-base-600">% talabalar qiynalgan</span>
+            <span className="text-xs text-base-600">% o'quvchilar qiynalgan</span>
           </div>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={difficulty || []} layout="vertical" margin={{ left: 20 }}>
@@ -160,7 +160,7 @@ export default function TeacherDashboard() {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 text-rose-400" />
-              <h2 className="section-title">Xavfli Talabalar</h2>
+              <h2 className="section-title">Xavfli O'quvchilar</h2>
             </div>
             <Link href="/students" className="text-xs text-sky-400 hover:text-sky-300 flex items-center gap-1">
               Barchasi <ChevronRight className="w-3 h-3" />
@@ -228,7 +228,7 @@ export default function TeacherDashboard() {
             <div key={c.id} className="p-4 rounded-xl bg-[#1A1A1F] border border-[#27272A] hover:border-sky-600/30 transition-colors">
               <div className="flex items-center justify-between mb-3">
                 <div className="badge bg-sky-500/10 text-sky-400 border border-sky-500/20">{c.category}</div>
-                <div className="text-xs text-base-500">{c.enrolled} talaba</div>
+                <div className="text-xs text-base-500">{c.enrolled} o'quvchi</div>
               </div>
               <h3 className="font-medium text-sm text-base-200 mb-2">{c.title}</h3>
               <div className="flex items-center gap-2 text-xs text-base-600">

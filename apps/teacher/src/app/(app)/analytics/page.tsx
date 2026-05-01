@@ -60,7 +60,7 @@ export default function TeacherAnalyticsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-base-100">Tahlil va Hisobotlar</h1>
-          <p className="text-sm text-base-500 mt-1">Talabalar natijalari va ta'lim samaradorligi</p>
+          <p className="text-sm text-base-500 mt-1">O'quvchilar natijalari va ta'lim samaradorligi</p>
         </div>
         <div className="flex gap-2">
           <button className="btn-secondary flex items-center gap-2">
@@ -86,7 +86,7 @@ export default function TeacherAnalyticsPage() {
         </div>
         <div className="stat-card">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs text-base-500 uppercase tracking-wider">Faol Talaba</span>
+            <span className="text-xs text-base-500 uppercase tracking-wider">Faol O'quvchi</span>
             <Users className="w-4 h-4 text-sky-400" />
           </div>
           <div className="text-3xl font-bold text-base-100">{activeStudents}</div>
@@ -117,7 +117,7 @@ export default function TeacherAnalyticsPage() {
       {/* Main Chart */}
       <div className="card p-5">
         <div className="flex items-center justify-between mb-5">
-          <h2 className="section-title">Talabalar Dinamikasi</h2>
+          <h2 className="section-title">O'quvchilar Dinamikasi</h2>
           <div className="flex gap-2">
             {['Hafta', 'Oy', 'Yil'].map(p => (
               <button key={p} className="text-xs px-3 py-1 rounded-full border border-[#27272A] text-base-500 hover:text-base-300 hover:border-[#3F3F46]">{p}</button>
@@ -152,7 +152,7 @@ export default function TeacherAnalyticsPage() {
         <div className="card p-5">
           <div className="mb-4">
             <h2 className="section-title">Mavzu Qiyinligi Xaritasi</h2>
-            <p className="text-xs text-base-500 mt-0.5">Qaysi mavzular talabalar uchun qiyin</p>
+            <p className="text-xs text-base-500 mt-0.5">Qaysi mavzular o'quvchilar uchun qiyin</p>
           </div>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={difficulty || []} layout="vertical" margin={{ left: 20 }}>

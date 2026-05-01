@@ -6,7 +6,8 @@ import {
   Flame, Target, ChevronRight, Brain, BookOpen, CheckCircle2, CheckCircle, Circle,
   Zap, Trophy, ArrowRight, BarChart3, Calendar,
   Globe, Database, Network, GitBranch, Shield, Code2,
-  Rocket, Wrench, Bot, Award, GraduationCap, Star
+  Rocket, Wrench, Bot, Award, GraduationCap, Star,
+  Calculator, Cpu, Leaf, Atom, FileText
 } from 'lucide-react'
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer
@@ -181,12 +182,12 @@ export default function StudentDashboard() {
                   <Link key={course.id} href={`/courses/${course.id}`}
                     className="flex items-center gap-4 p-3 rounded-xl hover:bg-[#1A1A1F] transition-colors group">
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-[#1A1A1F] border border-[#27272A] text-base-500">
-                      {course.thumbnail === 'python' ? <Code2 className="w-5 h-5" /> :
-                       course.thumbnail === 'web' ? <Globe className="w-5 h-5" /> :
-                       course.thumbnail === 'database' ? <Database className="w-5 h-5" /> :
-                       course.thumbnail === 'network' ? <Network className="w-5 h-5" /> :
-                       course.thumbnail === 'algo' ? <GitBranch className="w-5 h-5" /> :
-                       course.thumbnail === 'security' ? <Shield className="w-5 h-5" /> :
+                      {course.thumbnail === 'math' ? <Calculator className="w-5 h-5" /> :
+                       course.thumbnail === 'physics' ? <Zap className="w-5 h-5" /> :
+                       course.thumbnail === 'chemistry' ? <Atom className="w-5 h-5" /> :
+                       course.thumbnail === 'biology' ? <Leaf className="w-5 h-5" /> :
+                       course.thumbnail === 'computer' ? <Cpu className="w-5 h-5" /> :
+                       course.thumbnail === 'language' ? <FileText className="w-5 h-5" /> :
                        <BookOpen className="w-5 h-5" />}
                     </div>
                     <div className="flex-1 min-w-0">

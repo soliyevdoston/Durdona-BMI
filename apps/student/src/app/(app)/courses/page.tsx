@@ -9,12 +9,12 @@ import {
   Clock,
   ChevronRight,
   Play,
-  Code2,
-  Globe,
-  Database,
-  Network,
-  GitBranch,
-  Shield,
+  Calculator,
+  Zap,
+  Atom,
+  Leaf,
+  Cpu,
+  FileText,
 } from "lucide-react";
 import { api } from "@/lib/api";
 import { useApi } from "@/lib/useApi";
@@ -22,21 +22,20 @@ import { getDifficultyColor, getDifficultyLabel } from "@/lib/utils";
 
 const CATEGORIES = [
   "Barchasi",
-  "Dasturlash",
-  "Web",
-  "Database",
-  "Tarmoq",
-  "Security",
+  "Matematika",
+  "Tabiiy fanlar",
+  "Informatika",
+  "Gumanitar fanlar",
 ];
 
 import type { ElementType } from "react";
 const THUMBNAIL_MAP: Record<string, { icon: ElementType; color: string }> = {
-  python: { icon: Code2, color: "from-[#1E1E24] to-[#141418]" },
-  web: { icon: Globe, color: "from-[#1E1E24] to-[#141418]" },
-  database: { icon: Database, color: "from-[#1E1E24] to-[#141418]" },
-  network: { icon: Network, color: "from-[#1E1E24] to-[#141418]" },
-  algo: { icon: GitBranch, color: "from-[#1E1E24] to-[#141418]" },
-  security: { icon: Shield, color: "from-[#1E1E24] to-[#141418]" },
+  math: { icon: Calculator, color: "from-[#1E1E24] to-[#141418]" },
+  physics: { icon: Zap, color: "from-[#1E1E24] to-[#141418]" },
+  chemistry: { icon: Atom, color: "from-[#1E1E24] to-[#141418]" },
+  biology: { icon: Leaf, color: "from-[#1E1E24] to-[#141418]" },
+  computer: { icon: Cpu, color: "from-[#1E1E24] to-[#141418]" },
+  language: { icon: FileText, color: "from-[#1E1E24] to-[#141418]" },
 };
 
 export default function CoursesPage() {

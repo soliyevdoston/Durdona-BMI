@@ -12,7 +12,7 @@ const NAV_ITEMS = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Bosh sahifa' },
   { href: '/courses', icon: GraduationCap, label: 'Mening Kurslarim' },
   { href: '/create-course', icon: Plus, label: 'Kurs yaratish' },
-  { href: '/students', icon: Users, label: 'Talabalar' },
+  { href: '/students', icon: Users, label: "O'quvchilar" },
   { href: '/assignments', icon: ClipboardList, label: 'Topshiriqlar' },
   { href: '/analytics', icon: BarChart3, label: 'Tahlil' },
   { href: '/live', icon: Video, label: 'Jonli Dars' },
@@ -42,6 +42,7 @@ export default function TeacherLayout({ children }: { children: React.ReactNode 
           <div>
             <div className="font-bold text-base-100">EduCode</div>
             <div className="text-xs text-sky-400 -mt-0.5">O'qituvchi Paneli</div>
+
           </div>
         </Link>
       </div>
@@ -54,7 +55,7 @@ export default function TeacherLayout({ children }: { children: React.ReactNode 
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-sm font-semibold text-base-100 truncate">{user.name}</div>
-            <div className="text-xs text-base-500">O'qituvchi · 8 kurs</div>
+            <div className="text-xs text-base-500">O'qituvchi · 6 fan</div>
           </div>
         </div>
       </div>

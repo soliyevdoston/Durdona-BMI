@@ -3,7 +3,7 @@ import './globals.css'
 import { ThemeProvider } from '@/components/ThemeProvider'
 
 export const metadata: Metadata = {
-  title: 'EduCode — Talaba',
+  title: "EduCode — O'quvchi",
   description: 'AKT fanlarini amaliyot orqali o\'rganish platformasi',
 }
 

@@ -21,14 +21,14 @@ function AchIcon({ icon, className }: { icon: string; className?: string }) {
 }
 
 const CERTIFICATES = [
-  { id: 'cert-1', title: 'Python Dasturlash Asoslari', date: '2025-03-15', score: 94, color: 'from-blue-700 to-cyan-700' },
-  { id: 'cert-2', title: 'Web Dasturlash: HTML & CSS', date: '2025-01-20', score: 88, color: 'from-orange-700 to-amber-700' },
+  { id: 'cert-1', title: 'Matematika: Algebra va Geometriya', date: '2025-03-15', score: 94, color: 'from-blue-700 to-cyan-700' },
+  { id: 'cert-2', title: 'Informatika: Kompyuter va Algoritmlar', date: '2025-01-20', score: 88, color: 'from-orange-700 to-amber-700' },
 ]
 
 const PROJECTS = [
-  { id: 'p-1', title: 'Kalkulyator Ilovasi', desc: 'Python bilan yaratilgan konsol kalkulyator. OOP prinsiplariga asoslanadi.', lang: 'Python', stars: 12, color: 'text-blue-400', date: '2026-03-10' },
-  { id: 'p-2', title: 'Portfolio Sayti', desc: 'HTML, CSS va JavaScript bilan yaratilgan responsive portfolio sayti.', lang: 'HTML/CSS/JS', stars: 8, color: 'text-orange-400', date: '2026-02-20' },
-  { id: 'p-3', title: 'Talabalar DB', desc: 'PostgreSQL da talabalar ma\'lumotlar bazasi. Murakkab SQL so\'rovlar.', lang: 'SQL', stars: 5, color: 'text-emerald-400', date: '2026-01-15' },
+  { id: 'p-1', title: 'Matematik masalalar yechuvchi', desc: "Algebra va geometriya masalalarini yechadigan interaktiv dastur.", lang: 'Informatika', stars: 12, color: 'text-blue-400', date: '2026-03-10' },
+  { id: 'p-2', title: "Biologiya — Hujayra taqdimoti", desc: "Hujayra tuzilishi va vazifalari haqida vizual taqdimot loyihasi.", lang: 'Biologiya', stars: 8, color: 'text-emerald-400', date: '2026-02-20' },
+  { id: 'p-3', title: "O'quv yili daftari", desc: "Barcha fanlar bo'yicha yillik dars yakunlari va natijalar.", lang: 'Ona tili', stars: 5, color: 'text-orange-400', date: '2026-01-15' },
 ]
 
 export default function PortfolioPage() {

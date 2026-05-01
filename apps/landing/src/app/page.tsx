@@ -11,46 +11,46 @@ const TEACHER_URL = process.env.NEXT_PUBLIC_TEACHER_URL || 'https://educode-teac
 const ADMIN_URL = process.env.NEXT_PUBLIC_ADMIN_URL || 'https://educode-admins.vercel.app'
 
 const STATS = [
-  { label: 'Faol talaba', value: '1 240' },
+  { label: "Faol o'quvchi", value: '1 240' },
   { label: 'Kurs', value: '24' },
   { label: 'Dars moduli', value: '486' },
   { label: "O'rtacha baho", value: '4.8 / 5' },
 ]
 
 const FEATURES = [
-  { icon: Brain, title: "AI o'qituvchi yordamchi", desc: "Talabaning kodidagi xatolarni tahlil qiladi, tushuntirib beradi va mos tavsiya beradi.", color: 'text-accent-400', bg: 'bg-accent-600/10' },
+  { icon: Brain, title: "AI o'qituvchi yordamchi", desc: "O'quvchining savollarini tahlil qiladi, tushuntirib beradi va mos tavsiya beradi.", color: 'text-accent-400', bg: 'bg-accent-600/10' },
   { icon: Code2, title: 'Brauzerdagi kod muhiti', desc: "Python, JavaScript, SQL. Hech narsa o'rnatmasdan brauzerdan kod yozib ishga tushirish.", color: 'text-sky-400', bg: 'bg-sky-500/10' },
-  { icon: BarChart3, title: 'Didaktik tahlil', desc: "O'qituvchi har bir talabaning kuchli/zaif joylarini va sinfdagi qiyin mavzularni ko'radi.", color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
-  { icon: BookOpen, title: "Adaptiv sur'at", desc: "Tizim talabaning oxirgi javoblariga qarab qiyinlikni moslaydi.", color: 'text-amber-400', bg: 'bg-amber-500/10' },
+  { icon: BarChart3, title: 'Didaktik tahlil', desc: "O'qituvchi har bir o'quvchining kuchli/zaif joylarini va sinfdagi qiyin mavzularni ko'radi.", color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
+  { icon: BookOpen, title: "Adaptiv sur'at", desc: "Tizim o'quvchining oxirgi javoblariga qarab qiyinlikni moslaydi.", color: 'text-amber-400', bg: 'bg-amber-500/10' },
   { icon: Shield, title: 'Rol asosida xavfsizlik', desc: "Har rol o'z panelidan kiradi, JWT token, role-based access control.", color: 'text-rose-400', bg: 'bg-rose-500/10' },
   { icon: Users, title: 'Jonli dars', desc: "Video, chat, ekran ulashish. Qo'shimcha Zoom kerak emas.", color: 'text-violet-400', bg: 'bg-violet-500/10' },
 ]
 
 const COURSES_PREVIEW = [
-  { icon: Terminal, title: 'Python dasturlash', level: "Boshlang'ich", students: 342 },
-  { icon: Globe, title: 'Web: HTML, CSS, JS', level: "Boshlang'ich", students: 521 },
-  { icon: Database, title: "SQL va ma'lumotlar bazasi", level: "O'rta", students: 198 },
-  { icon: Network, title: 'Kompyuter tarmoqlari', level: "O'rta", students: 145 },
-  { icon: Cpu, title: "Algoritmlar va DSA", level: 'Murakkab', students: 89 },
-  { icon: Shield, title: 'Kiberxavfsizlik asoslari', level: 'Murakkab', students: 112 },
+  { icon: Terminal, title: 'Matematika: Algebra va Geometriya', level: "Boshlang'ich", students: 342 },
+  { icon: Globe, title: 'Fizika: Mexanika va Elektr', level: "O'rta", students: 521 },
+  { icon: Database, title: "Kimyo: Moddalar va Reaksiyalar", level: "O'rta", students: 198 },
+  { icon: Network, title: "Biologiya: Tirik Tabiat", level: "Boshlang'ich", students: 145 },
+  { icon: Cpu, title: "Informatika: Kompyuter va Algoritmlar", level: "Boshlang'ich", students: 289 },
+  { icon: Shield, title: "Ona tili va Adabiyot", level: "Boshlang'ich", students: 312 },
 ]
 
 const ROLES = [
   {
-    role: 'Talaba',
-    desc: 'Kurslarni ko\'ring, amaliyot qiling, AI yordamchi bilan mashg\'ulot olib boring.',
+    role: "O'quvchi",
+    desc: "Darslarni ko'ring, amaliyot qiling, AI yordamchi bilan mashg'ulot olib boring.",
     icon: GraduationCap,
     accent: 'accent',
     url: STUDENT_URL,
-    items: ['Kurs katalogi', 'Kod muhiti', 'AI yordamchi', 'XP va nishonlar', 'Portfolio'],
+    items: ['Dars katalogi', 'Amaliy topshiriqlar', 'AI yordamchi', 'XP va nishonlar', 'Portfolio'],
   },
   {
     role: "O'qituvchi",
-    desc: 'Kurs yarating, talabalar taraqqiyotini kuzating, topshiriqlarni baholang.',
+    desc: "Kurs yarating, o'quvchilar taraqqiyotini kuzating, topshiriqlarni baholang.",
     icon: UserCog,
     accent: 'sky',
     url: TEACHER_URL,
-    items: ['Kurs yaratish', 'Talabalar monitoringi', 'Didaktik tahlil', 'Baholash', 'Jonli dars'],
+    items: ["Kurs yaratish", "O'quvchilar monitoringi", 'Didaktik tahlil', 'Baholash', 'Jonli dars'],
   },
   {
     role: 'Admin',
@@ -135,8 +135,8 @@ export default function LandingPage() {
             amaliyot orqali o'rganing.
           </h1>
           <p className="text-lg text-base-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Brauzerda kod yozish, tezkor AI izohlari va har talabaning sur'atiga
-            moslashadigan interaktiv dars tizimi. Nazariya qisqa, amaliyot ko'p.
+            Interaktiv darslar, tezkor AI izohlari va har o'quvchining sur'atiga
+            moslashadigan zamonaviy ta'lim tizimi. Resurslar avval, keyin amaliyot.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <a href="#panellar" className="group inline-flex items-center gap-2 bg-accent-600 hover:bg-accent-700 text-white font-medium px-6 py-3 rounded-xl text-sm transition-colors">
@@ -267,7 +267,7 @@ export default function LandingPage() {
                 <h3 className="font-medium text-base-100 mb-3 group-hover:text-white">{c.title}</h3>
                 <div className="flex items-center justify-between text-xs text-base-500">
                   <span>{c.level}</span>
-                  <span className="tabular-nums">{c.students} talaba</span>
+                  <span className="tabular-nums">{c.students} o'quvchi</span>
                 </div>
               </div>
             ))}

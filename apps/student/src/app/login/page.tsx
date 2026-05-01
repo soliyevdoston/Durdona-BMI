@@ -35,13 +35,13 @@ export default function LoginPage() {
           <a href="https://educode-landing.vercel.app" className="inline-flex items-center gap-2">
             <div className="w-9 h-9 rounded-md bg-base-100 text-base-950 flex items-center justify-center font-semibold">E</div>
             <span className="text-lg font-medium text-base-100">EduCode</span>
-            <span className="text-xs text-base-500 ml-1">· Talaba</span>
+            <span className="text-xs text-base-500 ml-1">· O'quvchi</span>
           </a>
         </div>
 
         <div className="card p-8">
           <h1 className="text-2xl font-semibold text-base-100 mb-1">Tizimga kirish</h1>
-          <p className="text-sm text-base-500 mb-7">Talaba hisobingiz orqali kiring</p>
+          <p className="text-sm text-base-500 mb-7">O'quvchi hisobingiz orqali kiring</p>
 
           {error && (
             <div className="flex items-center gap-2 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm mb-4">

@@ -52,17 +52,17 @@ export default function TeacherStudentsPage() {
   return (
     <div className="max-w-7xl mx-auto space-y-6 animate-fade-in">
       <div>
-        <h1 className="text-2xl font-bold text-base-100">Talabalar</h1>
-        <p className="text-sm text-base-500 mt-1">{STUDENTS.length} ta talaba · {STUDENTS.filter(s => s.risk === 'high').length} xavfli</p>
+        <h1 className="text-2xl font-bold text-base-100">O'quvchilar</h1>
+        <p className="text-sm text-base-500 mt-1">{STUDENTS.length} ta o'quvchi · {STUDENTS.filter(s => s.risk === 'high').length} xavfli</p>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Jami Talabalar', value: STUDENTS.length, color: 'text-sky-400' },
+          { label: "Jami O'quvchilar", value: STUDENTS.length, color: 'text-sky-400' },
           { label: 'Yuqori Natija', value: STUDENTS.filter(s => s.progress >= 70).length, color: 'text-emerald-400' },
           { label: "O'rta Natija", value: STUDENTS.filter(s => s.progress >= 40 && s.progress < 70).length, color: 'text-amber-400' },
-          { label: 'Xavfli Talaba', value: STUDENTS.filter(s => s.risk === 'high').length, color: 'text-rose-400' },
+          { label: "Xavfli O'quvchi", value: STUDENTS.filter(s => s.risk === 'high').length, color: 'text-rose-400' },
         ].map((s) => (
           <div key={s.label} className="stat-card">
             <div className="text-xs text-base-500 uppercase tracking-wider mb-2">{s.label}</div>
@@ -76,7 +76,7 @@ export default function TeacherStudentsPage() {
         <div className="relative flex-1">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-base-600" />
           <input value={search} onChange={(e) => setSearch(e.target.value)}
-            className="input pl-10" placeholder="Talaba qidirish..." />
+            className="input pl-10" placeholder="O'quvchi qidirish..." />
         </div>
         <div className="flex gap-2">
           {(['all', 'low', 'medium', 'high'] as const).map((f) => (
@@ -97,7 +97,7 @@ export default function TeacherStudentsPage() {
               <tr className="border-b border-[#1E1E24] bg-[#0D0D10]">
                 <th className="text-left px-4 py-3 text-xs text-base-500 uppercase tracking-wider font-medium">
                   <button onClick={() => setSortBy('name')} className="flex items-center gap-1 hover:text-base-300">
-                    Talaba <ArrowUpDown className="w-3 h-3" />
+                    O'quvchi <ArrowUpDown className="w-3 h-3" />
                   </button>
                 </th>
                 <th className="text-left px-4 py-3 text-xs text-base-500 uppercase tracking-wider font-medium">Daraja</th>

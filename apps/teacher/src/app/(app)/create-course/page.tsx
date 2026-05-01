@@ -62,7 +62,7 @@ export default function CreateCoursePage() {
           <CheckCircle2 className="w-10 h-10 text-emerald-400" />
         </div>
         <h1 className="text-3xl font-bold text-base-100 mb-2">Kurs yaratildi!</h1>
-        <p className="text-base-500 mb-8">Kursingiz muvaffaqiyatli yaratildi va talabalar uchun mavjud</p>
+        <p className="text-base-500 mb-8">Kursingiz muvaffaqiyatli yaratildi va o'quvchilar uchun mavjud</p>
         <div className="flex gap-3 justify-center flex-wrap">
           <Link href="/courses" className="btn-secondary px-6">Kurslarga</Link>
           <button onClick={() => { setPublished(false); setStep(1); setTitle(''); setDescription(''); setCategory(''); setLessons([{ id: '1', title: 'Kirish', type: 'video', duration: '10' }]); setCreatedCourseId(null) }}

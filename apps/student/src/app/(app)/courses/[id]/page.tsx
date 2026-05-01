@@ -17,45 +17,45 @@ const TYPE_COLOR: Record<string, string> = { video: 'text-base-500', text: 'text
 
 // ─── Knowledge Space Theory — Diagnostic Questions ──────────────────────────
 const DIAG_QUESTIONS = [
-  { id: 1, lessonIdx: 0, topic: "Dasturlash asoslari",
+  { id: 1, lessonIdx: 0, topic: "Umumiy bilim",
     q: "Algoritm deganda nimani tushunasiz?",
-    options: ["Kompyuter tili", "Muammoni yechishning qadam-baqadam rejasi", "Kod yozish muhiti", "Xato xabari"],
+    options: ["Kompyuter dasturi", "Muammoni yechishning qadam-baqadam rejasi", "Matematika formuli", "Kitob nomi"],
     correct: 1 },
-  { id: 2, lessonIdx: 1, topic: "O'zgaruvchilar",
-    q: "Python'da o'zgaruvchi e'lon qilishning to'g'ri usuli:",
-    options: ["var x = 5", "int x = 5", "x = 5", "let x = 5"],
+  { id: 2, lessonIdx: 1, topic: "Matematika",
+    q: "2x + 6 = 14 tenglamada x nechaga teng?",
+    options: ["3", "4", "5", "6"],
+    correct: 1 },
+  { id: 3, lessonIdx: 2, topic: "Fizika",
+    q: "Kuch = Massa × Tezlanish — bu qaysi qonun?",
+    options: ["Gravitatsiya qonuni", "Newton'ning 2-qonuni", "Energiya saqlanish qonuni", "Arximed qonuni"],
+    correct: 1 },
+  { id: 4, lessonIdx: 3, topic: "Kimyo",
+    q: "Suvning kimyoviy formulasi nima?",
+    options: ["CO2", "H2O", "NaCl", "O2"],
+    correct: 1 },
+  { id: 5, lessonIdx: 4, topic: "Biologiya",
+    q: "Fotosintez qayerda sodir bo'ladi?",
+    options: ["Ildizda", "Bargda (xloroplastda)", "Mevada", "Po'stlog'da"],
+    correct: 1 },
+  { id: 6, lessonIdx: 5, topic: "Informatika",
+    q: "CPU — bu nima?",
+    options: ["Xotira qurilmasi", "Markaziy protsessor", "Ekran", "Klaviatura"],
+    correct: 1 },
+  { id: 7, lessonIdx: 6, topic: "Ona tili",
+    q: "'Kitob' so'zi qaysi so'z turkumiga kiradi?",
+    options: ["Fe'l", "Sifat", "Ot", "Ravish"],
     correct: 2 },
-  { id: 3, lessonIdx: 2, topic: "Shartli operatorlar",
-    q: "if x > 0 sharti qachon True bo'ladi?",
-    options: ["x nolga teng bo'lganda", "x noldan katta bo'lganda", "x manfiy bo'lganda", "Har doim"],
+  { id: 8, lessonIdx: 7, topic: "Matematika",
+    q: "3² (uch kvadrat) qiymati nima?",
+    options: ["6", "9", "12", "8"],
     correct: 1 },
-  { id: 4, lessonIdx: 3, topic: "Sikllar",
-    q: "for i in range(3) necha marta takrorlanadi?",
-    options: ["1", "2", "3", "4"],
-    correct: 2 },
-  { id: 5, lessonIdx: 4, topic: "Funksiyalar",
-    q: "Python'da funksiya yaratish uchun kalit so'z:",
-    options: ["function", "fun", "def", "fn"],
-    correct: 2 },
-  { id: 6, lessonIdx: 5, topic: "Ma'lumot turlari",
-    q: "type(3.14) qanday natija beradi?",
-    options: ["int", "float", "str", "double"],
+  { id: 9, lessonIdx: 8, topic: "Fizika",
+    q: "Yorug'lik tezligi taxminan qancha?",
+    options: ["300 km/s", "300 000 km/s", "3 000 km/s", "30 000 km/s"],
     correct: 1 },
-  { id: 7, lessonIdx: 6, topic: "Ro'yxatlar (list)",
-    q: "mylist = [10, 20, 30]; mylist[1] qiymati nima?",
-    options: ["10", "20", "30", "Xato"],
-    correct: 1 },
-  { id: 8, lessonIdx: 7, topic: "Lug'atlar (dict)",
-    q: "d = {'a': 1, 'b': 2} — bu qanday ma'lumot turi?",
-    options: ["list", "tuple", "dict", "set"],
-    correct: 2 },
-  { id: 9, lessonIdx: 8, topic: "OOP asoslari",
-    q: "Python'da class yaratishda __init__ metodining vazifasi:",
-    options: ["Klassni o'chirish", "Ob'ekt yaratilganda ishga tushadi (konstruktor)", "Metodlarni chaqirish", "Merros olish"],
-    correct: 1 },
-  { id: 10, lessonIdx: 9, topic: "Xatolarni boshqarish",
-    q: "try/except bloki asosan nima uchun ishlatiladi?",
-    options: ["Sikllar uchun", "Xatolarni ushlash va boshqarish uchun", "Klasslar uchun", "Import qilish uchun"],
+  { id: 10, lessonIdx: 9, topic: "Umumiy bilim",
+    q: "Internet nima uchun ishlatiladi?",
+    options: ["Faqat o'yin uchun", "Ma'lumot almashish va muloqot uchun", "Faqat video ko'rish uchun", "Faqat musiqa uchun"],
     correct: 1 },
 ]
 
@@ -665,6 +665,28 @@ export default function CourseDetailPage() {
                   <div className="badge-amber flex-shrink-0 animate-bounce-once">+{currentLesson.xpReward} XP</div>
                 </div>
 
+                {/* Dars Resurslari — video'dan OLDIN ko'rsatiladi */}
+                {(currentLesson.type === 'video' || currentLesson.type === 'text') && (
+                  <div className="mb-4 bg-[#0D0D10] border border-[#1E1E24] rounded-xl p-4 animate-fade-in">
+                    <p className="text-xs text-base-500 mb-3 uppercase tracking-wider">Dars Materiallari</p>
+                    <p className="text-sm text-base-400 leading-relaxed mb-3">
+                      Bu darsda <strong className="text-base-200">{currentLesson.title}</strong> mavzusini o'rganasiz.
+                    </p>
+                    <ul className="space-y-2 text-xs text-base-500">
+                      {[
+                        "Mavzuni diqqat bilan o'qib, asosiy tushunchalarni yozing",
+                        "Dars davomida savol tug'ilsa — AI yordamchiga murojaat qiling",
+                        "Darsni tugatib, testni bajaring va XP yig'ing",
+                      ].map((item, i) => (
+                        <li key={i} className="flex items-start gap-2 stagger-item animate-slide-in-left"
+                          style={{ animationDelay: `${i * 60}ms`, animationFillMode: 'backwards' }}>
+                          <span className="text-base-700 mt-0.5">•</span>{item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
                 {/* Video Player */}
                 {currentLesson.videoUrl && (
                   <div className="bg-black rounded-xl aspect-video overflow-hidden mb-4 border border-[#1E1E24] animate-fade-in shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
@@ -685,25 +707,6 @@ export default function CourseDetailPage() {
                       <Play className="w-7 h-7 text-base-600 ml-1" />
                     </div>
                     <p className="text-sm text-base-600">Video hali yuklanmagan</p>
-                  </div>
-                )}
-
-                {/* Text Content */}
-                {currentLesson.type === 'text' && (
-                  <div className="mb-4 space-y-4 text-sm text-base-400 leading-relaxed animate-fade-in">
-                    <p>Bu darsda <strong className="text-base-200">{currentLesson.title}</strong> mavzusini batafsil ko'rib chiqamiz.</p>
-                    <div className="bg-[#0D0D10] border border-[#1E1E24] rounded-xl p-4">
-                      <p className="text-xs text-base-500 mb-3 uppercase tracking-wider">Asosiy tushunchalar</p>
-                      <ul className="space-y-2 text-xs text-base-500">
-                        {["O'rnatish jarayoni va muhit sozlash", "Asosiy interfeys va buyruqlar", "Birinchi loyiha yaratish", "Xatolarni aniqlash va tuzatish"].map((item, i) => (
-                          <li key={i} className={`flex items-start gap-2 stagger-item animate-slide-in-left`}
-                            style={{ animationDelay: `${i * 80}ms`, animationFillMode: 'backwards' }}>
-                            <span className="text-base-700 mt-0.5">•</span>{item}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    <p>Darsni diqqat bilan o'qib, har bir misolni o'zingizda sinab ko'ring. Amaliyot — eng yaxshi o'qituvchi.</p>
                   </div>
                 )}
 

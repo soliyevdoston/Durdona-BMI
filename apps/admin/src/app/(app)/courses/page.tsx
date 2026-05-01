@@ -59,7 +59,7 @@ export default function AdminCoursesPage() {
                 <th className="text-left px-4 py-3 text-xs text-base-500 uppercase tracking-wider font-medium">Kategoriya</th>
                 <th className="text-left px-4 py-3 text-xs text-base-500 uppercase tracking-wider font-medium">Qiyinlik</th>
                 <th className="text-left px-4 py-3 text-xs text-base-500 uppercase tracking-wider font-medium">O'qituvchi</th>
-                <th className="text-left px-4 py-3 text-xs text-base-500 uppercase tracking-wider font-medium">Talabalar</th>
+                <th className="text-left px-4 py-3 text-xs text-base-500 uppercase tracking-wider font-medium">O'quvchilar</th>
                 <th className="text-left px-4 py-3 text-xs text-base-500 uppercase tracking-wider font-medium">Reyting</th>
                 <th className="text-right px-4 py-3 text-xs text-base-500 uppercase tracking-wider font-medium">Amal</th>
               </tr>

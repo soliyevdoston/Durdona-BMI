@@ -9,7 +9,7 @@ import { useApi } from '@/lib/useApi'
 import { formatDate } from '@/lib/utils'
 
 const ROLE_CONFIG = {
-  student: { label: 'Talaba', color: 'badge-accent', Icon: GraduationCap },
+  student: { label: "O'quvchi", color: 'badge-accent', Icon: GraduationCap },
   teacher: { label: "O'qituvchi", color: 'badge-sky', Icon: BookOpen },
   admin: { label: 'Admin', color: 'badge-emerald', Icon: ShieldCheck },
   super_admin: { label: 'Super Admin', color: 'badge bg-amber-500/10 text-amber-400 border border-amber-500/20', Icon: Crown },
@@ -66,7 +66,7 @@ function AddUserModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: 
               <div>
                 <label className="text-xs text-base-500 uppercase tracking-wider mb-2 block">Rol</label>
                 <select value={role} onChange={e => setRole(e.target.value)} className="input">
-                  <option value="student">Talaba</option>
+                  <option value="student">O'quvchi</option>
                   <option value="teacher">O'qituvchi</option>
                   <option value="admin">Admin</option>
                 </select>
@@ -158,7 +158,7 @@ export default function AdminUsersPage() {
         <div className="stat-card">
           <GraduationCap className="w-4 h-4 text-accent-400 mb-2" />
           <div className="text-2xl font-bold text-accent-400">{stats.students}</div>
-          <div className="text-xs text-base-600">Talabalar</div>
+          <div className="text-xs text-base-600">O'quvchilar</div>
         </div>
         <div className="stat-card">
           <BookOpen className="w-4 h-4 text-sky-400 mb-2" />
@@ -180,7 +180,7 @@ export default function AdminUsersPage() {
         </div>
         <select value={roleFilter} onChange={(e) => setRoleFilter(e.target.value as any)} className="input w-auto">
           <option value="all">Barcha rollar</option>
-          <option value="student">Talabalar</option>
+          <option value="student">O'quvchilar</option>
           <option value="teacher">O'qituvchilar</option>
           <option value="admin">Adminlar</option>
         </select>
