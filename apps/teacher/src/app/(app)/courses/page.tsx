@@ -1,19 +1,19 @@
 'use client'
 import Link from 'next/link'
 import type { ElementType } from 'react'
-import { Plus, Users, Star, MoreVertical, Edit, Copy, Trash2, Eye, BookOpen, Clock, Calculator, Zap, Atom, Leaf, Cpu, FileText } from 'lucide-react'
+import { Plus, Users, Star, MoreVertical, Edit, Copy, Trash2, Eye, BookOpen, Clock, Cpu, FileText, Code2, Network, Database, Globe } from 'lucide-react'
 import { useState } from 'react'
 import { api } from '@/lib/api'
 import { useApi } from '@/lib/useApi'
 import { getDifficultyColor, getDifficultyLabel } from '@/lib/utils'
 
 const THUMB_MAP: Record<string, { icon: ElementType; color: string }> = {
-  math: { icon: Calculator, color: 'from-[#1E1E24] to-[#141418]' },
-  physics: { icon: Zap, color: 'from-[#1E1E24] to-[#141418]' },
-  chemistry: { icon: Atom, color: 'from-[#1E1E24] to-[#141418]' },
-  biology: { icon: Leaf, color: 'from-[#1E1E24] to-[#141418]' },
   computer: { icon: Cpu, color: 'from-[#1E1E24] to-[#141418]' },
-  language: { icon: FileText, color: 'from-[#1E1E24] to-[#141418]' },
+  files: { icon: FileText, color: 'from-[#1E1E24] to-[#141418]' },
+  algo: { icon: Code2, color: 'from-[#1E1E24] to-[#141418]' },
+  network: { icon: Network, color: 'from-[#1E1E24] to-[#141418]' },
+  database: { icon: Database, color: 'from-[#1E1E24] to-[#141418]' },
+  web: { icon: Globe, color: 'from-[#1E1E24] to-[#141418]' },
 }
 
 export default function TeacherCoursesPage() {

@@ -21,14 +21,14 @@ function AchIcon({ icon, className }: { icon: string; className?: string }) {
 }
 
 const CERTIFICATES = [
-  { id: 'cert-1', title: 'Matematika: Algebra va Geometriya', date: '2025-03-15', score: 94, color: 'from-blue-700 to-cyan-700' },
-  { id: 'cert-2', title: 'Informatika: Kompyuter va Algoritmlar', date: '2025-01-20', score: 88, color: 'from-orange-700 to-amber-700' },
+  { id: 'cert-1', title: 'Kompyuter Savodxonligi', date: '2025-03-15', score: 94, color: 'from-blue-700 to-cyan-700' },
+  { id: 'cert-2', title: 'Algoritmlar va Dasturlash Asoslari', date: '2025-01-20', score: 88, color: 'from-orange-700 to-amber-700' },
 ]
 
 const PROJECTS = [
-  { id: 'p-1', title: 'Matematik masalalar yechuvchi', desc: "Algebra va geometriya masalalarini yechadigan interaktiv dastur.", lang: 'Informatika', stars: 12, color: 'text-blue-400', date: '2026-03-10' },
-  { id: 'p-2', title: "Biologiya — Hujayra taqdimoti", desc: "Hujayra tuzilishi va vazifalari haqida vizual taqdimot loyihasi.", lang: 'Biologiya', stars: 8, color: 'text-emerald-400', date: '2026-02-20' },
-  { id: 'p-3', title: "O'quv yili daftari", desc: "Barcha fanlar bo'yicha yillik dars yakunlari va natijalar.", lang: 'Ona tili', stars: 5, color: 'text-orange-400', date: '2026-01-15' },
+  { id: 'p-1', title: 'Python: Kalkulyator dasturi', desc: "Python da to'rt arifmetik amal va foiz hisoblaydigan konsol dastur.", lang: 'Python', stars: 12, color: 'text-blue-400', date: '2026-03-10' },
+  { id: 'p-2', title: "Shaxsiy veb-sahifa", desc: "HTML va CSS yordamida yaratilgan responsive shaxsiy portfolio sahifasi.", lang: 'HTML/CSS', stars: 8, color: 'text-orange-400', date: '2026-02-20' },
+  { id: 'p-3', title: "Excel: O'quvchilar jadvali", desc: "Sinf o'quvchilarining baholari va davomat jadvali formulalar bilan.", lang: 'Excel', stars: 5, color: 'text-emerald-400', date: '2026-01-15' },
 ]
 
 export default function PortfolioPage() {

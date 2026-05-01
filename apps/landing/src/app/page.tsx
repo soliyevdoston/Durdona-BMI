@@ -27,12 +27,12 @@ const FEATURES = [
 ]
 
 const COURSES_PREVIEW = [
-  { icon: Terminal, title: 'Matematika: Algebra va Geometriya', level: "Boshlang'ich", students: 342 },
-  { icon: Globe, title: 'Fizika: Mexanika va Elektr', level: "O'rta", students: 521 },
-  { icon: Database, title: "Kimyo: Moddalar va Reaksiyalar", level: "O'rta", students: 198 },
-  { icon: Network, title: "Biologiya: Tirik Tabiat", level: "Boshlang'ich", students: 145 },
-  { icon: Cpu, title: "Informatika: Kompyuter va Algoritmlar", level: "Boshlang'ich", students: 289 },
-  { icon: Shield, title: "Ona tili va Adabiyot", level: "Boshlang'ich", students: 312 },
+  { icon: Cpu, title: 'Kompyuter Savodxonligi', level: "Boshlang'ich", students: 342 },
+  { icon: Terminal, title: 'Ofis Dasturlari (Word, Excel)', level: "Boshlang'ich", students: 521 },
+  { icon: Globe, title: 'Algoritmlar va Dasturlash', level: "Boshlang'ich", students: 289 },
+  { icon: Network, title: 'Internet va Axborot Xavfsizligi', level: "Boshlang'ich", students: 198 },
+  { icon: Database, title: "Ma'lumotlar Bazasi Asoslari", level: "O'rta", students: 145 },
+  { icon: Shield, title: 'Web Texnologiyalar: HTML va CSS', level: "O'rta", students: 178 },
 ]
 
 const ROLES = [
