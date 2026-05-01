@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation'
 import {
   ChevronLeft, Play, Lock, CheckCircle2, Clock, BookOpen,
   Code2, FileQuestion, FileText, Brain, X, SkipForward,
-  Map, ArrowRight, Sparkles
+  Map, ArrowRight, Sparkles, Download
 } from 'lucide-react'
 import { api } from '@/lib/api'
 import { useApi } from '@/lib/useApi'
@@ -58,6 +58,84 @@ const DIAG_QUESTIONS = [
     options: ["1 bayt = 4 bit", "1 bayt = 8 bit", "1 bayt = 16 bit", "1 bayt = 2 bit"],
     correct: 1 },
 ]
+
+// ─── Downloadable resource helpers ───────────────────────────────────────────
+const KEY_TERMS: Record<string, string[]> = {
+  kompyuter:  ["Hardware — apparat qism", "Software — dasturiy ta'minot", "CPU — markaziy protsessor", "RAM — operativ xotira", "HDD/SSD — saqlash qurilmasi"],
+  operatsion: ["OS — operatsion tizim", "Windows, Linux, MacOS", "Fayl tizimi", "Protsess — jarayon", "Drayvyer — haydovchi"],
+  word:       ["Hujjat — Document", "Paragraf — Paragraph", "Formatlash — Formatting", "Shrift — Font", "Jadval — Table"],
+  excel:      ["Katakcha — Cell", "Formula — Formula", "Funksiya — Function", "Diagramma — Chart", "=SUM(), =AVERAGE()"],
+  python:     ["O'zgaruvchi — Variable", "Funksiya — def", "Tsikl — for/while", "Shart — if/else", "Ro'yxat — List"],
+  algoritm:   ["Algoritm — Algorithm", "Psevdokod — Pseudocode", "Tarmoqlanish — Branch", "Takrorlash — Loop", "Murakkablik — Complexity"],
+  internet:   ["URL — veb manzil", "HTTP/HTTPS — protokol", "Brauzer — Browser", "Tarmoq — Network", "IP manzil"],
+  xavfsizlik: ["Parol — Password", "Fishing — Phishing", "Antivirus", "Shifrlash — Encryption", "2FA — ikki bosqichli"],
+  sql:        ["Ma'lumotlar bazasi — Database", "Jadval — Table", "SELECT / WHERE", "JOIN — birlashtirish", "INDEX — indeks"],
+  html:       ["Teg — Tag", "Element", "Atribut — Attribute", "Sarlavha — <h1>", "Havola — <a href>"],
+  css:        ["Selektor — Selector", "Rang — color", "Shrift — font", "Joylashuv — display/flex", "Animatsiya — animation"],
+}
+
+function getKeyTerms(title: string): string[] {
+  const t = title.toLowerCase()
+  for (const [key, terms] of Object.entries(KEY_TERMS)) {
+    if (t.includes(key)) return terms
+  }
+  return ["Mavzuni diqqat bilan o'qing", "Asosiy tushunchalarni yozing", "Testni bajaring va XP yig'ing"]
+}
+
+function buildResourceHTML(lesson: any, course: any): string {
+  const terms = getKeyTerms(lesson?.title || '')
+  const today = new Date().toLocaleDateString('uz-UZ')
+  return `<html><head><meta charset="UTF-8">
+<style>
+  body{font-family:Arial,sans-serif;max-width:680px;margin:40px auto;color:#1f2937;line-height:1.7}
+  h1{color:#111827;border-bottom:3px solid #3b82f6;padding-bottom:10px;font-size:22px}
+  h2{color:#374151;font-size:15px;margin-top:24px;margin-bottom:8px}
+  .badge{background:#eff6ff;color:#1d4ed8;padding:2px 10px;border-radius:12px;font-size:12px;margin-right:6px}
+  ul{padding-left:20px}li{margin-bottom:5px;font-size:14px}
+  .term{background:#f8fafc;border-left:4px solid #3b82f6;padding:7px 12px;margin-bottom:5px;border-radius:0 6px 6px 0;font-size:13px}
+  .footer{margin-top:48px;color:#9ca3af;font-size:11px;border-top:1px solid #e5e7eb;padding-top:12px;text-align:center}
+</style></head><body>
+<h1>${lesson?.title || 'Dars materiali'}</h1>
+<p><span class="badge">${course?.title || 'Kurs'}</span><span class="badge">${lesson?.duration || ''}</span></p>
+<h2>Dars Maqsadlari</h2>
+<ul>
+  <li>${lesson?.title || ''} mavzusini o'rganish</li>
+  <li>Asosiy tushunchalarni tushunish va yodda saqlash</li>
+  <li>Amaliy ko'nikmalarni rivojlantirish</li>
+</ul>
+<h2>Asosiy Atamalar</h2>
+${terms.map(t => `<div class="term">${t}</div>`).join('\n')}
+<h2>O'rganish Ko'rsatmalari</h2>
+<ul>
+  <li>Mavzuni diqqat bilan ko'rib chiqing</li>
+  <li>Asosiy tushunchalarni daftaringizga yozing</li>
+  <li>Savol tug'ilsa — AI yordamchiga murojaat qiling</li>
+  <li>Darsni tugatib, testni bajaring va XP yig'ing</li>
+</ul>
+<div class="footer">EduCode — AKT Virtual Sinf &bull; ${today}</div>
+</body></html>`
+}
+
+function downloadAsWord(lesson: any, course: any) {
+  const html = buildResourceHTML(lesson, course)
+  const blob = new Blob([html], { type: 'application/msword' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `${(lesson?.title || 'dars').replace(/[/\\?%*:|"<>]/g, '-')}.doc`
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
+function downloadAsPDF(lesson: any, course: any) {
+  const html = buildResourceHTML(lesson, course)
+  const win = window.open('', '_blank')
+  if (!win) return
+  win.document.write(html)
+  win.document.close()
+  win.focus()
+  setTimeout(() => win.print(), 400)
+}
 
 // ─── Animated counter hook ────────────────────────────────────────────────────
 function useCountUp(target: number, duration = 800) {
@@ -668,17 +746,41 @@ export default function CourseDetailPage() {
                 {/* Dars Resurslari — video'dan OLDIN ko'rsatiladi */}
                 {(currentLesson.type === 'video' || currentLesson.type === 'text') && (
                   <div className="mb-4 bg-[#0D0D10] border border-[#1E1E24] rounded-xl p-4 animate-fade-in">
-                    <p className="text-xs text-base-500 mb-3 uppercase tracking-wider">Dars Materiallari</p>
+                    <div className="flex items-center justify-between mb-3">
+                      <p className="text-xs text-base-500 uppercase tracking-wider">Dars Materiallari</p>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => downloadAsWord(currentLesson, course)}
+                          className="flex items-center gap-1.5 text-xs text-base-400 hover:text-base-100 bg-[#1A1A1F] border border-[#27272A] hover:border-sky-600/40 rounded-lg px-3 py-1.5 transition-all">
+                          <Download className="w-3 h-3" /> Word
+                        </button>
+                        <button
+                          onClick={() => downloadAsPDF(currentLesson, course)}
+                          className="flex items-center gap-1.5 text-xs text-base-400 hover:text-base-100 bg-[#1A1A1F] border border-[#27272A] hover:border-rose-500/40 rounded-lg px-3 py-1.5 transition-all">
+                          <Download className="w-3 h-3" /> PDF
+                        </button>
+                      </div>
+                    </div>
                     <p className="text-sm text-base-400 leading-relaxed mb-3">
                       Bu darsda <strong className="text-base-200">{currentLesson.title}</strong> mavzusini o'rganasiz.
                     </p>
+                    <div className="mb-3">
+                      <p className="text-xs text-base-600 mb-2 uppercase tracking-wider">Asosiy Atamalar</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {getKeyTerms(currentLesson.title).map((term, i) => (
+                          <span key={i} className="text-xs px-2.5 py-1 rounded-lg bg-[#111113] border border-[#27272A] text-base-400">
+                            {term}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
                     <ul className="space-y-2 text-xs text-base-500">
                       {[
                         "Mavzuni diqqat bilan o'qib, asosiy tushunchalarni yozing",
                         "Dars davomida savol tug'ilsa — AI yordamchiga murojaat qiling",
                         "Darsni tugatib, testni bajaring va XP yig'ing",
                       ].map((item, i) => (
-                        <li key={i} className="flex items-start gap-2 stagger-item animate-slide-in-left"
+                        <li key={i} className="flex items-start gap-2 animate-slide-in-left"
                           style={{ animationDelay: `${i * 60}ms`, animationFillMode: 'backwards' }}>
                           <span className="text-base-700 mt-0.5">•</span>{item}
                         </li>

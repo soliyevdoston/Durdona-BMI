@@ -14,6 +14,9 @@ interface DraftLesson {
   title: string
   type: LessonType
   duration: string
+  videoUrl?: string
+  videoFileName?: string
+  resourceName?: string
 }
 
 const LESSON_TYPES: { id: LessonType; label: string; icon: any; color: string }[] = [
@@ -34,6 +37,7 @@ export default function CreateCoursePage() {
   const [lessons, setLessons] = useState<DraftLesson[]>([
     { id: '1', title: 'Kirish', type: 'video', duration: '10' },
   ])
+  const [expandedLesson, setExpandedLesson] = useState<string | null>(null)
   const [published, setPublished] = useState(false)
   const [publishing, setPublishing] = useState(false)
   const [publishError, setPublishError] = useState<string | null>(null)
@@ -129,6 +133,7 @@ export default function CreateCoursePage() {
               <label className="text-xs text-base-500 uppercase tracking-wider mb-2 block">Kategoriya *</label>
               <select value={category} onChange={(e) => setCategory(e.target.value)} className="input">
                 <option value="">Tanlang...</option>
+                <option value="Informatika">Informatika (Umumiy)</option>
                 <option value="Dasturlash">Dasturlash</option>
                 <option value="Web">Web Dasturlash</option>
                 <option value="Database">Ma'lumotlar Bazasi</option>
@@ -208,29 +213,89 @@ export default function CreateCoursePage() {
 
           {/* Lesson List */}
           <div className="card p-5">
-            <h3 className="font-semibold text-base-100 mb-4">Dasturlar Ro'yxati</h3>
+            <h3 className="font-semibold text-base-100 mb-4">Darslar Ro'yxati</h3>
             <div className="space-y-2">
               {lessons.map((lesson, idx) => {
                 const lt = LESSON_TYPES.find(l => l.id === lesson.type)!
                 const LIcon = lt.icon
+                const isExpanded = expandedLesson === lesson.id
                 return (
-                  <div key={lesson.id} className="flex items-center gap-3 p-3 rounded-xl bg-[#1A1A1F] border border-[#27272A] hover:border-[#3F3F46] transition-colors group">
-                    <GripVertical className="w-4 h-4 text-base-700 cursor-move" />
-                    <div className="text-xs font-bold text-base-600 w-6">{idx + 1}</div>
-                    <div className={`w-8 h-8 rounded-lg bg-[#0D0D10] flex items-center justify-center`}>
-                      <LIcon className={`w-4 h-4 ${lt.color}`} />
+                  <div key={lesson.id}>
+                    <div className={`flex items-center gap-3 p-3 rounded-xl bg-[#1A1A1F] border transition-colors group cursor-pointer
+                      ${isExpanded ? 'border-sky-600/40' : 'border-[#27272A] hover:border-[#3F3F46]'}`}
+                      onClick={() => setExpandedLesson(isExpanded ? null : lesson.id)}>
+                      <GripVertical className="w-4 h-4 text-base-700 cursor-move" onClick={e => e.stopPropagation()} />
+                      <div className="text-xs font-bold text-base-600 w-6">{idx + 1}</div>
+                      <div className="w-8 h-8 rounded-lg bg-[#0D0D10] flex items-center justify-center flex-shrink-0">
+                        <LIcon className={`w-4 h-4 ${lt.color}`} />
+                      </div>
+                      <input value={lesson.title} onChange={(e) => { e.stopPropagation(); updateLesson(lesson.id, 'title', e.target.value) }}
+                        onClick={e => e.stopPropagation()}
+                        className="flex-1 bg-transparent text-sm text-base-200 focus:outline-none" placeholder="Dars nomi" />
+                      <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
+                        <input value={lesson.duration} onChange={(e) => updateLesson(lesson.id, 'duration', e.target.value)}
+                          className="w-12 bg-[#0D0D10] border border-[#27272A] rounded px-2 py-1 text-xs text-base-300 text-center focus:outline-none focus:border-sky-600" />
+                        <span className="text-xs text-base-600">daq</span>
+                      </div>
+                      <button onClick={(e) => { e.stopPropagation(); removeLesson(lesson.id) }}
+                        className="p-1.5 rounded-lg hover:bg-rose-500/10 text-base-700 hover:text-rose-400 opacity-0 group-hover:opacity-100 transition-all">
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
                     </div>
-                    <input value={lesson.title} onChange={(e) => updateLesson(lesson.id, 'title', e.target.value)}
-                      className="flex-1 bg-transparent text-sm text-base-200 focus:outline-none" placeholder="Dars nomi" />
-                    <div className="flex items-center gap-1">
-                      <input value={lesson.duration} onChange={(e) => updateLesson(lesson.id, 'duration', e.target.value)}
-                        className="w-12 bg-[#0D0D10] border border-[#27272A] rounded px-2 py-1 text-xs text-base-300 text-center focus:outline-none focus:border-sky-600" />
-                      <span className="text-xs text-base-600">daq</span>
-                    </div>
-                    <button onClick={() => removeLesson(lesson.id)}
-                      className="p-1.5 rounded-lg hover:bg-rose-500/10 text-base-700 hover:text-rose-400 opacity-0 group-hover:opacity-100 transition-all">
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+
+                    {/* Expanded lesson fields */}
+                    {isExpanded && (
+                      <div className="mt-1 p-4 bg-[#0D0D10] border border-sky-600/20 rounded-xl space-y-4">
+                        {lesson.type === 'video' && (
+                          <>
+                            <div>
+                              <label className="text-xs text-base-500 mb-1.5 block">Video Manzili (URL)</label>
+                              <input
+                                value={lesson.videoUrl || ''}
+                                onChange={(e) => updateLesson(lesson.id, 'videoUrl', e.target.value)}
+                                className="input text-xs"
+                                placeholder="https://www.youtube.com/watch?v=..."
+                              />
+                              {lesson.videoUrl && (
+                                <p className="text-xs text-emerald-400 mt-1 flex items-center gap-1">
+                                  <CheckCircle2 className="w-3 h-3" /> URL saqlandi
+                                </p>
+                              )}
+                            </div>
+                            <div>
+                              <label className="text-xs text-base-500 mb-1.5 block">Video Fayl Yuklash (MP4)</label>
+                              <label className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#1A1A1F] border border-[#27272A] hover:border-sky-600/40 cursor-pointer transition-colors text-xs text-base-400 hover:text-base-200">
+                                <Upload className="w-3.5 h-3.5 text-sky-400" /> Fayl tanlash
+                                <input type="file" accept="video/*" className="hidden" onChange={(e) => {
+                                  const f = e.target.files?.[0]
+                                  if (f) updateLesson(lesson.id, 'videoFileName', f.name)
+                                }} />
+                              </label>
+                              {lesson.videoFileName && (
+                                <p className="text-xs text-emerald-400 mt-1.5 flex items-center gap-1">
+                                  <CheckCircle2 className="w-3 h-3" /> {lesson.videoFileName}
+                                </p>
+                              )}
+                            </div>
+                          </>
+                        )}
+                        <div>
+                          <label className="text-xs text-base-500 mb-1.5 block">Dars Resursi (PDF yoki Word)</label>
+                          <label className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#1A1A1F] border border-[#27272A] hover:border-sky-600/40 cursor-pointer transition-colors text-xs text-base-400 hover:text-base-200">
+                            <Upload className="w-3.5 h-3.5 text-amber-400" /> Resurs yuklash (PDF, DOCX)
+                            <input type="file" accept=".pdf,.doc,.docx" className="hidden" onChange={(e) => {
+                              const f = e.target.files?.[0]
+                              if (f) updateLesson(lesson.id, 'resourceName', f.name)
+                            }} />
+                          </label>
+                          {lesson.resourceName && (
+                            <p className="text-xs text-emerald-400 mt-1.5 flex items-center gap-1">
+                              <CheckCircle2 className="w-3 h-3" /> {lesson.resourceName}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )
               })}
@@ -297,15 +362,15 @@ export default function CreateCoursePage() {
                 setPublishing(true); setPublishError(null)
                 try {
                   const THUMB: Record<string, string> = {
-                    'Dasturlash': 'python', 'Web': 'web', 'Database': 'database',
-                    'Tarmoq': 'network', 'Security': 'security',
+                    'Dasturlash': 'algo', 'Web': 'web', 'Database': 'database',
+                    'Tarmoq': 'network', 'Security': 'network', 'Informatika': 'computer',
                   }
                   const course = await api.createCourse({
                     title, description, category,
                     difficulty,
                     tags,
                     duration: `${Math.ceil(lessons.reduce((s, l) => s + Number(l.duration), 0) / 60) || 1} soat`,
-                    thumbnail: THUMB[category] || 'python',
+                    thumbnail: THUMB[category] || 'algo',
                   })
                   setCreatedCourseId(course.id)
                   for (let i = 0; i < lessons.length; i++) {
@@ -316,6 +381,7 @@ export default function CreateCoursePage() {
                       type: l.type,
                       duration: `${l.duration} daqiqa`,
                       xpReward: 20,
+                      videoUrl: l.videoUrl || undefined,
                     })
                   }
                   setPublished(true)
