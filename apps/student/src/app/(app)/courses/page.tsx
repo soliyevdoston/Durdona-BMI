@@ -122,7 +122,8 @@ export default function CoursesPage() {
             >
               {/* Thumbnail */}
               {(() => {
-                const firstVideoLesson = (course.lessons || []).find((l: any) => l.type === 'video' && l.videoUrl)
+                const lessonsArr = Array.isArray(course.lessons) ? course.lessons : []
+                const firstVideoLesson = lessonsArr.find((l: any) => l.type === 'video' && l.videoUrl)
                 const ytId = firstVideoLesson ? getYouTubeId(firstVideoLesson.videoUrl) : null
                 return ytId ? (
                   <div className="h-36 relative border-b border-[#27272A] overflow-hidden">
