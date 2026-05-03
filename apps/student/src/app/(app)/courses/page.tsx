@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import type { ElementType } from "react";
 import Link from "next/link";
 import {
   Search, BookOpen, Users, Star, Clock, ChevronRight, Play, Cpu,
@@ -20,7 +21,6 @@ function getYouTubeId(url: string): string | null {
   return m ? m[1] : null
 }
 
-import type { ElementType } from "react";
 const THUMBNAIL_MAP: Record<string, { icon: ElementType; color: string }> = {
   computer: { icon: Cpu, color: "from-[#1E1E24] to-[#141418]" },
   files: { icon: FileText, color: "from-[#1E1E24] to-[#141418]" },
@@ -118,7 +118,7 @@ export default function CoursesPage() {
             <Link
               key={course.id}
               href={`/courses/${course.id}`}
-              className="card hover:border-[#3F3F46] transition-all duration-300 group overflow-hidden block"
+              className="card hover:border-accent-600/40 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 group overflow-hidden block cursor-pointer"
             >
               {/* Thumbnail */}
               {(() => {
@@ -161,7 +161,7 @@ export default function CoursesPage() {
                   ))}
                 </div>
 
-                <h3 className="font-semibold text-base-100 group-hover:text-accent-400 transition-colors mb-2">
+                <h3 className="font-semibold text-base-100 group-hover:text-accent-300 transition-colors mb-2">
                   {course.title}
                 </h3>
                 <p className="text-xs text-base-500 leading-relaxed mb-4 line-clamp-2">
