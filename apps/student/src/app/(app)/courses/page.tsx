@@ -2,14 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import {
-  Search,
-  BookOpen,
-  Users,
-  Star,
-  Clock,
-  ChevronRight,
-  Play,
-  Cpu,
+  Search, BookOpen, Users, Star, Clock, ChevronRight, Play, Cpu,
   FileText,
   Code2,
   Network,
@@ -20,10 +13,12 @@ import { api } from "@/lib/api";
 import { useApi } from "@/lib/useApi";
 import { getDifficultyColor, getDifficultyLabel } from "@/lib/utils";
 
-const CATEGORIES = [
-  "Barchasi",
-  "Informatika",
-];
+const CATEGORIES = ["Barchasi", "Informatika"]
+
+function getYouTubeId(url: string): string | null {
+  const m = url?.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^?&\n]{11})/)
+  return m ? m[1] : null
+}
 
 import type { ElementType } from "react";
 const THUMBNAIL_MAP: Record<string, { icon: ElementType; color: string }> = {
@@ -126,16 +121,32 @@ export default function CoursesPage() {
               className="card hover:border-[#3F3F46] transition-all duration-300 group overflow-hidden block"
             >
               {/* Thumbnail */}
-              <div
-                className={`h-36 bg-gradient-to-br ${thumb.color} flex items-center justify-center relative border-b border-[#27272A]`}
-              >
-                <thumb.icon className="w-14 h-14 text-base-600" />
-                {enrolled && (
-                  <div className="absolute top-3 right-3 badge-emerald text-xs">
-                    Yozilgan
+              {(() => {
+                const firstVideoLesson = (course.lessons || []).find((l: any) => l.type === 'video' && l.videoUrl)
+                const ytId = firstVideoLesson ? getYouTubeId(firstVideoLesson.videoUrl) : null
+                return ytId ? (
+                  <div className="h-36 relative border-b border-[#27272A] overflow-hidden">
+                    <img src={`https://img.youtube.com/vi/${ytId}/hqdefault.jpg`} alt={course.title}
+                      className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                    {enrolled && (
+                      <div className="absolute top-3 right-3 badge-emerald text-xs">Yozilgan</div>
+                    )}
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                        <Play className="w-5 h-5 text-white ml-0.5" />
+                      </div>
+                    </div>
                   </div>
-                )}
-              </div>
+                ) : (
+                  <div className={`h-36 bg-gradient-to-br ${thumb.color} flex items-center justify-center relative border-b border-[#27272A]`}>
+                    <thumb.icon className="w-14 h-14 text-base-600" />
+                    {enrolled && (
+                      <div className="absolute top-3 right-3 badge-emerald text-xs">Yozilgan</div>
+                    )}
+                  </div>
+                )
+              })()}
 
               <div className="p-5">
                 {/* Tags */}

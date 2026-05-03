@@ -7,6 +7,7 @@ import {
   ClipboardList, Plus, Bell, LogOut, ChevronRight, Menu, Video
 } from 'lucide-react'
 import { useAuthStore } from '@/lib/store'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 const NAV_ITEMS = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Bosh sahifa' },
@@ -33,7 +34,7 @@ export default function TeacherLayout({ children }: { children: React.ReactNode 
   const handleLogout = () => { logout(); router.push('/login') }
 
   const Sidebar = () => (
-    <aside className="flex flex-col h-full bg-[#0D0D10] border-r border-[#1E1E24]">
+    <aside className="flex flex-col h-full bg-[var(--sidebar-bg,#0D0D10)] border-r border-[var(--border-muted,#1E1E24)]">
       <div className="p-5 border-b border-[#1E1E24]">
         <Link href="/dashboard" className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-sky-600 to-sky-500 flex items-center justify-center">
@@ -103,7 +104,7 @@ export default function TeacherLayout({ children }: { children: React.ReactNode 
       )}
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <header className="h-14 border-b border-[#1E1E24] bg-[#0D0D10]/80 backdrop-blur-sm flex items-center justify-between px-4 flex-shrink-0">
+        <header className="h-14 border-b border-[var(--border-muted,#1E1E24)] bg-[var(--header-bg,rgba(13,13,16,0.85))] backdrop-blur-sm flex items-center justify-between px-4 flex-shrink-0">
           <button onClick={() => setMobileOpen(true)} className="lg:hidden btn-ghost p-2">
             <Menu className="w-5 h-5" />
           </button>
@@ -111,6 +112,7 @@ export default function TeacherLayout({ children }: { children: React.ReactNode 
             {NAV_ITEMS.find(n => pathname.startsWith(n.href))?.label || 'Dashboard'}
           </div>
           <div className="flex items-center gap-2 ml-auto">
+            <ThemeToggle />
             <button className="btn-ghost relative p-2 rounded-xl">
               <Bell className="w-4 h-4" />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full" />

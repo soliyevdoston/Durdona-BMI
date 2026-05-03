@@ -193,9 +193,67 @@
     background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0);
     background-size: 20px 20px;
   }
-  /* Fading mask so grid doesn't reach page edges harshly */
   .mask-fade-b {
     mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
     -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
   }
 }
+
+/* ─── Light Mode ─────────────────────────────────────────────────────────── */
+html.light {
+  --bg-base:       #F8FAFC;
+  --bg-surface:    #FFFFFF;
+  --bg-elevated:   #F4F4F5;
+  --bg-overlay:    #E4E4E7;
+  --border:        #D4D4D8;
+  --border-muted:  #E4E4E7;
+  --text-primary:  #09090B;
+  --text-secondary:#3F3F46;
+  --text-muted:    #71717A;
+  --accent:        #7C3AED;
+  --accent-light:  rgba(124,58,237,0.07);
+  --accent-glow:   rgba(124,58,237,0.12);
+  color-scheme: light;
+}
+html.light body {
+  background-color: #F8FAFC;
+  background-image:
+    linear-gradient(to right, rgba(0,0,0,0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0,0,0,0.04) 1px, transparent 1px);
+  color: #09090B;
+}
+html.light .bg-app {
+  background-color: #F8FAFC;
+  background-image:
+    linear-gradient(to right, rgba(0,0,0,0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0,0,0,0.04) 1px, transparent 1px);
+}
+html.light ::-webkit-scrollbar-track { background: #F4F4F5; }
+html.light ::-webkit-scrollbar-thumb { background: #D4D4D8; }
+html.light ::-webkit-scrollbar-thumb:hover { background: #A1A1AA; }
+html.light .text-base-100 { color: #18181B; }
+html.light .text-base-200 { color: #27272A; }
+html.light .text-base-300 { color: #3F3F46; }
+html.light .text-base-400 { color: #52525B; }
+html.light .text-base-500 { color: #71717A; }
+html.light .text-base-600 { color: #A1A1AA; }
+html.light .text-base-700 { color: #D4D4D8; }
+html.light .bg-\[\#09090B\]  { background-color: #F8FAFC; }
+html.light .bg-\[\#0D0D10\]  { background-color: #FAFAFA; }
+html.light .bg-\[\#111113\]  { background-color: #FFFFFF; }
+html.light .bg-\[\#1A1A1F\]  { background-color: #F4F4F5; }
+html.light .bg-\[\#1E1E24\]  { background-color: #F1F1F3; }
+html.light .bg-\[\#222229\]  { background-color: #E4E4E7; }
+html.light .bg-\[\#3F3F46\]  { background-color: #D4D4D8; }
+html.light .hover\:bg-\[\#1A1A1F\]:hover { background-color: #F4F4F5; }
+html.light .hover\:bg-\[\#222229\]:hover  { background-color: #E4E4E7; }
+html.light .border-\[\#1E1E24\]  { border-color: #E4E4E7; }
+html.light .border-\[\#27272A\]  { border-color: #D4D4D8; }
+html.light .border-\[\#3F3F46\]  { border-color: #A1A1AA; }
+html.light .hover\:border-\[\#3F3F46\]:hover { border-color: #A1A1AA; }
+html.light aside { background-color: #FFFFFF !important; border-color: #E4E4E7 !important; }
+html.light header { background-color: rgba(255,255,255,0.9) !important; border-color: #E4E4E7 !important; }
+html.light .glass { background: rgba(255,255,255,0.85); border-color: rgba(212,212,216,0.7); }
+html.light .bg-black\/40 { background-color: rgba(200,200,200,0.4); }
+html.light .bg-black\/60 { background-color: rgba(180,180,180,0.5); }
+html.light .hover\:bg-\[\#222229\]:hover { background-color: #F4F4F5; }

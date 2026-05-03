@@ -15,13 +15,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: `
           try {
             var s = localStorage.getItem('edu-theme');
-            var t = s ? JSON.parse(s).state?.theme : 'dark';
+            var t = s ? JSON.parse(s).state?.theme : 'light';
             var resolved = t === 'system'
               ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-              : (t || 'dark');
+              : (t || 'light');
             document.documentElement.classList.add(resolved);
           } catch(e) {
-            document.documentElement.classList.add('dark');
+            document.documentElement.classList.add('light');
           }
         `}} />
       </head>
