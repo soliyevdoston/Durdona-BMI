@@ -1,5 +1,6 @@
 'use client'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import type { ElementType } from 'react'
 import { Plus, Users, Star, MoreVertical, Edit, Copy, Trash2, Eye, BookOpen, Clock, Cpu, FileText, Code2, Network, Database, Globe } from 'lucide-react'
 import { useState } from 'react'
@@ -17,6 +18,7 @@ const THUMB_MAP: Record<string, { icon: ElementType; color: string }> = {
 }
 
 export default function TeacherCoursesPage() {
+  const router = useRouter()
   const [menuOpen, setMenuOpen] = useState<string | null>(null)
   const { data, refetch } = useApi(() => api.myCourses())
   const myCourses: any[] = data || []
@@ -68,17 +70,20 @@ export default function TeacherCoursesPage() {
         {myCourses.map((course: any) => {
           const thumb = THUMB_MAP[course.thumbnail] || { icon: BookOpen, color: 'from-base-700 to-base-600' }
           return (
-            <div key={course.id} className="card hover:border-sky-600/30 transition-all duration-300 overflow-hidden relative group">
+            <div key={course.id}
+              onClick={() => router.push(`/courses/${course.id}`)}
+              className="card hover:border-sky-600/40 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden relative group cursor-pointer">
               {/* Menu */}
-              <button onClick={() => setMenuOpen(menuOpen === course.id ? null : course.id)}
+              <button onClick={(e) => { e.stopPropagation(); setMenuOpen(menuOpen === course.id ? null : course.id) }}
                 className="absolute top-3 right-3 z-10 w-8 h-8 rounded-lg bg-black/40 backdrop-blur-sm hover:bg-black/60 flex items-center justify-center">
                 <MoreVertical className="w-4 h-4 text-white" />
               </button>
               {menuOpen === course.id && (
-                <div className="absolute top-12 right-3 z-20 w-48 card-elevated shadow-card-hover py-1 animate-slide-up">
+                <div onClick={(e) => e.stopPropagation()}
+                  className="absolute top-12 right-3 z-20 w-48 card-elevated shadow-card-hover py-1 animate-slide-up">
                   {[
-                    { icon: Eye, label: "Ko'rish", color: 'text-base-300', action: () => setMenuOpen(null) },
-                    { icon: Edit, label: 'Tahrirlash', color: 'text-base-300', action: () => setMenuOpen(null) },
+                    { icon: Eye, label: "Ko'rish", color: 'text-base-300', action: () => { setMenuOpen(null); router.push(`/courses/${course.id}`) } },
+                    { icon: Edit, label: 'Tahrirlash', color: 'text-base-300', action: () => { setMenuOpen(null); router.push(`/courses/${course.id}`) } },
                     { icon: Copy, label: 'Nusxalash', color: 'text-base-300', action: () => setMenuOpen(null) },
                     { icon: Trash2, label: "O'chirish", color: 'text-rose-400', action: () => handleDelete(course.id, course.title) },
                   ].map((a) => (
@@ -121,7 +126,7 @@ export default function TeacherCoursesPage() {
                     <span className="text-xs text-base-400 font-medium">{course.rating}</span>
                     <span className="text-xs text-base-600">({course.enrolled} baho)</span>
                   </div>
-                  <div className="flex gap-1.5">
+                  <div className="flex gap-1.5" onClick={(e) => e.stopPropagation()}>
                     <Link href={`/courses/${course.id}`} className="btn-ghost p-1.5 border border-[#27272A]" title="Ichiga kirish">
                       <Eye className="w-3.5 h-3.5" />
                     </Link>
