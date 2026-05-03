@@ -37,6 +37,7 @@ export default function CreateCoursePage() {
   const [lessons, setLessons] = useState<DraftLesson[]>([
     { id: '1', title: 'Kirish', type: 'video', duration: '10' },
   ])
+  const [coverImage, setCoverImage] = useState<string | null>(null)
   const [published, setPublished] = useState(false)
   const [publishing, setPublishing] = useState(false)
   const [publishError, setPublishError] = useState<string | null>(null)
@@ -178,11 +179,43 @@ export default function CreateCoursePage() {
           </div>
           <div>
             <label className="text-xs text-base-500 uppercase tracking-wider mb-2 block">Kurs Rasmi</label>
-            <div className="border-2 border-dashed border-[#27272A] rounded-xl p-6 text-center hover:border-sky-600/40 transition-colors cursor-pointer">
-              <Image className="w-8 h-8 text-base-700 mx-auto mb-2" />
-              <p className="text-sm text-base-500">Rasm yuklash</p>
-              <p className="text-xs text-base-700 mt-0.5">JPG, PNG — max 5MB</p>
-            </div>
+            <label className="block cursor-pointer group">
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0]
+                  if (!file) return
+                  if (file.size > 5 * 1024 * 1024) { alert('Fayl hajmi 5MB dan oshmasin'); return }
+                  const reader = new FileReader()
+                  reader.onload = (ev) => setCoverImage(ev.target?.result as string)
+                  reader.readAsDataURL(file)
+                }}
+              />
+              {coverImage ? (
+                <div className="relative rounded-xl overflow-hidden border border-[#27272A] h-40">
+                  <img src={coverImage} alt="cover" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <div className="flex items-center gap-2 text-white text-sm font-medium">
+                      <Image className="w-4 h-4" /> Rasmni almashtirish
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="border-2 border-dashed border-[#27272A] rounded-xl p-6 text-center hover:border-sky-600/40 transition-colors">
+                  <Image className="w-8 h-8 text-base-700 mx-auto mb-2 group-hover:text-sky-500 transition-colors" />
+                  <p className="text-sm text-base-500 group-hover:text-base-300 transition-colors">Rasm yuklash uchun bosing</p>
+                  <p className="text-xs text-base-700 mt-0.5">JPG, PNG, WEBP — max 5MB</p>
+                </div>
+              )}
+            </label>
+            {coverImage && (
+              <button onClick={() => setCoverImage(null)}
+                className="mt-2 text-xs text-rose-400 hover:text-rose-300 transition-colors flex items-center gap-1">
+                <X className="w-3 h-3" /> Rasmni olib tashlash
+              </button>
+            )}
           </div>
           <button onClick={() => setStep(2)} disabled={!title || !description || !category}
             className="btn-primary bg-sky-600 hover:bg-sky-700 w-full py-3 font-semibold disabled:opacity-40 disabled:cursor-not-allowed">
