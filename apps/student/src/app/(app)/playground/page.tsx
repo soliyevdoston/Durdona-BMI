@@ -14,6 +14,29 @@ const CODE_EXAMPLES: Record<Lang, string> = {
   sql: `-- SQL - Murakkab so'rov\nSELECT t.ism, k.sarlavha AS kurs,\n    AVG(b.ball) AS o_rtacha\nFROM talabalar t\nJOIN yozilishlar y ON t.id = y.talaba_id\nJOIN kurslar k ON y.kurs_id = k.id\nLEFT JOIN baholar b ON t.id = b.talaba_id\nGROUP BY t.id, t.ism, k.id, k.sarlavha\nORDER BY o_rtacha DESC;`,
 }
 
+const TEMPLATES: Record<string, { lang: Lang; code: string }> = {
+  'Saralash Algoritmi': {
+    lang: 'python',
+    code: `# Saralash Algoritmi - Bubble Sort\ndef bubble_sort(arr):\n    n = len(arr)\n    for i in range(n):\n        for j in range(0, n-i-1):\n            if arr[j] > arr[j+1]:\n                arr[j], arr[j+1] = arr[j+1], arr[j]\n    return arr\n\nsonlar = [64, 34, 25, 12, 22, 11, 90]\nnatija = bubble_sort(sonlar[:])\nprint("Asl:      ", sonlar)\nprint("Saralangan:", natija)`,
+  },
+  'Binary Search': {
+    lang: 'python',
+    code: `# Binary Search - Ikkilik Qidirish\ndef binary_search(arr, target):\n    left, right = 0, len(arr) - 1\n    while left <= right:\n        mid = (left + right) // 2\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n    return -1\n\nsonlar = [1, 3, 5, 7, 9, 11, 13, 15]\nmaqsad = 7\nindex = binary_search(sonlar, maqsad)\nprint(f"{maqsad} soni {index}-indeksda topildi")`,
+  },
+  'Linked List': {
+    lang: 'python',
+    code: `# Linked List - Bog'liq Ro'yxat\nclass Tugun:\n    def __init__(self, q):\n        self.q = q\n        self.keyingi = None\n\nclass BoglliqRoyxat:\n    def __init__(self):\n        self.bosh = None\n    def qosh(self, q):\n        yangi = Tugun(q)\n        if not self.bosh:\n            self.bosh = yangi; return\n        j = self.bosh\n        while j.keyingi: j = j.keyingi\n        j.keyingi = yangi\n    def chiqar(self):\n        j = self.bosh\n        while j:\n            print(j.q, end=" -> ")\n            j = j.keyingi\n        print("None")\n\nrl = BoglliqRoyxat()\nfor x in [10, 20, 30, 40]:\n    rl.qosh(x)\nrl.chiqar()`,
+  },
+  'Fibonacci': {
+    lang: 'python',
+    code: `# Fibonacci - Ketma-ketlik\ndef fibonacci(n):\n    if n <= 1: return n\n    a, b = 0, 1\n    for _ in range(2, n + 1):\n        a, b = b, a + b\n    return b\n\nprint("Birinchi 10 ta Fibonacci:")\nfor i in range(10):\n    print(f"F({i}) = {fibonacci(i)}")\n\n# Generator variant\ndef fib_gen(limit):\n    a, b = 0, 1\n    while a < limit:\n        yield a\n        a, b = b, a + b\n\nprint("\\n100 gacha:", list(fib_gen(100)))`,
+  },
+  'Rekursiya': {
+    lang: 'python',
+    code: `# Rekursiya - Faktorial\ndef faktorial(n):\n    if n <= 1: return 1\n    return n * faktorial(n - 1)\n\nfor i in range(1, 9):\n    print(f"{i}! = {faktorial(i)}")\n\n# Daraxt DFS\ndef dfs(node, depth=0):\n    print("  " * depth + f"- {node['name']}")\n    for child in node.get('bolalar', []):\n        dfs(child, depth + 1)\n\ndaraxt = {\n  "name": "Ildiz",\n  "bolalar": [\n    {"name": "A", "bolalar": [{"name": "A1"}, {"name": "A2"}]},\n    {"name": "B", "bolalar": [{"name": "B1"}]}\n  ]\n}\nprint("\\nDaraxt:")\ndfs(daraxt)`,
+  },
+}
+
 const LANGS: { id: Lang; label: string; color: string }[] = [
   { id: 'python', label: 'Python', color: 'text-blue-400' },
   { id: 'javascript', label: 'JavaScript', color: 'text-yellow-400' },
@@ -308,8 +331,15 @@ export default function PlaygroundPage() {
       {/* Bottom: Templates */}
       <div className="mt-3 flex items-center gap-3">
         <span className="text-xs text-base-600">Shablonlar:</span>
-        {['Saralash Algoritmi', 'Binary Search', 'Linked List', 'Fibonacci', 'Rekursiya'].map((t) => (
+        {Object.keys(TEMPLATES).map((t) => (
           <button key={t}
+            onClick={() => {
+              const tpl = TEMPLATES[t]
+              setLang(tpl.lang)
+              setCode(tpl.code)
+              setOutput(null)
+              setLangOpen(false)
+            }}
             className="text-xs px-3 py-1 rounded-full border border-[#27272A] text-base-500 hover:text-base-300 hover:border-[#3F3F46] transition-colors">
             {t}
           </button>

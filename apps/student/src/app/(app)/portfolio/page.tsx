@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import type { ElementType } from 'react'
+import Link from 'next/link'
 import {
   Award, Star, Lock, Download, Share2, Trophy, Flame, Code2, BookOpen, Zap,
   Rocket, CheckCircle, Wrench, Bot, GraduationCap, Database, Network, GitBranch, Shield
@@ -34,9 +35,50 @@ const PROJECTS = [
 export default function PortfolioPage() {
   const { user } = useAuthStore()
   const [tab, setTab] = useState<'achievements' | 'certificates' | 'projects'>('achievements')
+  const [shareCopied, setShareCopied] = useState(false)
 
   const { data: achievements } = useApi(() => api.achievements())
   const { data: courses } = useApi(() => api.myCourses())
+
+  const handleShare = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href)
+      setShareCopied(true)
+      setTimeout(() => setShareCopied(false), 2000)
+    } catch {
+      setShareCopied(false)
+    }
+  }
+
+  const handleDownloadPortfolio = () => { window.print() }
+
+  const downloadCertificate = (cert: typeof CERTIFICATES[0]) => {
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${cert.title}</title>
+<style>
+  body{font-family:Georgia,serif;text-align:center;padding:60px 40px;background:#fff;color:#333}
+  .wrap{border:8px double #b8860b;padding:50px;display:inline-block;min-width:500px}
+  h1{font-size:40px;color:#b8860b;margin:0 0 8px}
+  h2{font-size:26px;font-weight:normal;margin:16px 0}
+  .name{font-size:32px;font-weight:bold;color:#1a1a1a;border-bottom:2px solid #b8860b;padding-bottom:8px;margin:16px auto;display:inline-block}
+  .score{font-size:56px;font-weight:bold;color:${cert.score>=90?'#28a745':'#e6a817'};margin:16px 0}
+  .footer{font-size:12px;color:#888;margin-top:40px}
+  @media print{body{margin:0}}
+</style></head><body>
+<div class="wrap">
+  <div style="font-size:56px">🏆</div>
+  <h1>SERTIFIKAT</h1>
+  <p>Ushbu sertifikat quyidagi o'quvchiga berildi:</p>
+  <div class="name">${user?.name}</div>
+  <h2>muvaffaqiyatli yakunladi:</h2>
+  <h2><strong>${cert.title}</strong></h2>
+  <div class="score">${cert.score}<span style="font-size:24px">/100</span></div>
+  <p>Sana: ${cert.date}</p>
+  <div class="footer">EduCode — AKT Virtual Sinf · TATU · 2026</div>
+</div>
+</body></html>`
+    const w = window.open('', '_blank')
+    if (w) { w.document.write(html); w.document.close(); w.print() }
+  }
 
   if (!user) return null
 
@@ -78,10 +120,11 @@ export default function PortfolioPage() {
             </div>
           </div>
           <div className="flex gap-2">
-            <button className="btn-secondary flex items-center gap-2 text-xs py-2 px-3">
-              <Share2 className="w-3.5 h-3.5" /> Ulashish
+            <button onClick={handleShare} className="btn-secondary flex items-center gap-2 text-xs py-2 px-3">
+              {shareCopied ? <CheckCircle className="w-3.5 h-3.5 text-emerald-400" /> : <Share2 className="w-3.5 h-3.5" />}
+              {shareCopied ? 'Nusxalandi!' : 'Ulashish'}
             </button>
-            <button className="btn-secondary flex items-center gap-2 text-xs py-2 px-3">
+            <button onClick={handleDownloadPortfolio} className="btn-secondary flex items-center gap-2 text-xs py-2 px-3">
               <Download className="w-3.5 h-3.5" /> Yuklab olish
             </button>
           </div>
@@ -182,7 +225,8 @@ export default function PortfolioPage() {
                     {cert.score}/100
                   </span>
                 </div>
-                <button className="btn-secondary w-full text-xs py-2 flex items-center justify-center gap-2">
+                <button onClick={() => downloadCertificate(cert)}
+                  className="btn-secondary w-full text-xs py-2 flex items-center justify-center gap-2">
                   <Download className="w-3.5 h-3.5" /> Yuklab olish (PDF)
                 </button>
               </div>
@@ -212,9 +256,9 @@ export default function PortfolioPage() {
               <p className="text-xs text-base-500 leading-relaxed mb-4">{proj.desc}</p>
               <div className="flex items-center justify-between">
                 <span className="text-xs text-base-700">{proj.date}</span>
-                <button className="text-xs text-accent-400 hover:text-accent-300 transition-colors flex items-center gap-1">
+                <Link href="/playground" className="text-xs text-accent-400 hover:text-accent-300 transition-colors flex items-center gap-1">
                   Ko'rish <Code2 className="w-3 h-3" />
-                </button>
+                </Link>
               </div>
             </div>
           ))}
