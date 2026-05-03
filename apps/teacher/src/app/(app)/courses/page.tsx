@@ -68,7 +68,7 @@ export default function TeacherCoursesPage() {
         {myCourses.map((course: any) => {
           const thumb = THUMB_MAP[course.thumbnail] || { icon: BookOpen, color: 'from-base-700 to-base-600' }
           return (
-            <div key={course.id} className="card hover:border-sky-600/30 transition-all duration-300 overflow-hidden relative">
+            <div key={course.id} className="card hover:border-sky-600/30 transition-all duration-300 overflow-hidden relative group">
               {/* Menu */}
               <button onClick={() => setMenuOpen(menuOpen === course.id ? null : course.id)}
                 className="absolute top-3 right-3 z-10 w-8 h-8 rounded-lg bg-black/40 backdrop-blur-sm hover:bg-black/60 flex items-center justify-center">
@@ -104,7 +104,9 @@ export default function TeacherCoursesPage() {
                   </span>
                 </div>
 
-                <h3 className="font-semibold text-base-100 mb-2 line-clamp-1">{course.title}</h3>
+                <Link href={`/courses/${course.id}`} className="block">
+                  <h3 className="font-semibold text-base-100 mb-2 line-clamp-1 group-hover:text-sky-400 transition-colors">{course.title}</h3>
+                </Link>
                 <p className="text-xs text-base-500 leading-relaxed mb-4 line-clamp-2">{course.description}</p>
 
                 <div className="flex items-center justify-between text-xs text-base-600 pb-4 border-b border-[#1E1E24]">
@@ -120,8 +122,12 @@ export default function TeacherCoursesPage() {
                     <span className="text-xs text-base-600">({course.enrolled} baho)</span>
                   </div>
                   <div className="flex gap-1.5">
-                    <button className="btn-ghost p-1.5 border border-[#27272A]"><Eye className="w-3.5 h-3.5" /></button>
-                    <button className="btn-ghost p-1.5 border border-[#27272A]"><Edit className="w-3.5 h-3.5" /></button>
+                    <Link href={`/courses/${course.id}`} className="btn-ghost p-1.5 border border-[#27272A]" title="Ichiga kirish">
+                      <Eye className="w-3.5 h-3.5" />
+                    </Link>
+                    <Link href={`/courses/${course.id}`} className="btn-ghost p-1.5 border border-[#27272A]" title="Dars qo'shish">
+                      <Edit className="w-3.5 h-3.5" />
+                    </Link>
                   </div>
                 </div>
               </div>
