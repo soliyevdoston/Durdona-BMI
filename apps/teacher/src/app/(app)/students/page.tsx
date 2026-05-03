@@ -167,12 +167,14 @@ export default function TeacherStudentsPage() {
                   </td>
                   <td className="px-4 py-4">
                     <div className="flex items-center justify-end gap-1">
-                      <button className="p-1.5 rounded-lg hover:bg-[#222229] text-base-500 hover:text-base-200 transition-colors">
+                      <button onClick={() => setSelected(s)}
+                        className="p-1.5 rounded-lg hover:bg-[#222229] text-base-500 hover:text-base-200 transition-colors" title="Batafsil ko'rish">
                         <MessageSquare className="w-4 h-4" />
                       </button>
-                      <button className="p-1.5 rounded-lg hover:bg-[#222229] text-base-500 hover:text-base-200 transition-colors">
+                      <a href={`mailto:${s.email}`}
+                        className="p-1.5 rounded-lg hover:bg-[#222229] text-base-500 hover:text-base-200 transition-colors" title={s.email}>
                         <Mail className="w-4 h-4" />
-                      </button>
+                      </a>
                       <button onClick={() => setSelected(s)}
                         className="p-1.5 rounded-lg hover:bg-[#222229] text-base-500 hover:text-base-200 transition-colors">
                         <ChevronRight className="w-4 h-4" />

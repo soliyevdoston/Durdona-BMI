@@ -96,6 +96,7 @@ function SubmitModal({ assignment, onClose, onSuccess }: {
   const [submitted, setSubmitted] = useState(false)
   const [text, setText] = useState('')
   const [comment, setComment] = useState('')
+  const [projectFile, setProjectFile] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const tp = TYPE_CONFIG[assignment.type]
@@ -145,11 +146,29 @@ function SubmitModal({ assignment, onClose, onSuccess }: {
 
             {assignment.type === 'project' && (
               <div className="mb-4">
-                <div className="border-2 border-dashed border-[#27272A] rounded-xl p-8 text-center hover:border-accent-600/40 transition-colors cursor-pointer">
-                  <Upload className="w-8 h-8 text-base-700 mx-auto mb-2" />
-                  <p className="text-sm text-base-500">Fayllarni yuklash uchun bosing</p>
-                  <p className="text-xs text-base-700 mt-1">.zip, .pdf, .docx — max 50MB</p>
-                </div>
+                <label className="block cursor-pointer">
+                  <div className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors
+                    ${projectFile ? 'border-emerald-500/40 bg-emerald-500/5' : 'border-[#27272A] hover:border-accent-600/40'}`}>
+                    {projectFile ? (
+                      <>
+                        <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto mb-2" />
+                        <p className="text-sm text-emerald-400 font-medium">{projectFile}</p>
+                        <p className="text-xs text-base-600 mt-1">Faylni almashtirish uchun bosing</p>
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-8 h-8 text-base-700 mx-auto mb-2" />
+                        <p className="text-sm text-base-500">Fayllarni yuklash uchun bosing</p>
+                        <p className="text-xs text-base-700 mt-1">.zip, .pdf, .docx — max 50MB</p>
+                      </>
+                    )}
+                  </div>
+                  <input type="file" accept=".zip,.pdf,.doc,.docx" className="hidden"
+                    onChange={e => {
+                      const f = e.target.files?.[0]
+                      if (f) { setProjectFile(f.name); setText(f.name) }
+                    }} />
+                </label>
               </div>
             )}
 

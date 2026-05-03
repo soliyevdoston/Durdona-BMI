@@ -319,7 +319,8 @@ export default function TeacherAssignmentsPage() {
             </div>
 
             <div className="flex gap-2 pt-4 border-t border-[#1E1E24]">
-              <button className="btn-ghost border border-[#27272A] flex-1 text-xs py-2 flex items-center justify-center gap-1">
+              <button onClick={() => setGrading(a)}
+                className="btn-ghost border border-[#27272A] flex-1 text-xs py-2 flex items-center justify-center gap-1">
                 <Eye className="w-3 h-3" /> Ko'rish
               </button>
               <button onClick={() => setGrading(a)}
