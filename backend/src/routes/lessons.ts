@@ -6,7 +6,7 @@ const router = Router()
 
 // Create lesson
 router.post('/', requireAuth, requireRole('teacher', 'admin', 'super_admin'), async (req, res) => {
-  const { courseId, title, type, duration, xpReward, content, videoUrl } = req.body
+  const { courseId, title, type, duration, xpReward, content, videoUrl, resourceUrl, resourceName, resourceType } = req.body
   if (!courseId || !title || !type) return res.status(400).json({ error: 'courseId, title, type kerak' })
   const course = await prisma.course.findUnique({ where: { id: courseId } })
   if (!course) return res.status(404).json({ error: 'Kurs topilmadi' })
@@ -22,6 +22,9 @@ router.post('/', requireAuth, requireRole('teacher', 'admin', 'super_admin'), as
       order: (last?.order ?? 0) + 1,
       content: content || null,
       videoUrl: videoUrl || null,
+      resourceUrl: resourceUrl || null,
+      resourceName: resourceName || null,
+      resourceType: resourceType || null,
     },
   })
   const allLessons = await prisma.lesson.findMany({ where: { courseId } })
@@ -38,8 +41,13 @@ router.patch('/:id', requireAuth, requireRole('teacher', 'admin', 'super_admin')
   if (lesson.course.instructorId !== req.user!.id && req.user!.role !== 'admin' && req.user!.role !== 'super_admin') {
     return res.status(403).json({ error: 'Bu kurs sizniki emas' })
   }
-  const updated = await prisma.lesson.update({ where: { id: req.params.id }, data: req.body })
-  await log(req.user!.id, 'lesson.update', { lessonId: lesson.id })
+  const allowed = ['title', 'type', 'duration', 'xpReward', 'content', 'videoUrl', 'resourceUrl', 'resourceName', 'resourceType', 'order']
+  const data: any = {}
+  for (const k of allowed) {
+    if (k in req.body) data[k] = req.body[k]
+  }
+  const updated = await prisma.lesson.update({ where: { id: req.params.id }, data })
+  await log(req.user!.id, 'lesson.update', { lessonId: lesson.id, fields: Object.keys(data) })
   res.json(updated)
 })
 

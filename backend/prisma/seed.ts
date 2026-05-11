@@ -49,6 +49,7 @@ async function main() {
     prisma.course.create({ data: { id: 'c-004', title: 'Internet va Axborot Xavfsizligi', description: "Internet ishlash tamoyillari, elektron pochta, xavfsiz internet va kiber tahdidlardan himoya.", instructorId: 'u-d2', category: 'Informatika', difficulty: 'beginner', duration: '14 soat', rating: 4.7, thumbnail: 'network', tags: ['Internet', 'Xavfsizlik', 'Tarmoq'] } }),
     prisma.course.create({ data: { id: 'c-005', title: "Ma'lumotlar Bazasi Asoslari", description: "Ma'lumotlar bazasi tushunchasi, MS Access va SQL so'rovlari bilan ishlash.", instructorId: 'u-d2', category: 'Informatika', difficulty: 'intermediate', duration: '18 soat', rating: 4.7, thumbnail: 'database', tags: ['SQL', 'Access', "Ma'lumotlar bazasi"] } }),
     prisma.course.create({ data: { id: 'c-006', title: 'Web Texnologiyalar: HTML va CSS', description: "HTML tuzilishi, CSS uslublash va oddiy veb-sahifa yaratish asoslari.", instructorId: 'u-d2', category: 'Informatika', difficulty: 'intermediate', duration: '20 soat', rating: 4.8, thumbnail: 'web', tags: ['HTML', 'CSS', 'Veb-sahifa'] } }),
+    prisma.course.create({ data: { id: 'c-007', title: 'Kompyuter Tarmoqlari', description: "Kompyuter tarmoqlari asoslari: LAN/WAN, IP manzillar, OSI modeli, TCP/IP, tarmoq qurilmalari.", instructorId: 'u-d2', category: 'Informatika', difficulty: 'intermediate', duration: '16 soat', rating: 4.8, thumbnail: 'network', tags: ['Tarmoq', 'OSI', 'TCP/IP', 'IP manzil'] } }),
   ])
   console.log(`  ✓ ${courses.length} kurs yaratildi`)
 
@@ -96,6 +97,15 @@ async function main() {
     { id: 'l-038', courseId: 'c-006', title: "CSS: rang, shrift va joylashuv", duration: '16 daq', type: 'video', order: 4, xpReward: 20, videoUrl: 'https://www.youtube.com/watch?v=E5AzelysLQc' },
     { id: 'l-039', courseId: 'c-006', title: 'Web texnologiyalar testi', duration: '10 daq', type: 'quiz', order: 5, xpReward: 30, videoUrl: null },
     { id: 'l-040', courseId: 'c-006', title: "Loyiha: shaxsiy veb-sahifa yaratish", duration: '25 daq', type: 'video', order: 6, xpReward: 40, videoUrl: 'https://www.youtube.com/watch?v=JZZbZVzcFN4' },
+    // c-007: Kompyuter Tarmoqlari — videoUrl va resourceUrl o'qituvchi tomonidan yuklanadi
+    { id: 'l-101', courseId: 'c-007', title: "Kompyuter tarmoqlari haqida umumiy ma'lumot", duration: '12 daq', type: 'video', order: 1, xpReward: 10, videoUrl: null },
+    { id: 'l-102', courseId: 'c-007', title: 'Tarmoq turlari: LAN, MAN, WAN', duration: '14 daq', type: 'video', order: 2, xpReward: 15, videoUrl: null },
+    { id: 'l-103', courseId: 'c-007', title: 'Tarmoq topologiyalari', duration: '14 daq', type: 'video', order: 3, xpReward: 15, videoUrl: null },
+    { id: 'l-104', courseId: 'c-007', title: 'IP manzil va MAC manzil', duration: '16 daq', type: 'video', order: 4, xpReward: 20, videoUrl: null },
+    { id: 'l-105', courseId: 'c-007', title: 'OSI modeli va uning qatlamlari', duration: '18 daq', type: 'video', order: 5, xpReward: 25, videoUrl: null },
+    { id: 'l-106', courseId: 'c-007', title: 'TCP/IP protokollari', duration: '16 daq', type: 'video', order: 6, xpReward: 20, videoUrl: null },
+    { id: 'l-107', courseId: 'c-007', title: "Tarmoq qurilmalari: router, switch, hub", duration: '14 daq', type: 'video', order: 7, xpReward: 15, videoUrl: null },
+    { id: 'l-108', courseId: 'c-007', title: 'Kompyuter tarmoqlari testi', duration: '10 daq', type: 'quiz', order: 8, xpReward: 30, videoUrl: null },
   ]
   for (const l of lessons) await prisma.lesson.create({ data: l })
   console.log(`  ✓ ${lessons.length} dars yaratildi`)

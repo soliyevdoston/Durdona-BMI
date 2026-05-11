@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation'
 import {
   ChevronLeft, Plus, Video, FileText, Code2, FileQuestion,
   Trash2, CheckCircle2, Upload, Play, Clock, Users, BookOpen,
-  GripVertical, ExternalLink, Image as ImageIcon
+  GripVertical, ExternalLink, Pencil, Paperclip, X
 } from 'lucide-react'
 import { api } from '@/lib/api'
 import { useApi } from '@/lib/useApi'
@@ -22,43 +22,168 @@ const TYPE_COLOR: Record<LessonType, string> = {
   video: 'text-sky-400', text: 'text-base-400', quiz: 'text-amber-400', practice: 'text-emerald-400',
 }
 
+const MAX_RESOURCE_BYTES = 20 * 1024 * 1024 // 20MB
+
 function getYouTubeId(url: string): string | null {
   const m = url?.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^?&\n]{11})/)
   return m ? m[1] : null
 }
 
-const EMPTY_FORM = {
-  title: '', type: 'video' as LessonType, duration: '15',
-  videoUrl: '', resourceName: '', resourceFile: null as File | null,
+// YouTube URL'larini iframe uchun embed shakliga keltirish
+function toEmbedUrl(url: string): string {
+  const id = getYouTubeId(url)
+  return id ? `https://www.youtube.com/embed/${id}` : url
+}
+
+function readFileAsDataURL(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result as string)
+    reader.onerror = () => reject(new Error('Faylni o\'qib bo\'lmadi'))
+    reader.readAsDataURL(file)
+  })
+}
+
+type FormState = {
+  title: string
+  type: LessonType
+  duration: string
+  videoUrl: string
+  resourceName: string
+  resourceFile: File | null
+  resourceUrl: string | null // mavjud darsni tahrirlashda bor data URL
+  resourceType: string | null
+  resourceCleared: boolean // tahrir vaqtida foydalanuvchi faylni o'chirdi
+}
+
+const EMPTY_FORM: FormState = {
+  title: '', type: 'video', duration: '15',
+  videoUrl: '',
+  resourceName: '', resourceFile: null,
+  resourceUrl: null, resourceType: null, resourceCleared: false,
 }
 
 export default function TeacherCourseDetailPage() {
   const { id } = useParams()
   const { data: course, loading, refetch } = useApi(() => api.course(String(id)))
   const [showForm, setShowForm] = useState(false)
-  const [form, setForm] = useState({ ...EMPTY_FORM })
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [form, setForm] = useState<FormState>({ ...EMPTY_FORM })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [deleting, setDeleting] = useState<string | null>(null)
 
   const lessons: any[] = course?.lessons || []
 
-  const handleAdd = async () => {
+  const resetForm = () => {
+    setForm({ ...EMPTY_FORM })
+    setEditingId(null)
+    setError(null)
+    setShowForm(false)
+  }
+
+  const openCreate = () => {
+    setForm({ ...EMPTY_FORM })
+    setEditingId(null)
+    setError(null)
+    setShowForm(true)
+  }
+
+  const openEdit = (lesson: any) => {
+    setForm({
+      title: lesson.title || '',
+      type: (lesson.type as LessonType) || 'video',
+      duration: String(parseInt(lesson.duration) || 15),
+      videoUrl: lesson.videoUrl || '',
+      resourceName: lesson.resourceName || '',
+      resourceFile: null,
+      resourceUrl: lesson.resourceUrl || null,
+      resourceType: lesson.resourceType || null,
+      resourceCleared: false,
+    })
+    setEditingId(lesson.id)
+    setError(null)
+    setShowForm(true)
+  }
+
+  const onPickFile = async (file: File) => {
+    if (file.size > MAX_RESOURCE_BYTES) {
+      setError(`Fayl juda katta. Maksimum ${Math.round(MAX_RESOURCE_BYTES / 1024 / 1024)} MB`)
+      return
+    }
+    setForm(prev => ({
+      ...prev,
+      resourceName: file.name,
+      resourceFile: file,
+      resourceType: file.type || 'application/octet-stream',
+      resourceCleared: false,
+    }))
+    setError(null)
+  }
+
+  const clearFile = () => {
+    setForm(prev => ({
+      ...prev,
+      resourceName: '',
+      resourceFile: null,
+      resourceUrl: null,
+      resourceType: null,
+      resourceCleared: true,
+    }))
+  }
+
+  const handleSave = async () => {
     if (!form.title.trim()) return setError("Dars nomi kiritilmagan")
     setSaving(true); setError(null)
     try {
-      await api.createLesson({
-        courseId: String(id),
-        title: form.title.trim(),
-        type: form.type,
-        duration: `${form.duration} daqiqa`,
-        xpReward: 20,
-        videoUrl: form.videoUrl || undefined,
-      })
-      setForm({ ...EMPTY_FORM })
-      setShowForm(false)
+      // Yangi fayl tanlangan bo'lsa, base64 ga o'tkazamiz
+      let resourceUrl: string | null | undefined = undefined
+      let resourceName: string | null | undefined = undefined
+      let resourceType: string | null | undefined = undefined
+
+      if (form.resourceFile) {
+        resourceUrl = await readFileAsDataURL(form.resourceFile)
+        resourceName = form.resourceFile.name
+        resourceType = form.resourceFile.type || 'application/octet-stream'
+      } else if (form.resourceCleared) {
+        // Foydalanuvchi faylni olib tashladi
+        resourceUrl = null
+        resourceName = null
+        resourceType = null
+      }
+      // Aks holda undefined — backend o'zgartirmaydi
+
+      if (editingId) {
+        const patch: any = {
+          title: form.title.trim(),
+          type: form.type,
+          duration: `${form.duration} daqiqa`,
+          videoUrl: form.videoUrl || null,
+        }
+        if (resourceUrl !== undefined) {
+          patch.resourceUrl = resourceUrl
+          patch.resourceName = resourceName
+          patch.resourceType = resourceType
+        }
+        await api.updateLesson(editingId, patch)
+      } else {
+        await api.createLesson({
+          courseId: String(id),
+          title: form.title.trim(),
+          type: form.type,
+          duration: `${form.duration} daqiqa`,
+          xpReward: 20,
+          videoUrl: form.videoUrl || undefined,
+          resourceUrl: resourceUrl || undefined,
+          resourceName: resourceName || undefined,
+          resourceType: resourceType || undefined,
+        })
+      }
+      resetForm()
       refetch()
-    } catch (e: any) { setError(e.message) }
+    } catch (e: any) {
+      setError(e.message || 'Saqlashda xatolik')
+    }
     setSaving(false)
   }
 
@@ -79,6 +204,8 @@ export default function TeacherCourseDetailPage() {
 
   if (!course) return <div className="flex items-center justify-center h-64"><p className="text-base-500">Kurs topilmadi</p></div>
 
+  const hasResource = !!form.resourceFile || (!!form.resourceUrl && !form.resourceCleared)
+
   return (
     <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
       {/* Header */}
@@ -91,7 +218,7 @@ export default function TeacherCourseDetailPage() {
           <p className="text-xs text-base-500 mt-0.5">{course.category} · {course.difficulty}</p>
         </div>
         <button
-          onClick={() => { setShowForm(true); setError(null) }}
+          onClick={openCreate}
           className="btn-primary bg-sky-600 hover:bg-sky-700 flex items-center gap-2">
           <Plus className="w-4 h-4" /> Dars qo'shish
         </button>
@@ -114,12 +241,14 @@ export default function TeacherCourseDetailPage() {
         ))}
       </div>
 
-      {/* Add Lesson Form */}
+      {/* Add / Edit Lesson Form */}
       {showForm && (
         <div className="card p-5 border-sky-600/30 space-y-4 animate-fade-in">
           <div className="flex items-center justify-between">
-            <h2 className="font-semibold text-base-100">Yangi Dars Qo'shish</h2>
-            <button onClick={() => setShowForm(false)} className="btn-ghost p-1.5">✕</button>
+            <h2 className="font-semibold text-base-100">
+              {editingId ? 'Darsni Tahrirlash' : "Yangi Dars Qo'shish"}
+            </h2>
+            <button onClick={resetForm} className="btn-ghost p-1.5">✕</button>
           </div>
 
           {/* Dars turi */}
@@ -153,33 +282,50 @@ export default function TeacherCourseDetailPage() {
             </div>
           </div>
 
-          {/* 1. Resurs yuklash — BIRINCHI */}
+          {/* 1. Resurs yuklash */}
           <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-4">
             <label className="text-xs text-amber-400 mb-2 block font-medium uppercase tracking-wider flex items-center gap-1.5">
-              <Upload className="w-3.5 h-3.5" /> 1. Dars Resursi (PDF yoki Word)
+              <Upload className="w-3.5 h-3.5" /> 1. Dars Qo'llanmasi (PDF yoki Word)
             </label>
-            <label className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border cursor-pointer transition-all text-sm w-full
-              ${form.resourceName
-                ? 'bg-emerald-500/5 border-emerald-500/30 text-emerald-400'
-                : 'bg-[#1A1A1F] border-[#27272A] hover:border-amber-500/40 text-base-400 hover:text-base-200'}`}>
-              {form.resourceName
-                ? <><CheckCircle2 className="w-4 h-4 flex-shrink-0" /><span className="truncate">{form.resourceName}</span></>
-                : <><FileText className="w-4 h-4 text-amber-400 flex-shrink-0" /><span>Resurs faylini tanlang (PDF, DOC, DOCX)</span></>
-              }
-              <input type="file" accept=".pdf,.doc,.docx" className="hidden"
-                onChange={e => {
-                  const f = e.target.files?.[0]
-                  if (f) setForm(prev => ({ ...prev, resourceName: f.name, resourceFile: f }))
-                }} />
-            </label>
-            <p className="text-xs text-base-600 mt-1.5">O'quvchilar bu faylni yuklab olishlari mumkin bo'ladi</p>
+            {hasResource ? (
+              <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl border bg-emerald-500/5 border-emerald-500/30 text-emerald-400 text-sm">
+                <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                <span className="truncate flex-1">{form.resourceName}</span>
+                {form.resourceFile && (
+                  <span className="text-xs text-base-500">
+                    {(form.resourceFile.size / 1024 / 1024).toFixed(2)} MB
+                  </span>
+                )}
+                <button onClick={clearFile} type="button"
+                  className="p-1 rounded hover:bg-rose-500/10 text-base-500 hover:text-rose-400 transition-colors">
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ) : (
+              <label className="flex items-center gap-2 px-4 py-2.5 rounded-xl border cursor-pointer transition-all text-sm w-full
+                  bg-[#1A1A1F] border-[#27272A] hover:border-amber-500/40 text-base-400 hover:text-base-200">
+                <FileText className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                <span>Qo'llanma faylini tanlang (PDF, DOC, DOCX)</span>
+                <input type="file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                  className="hidden"
+                  onChange={e => {
+                    const f = e.target.files?.[0]
+                    if (f) onPickFile(f)
+                    // Inputni resetlash — bir xil faylni qayta tanlash uchun
+                    e.currentTarget.value = ''
+                  }} />
+              </label>
+            )}
+            <p className="text-xs text-base-600 mt-1.5">
+              O'quvchilar bu faylni o'z darsida ko'rib, yuklab olishlari mumkin (maks. 20 MB)
+            </p>
           </div>
 
-          {/* 2. Video URL — IKKINCHI (faqat video uchun) */}
+          {/* 2. Video URL (faqat video uchun) */}
           {form.type === 'video' && (
             <div className="bg-sky-500/5 border border-sky-500/20 rounded-xl p-4">
               <label className="text-xs text-sky-400 mb-2 block font-medium uppercase tracking-wider flex items-center gap-1.5">
-                <Play className="w-3.5 h-3.5" /> 2. Video Manzili (URL)
+                <Play className="w-3.5 h-3.5" /> 2. Video Manzili (YouTube URL)
               </label>
               <input
                 value={form.videoUrl}
@@ -205,11 +351,11 @@ export default function TeacherCourseDetailPage() {
           {error && <p className="text-xs text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-xl px-3 py-2">{error}</p>}
 
           <div className="flex gap-3 pt-1">
-            <button onClick={() => setShowForm(false)} className="btn-secondary flex-1">Bekor qilish</button>
-            <button onClick={handleAdd} disabled={saving || !form.title.trim()}
+            <button onClick={resetForm} className="btn-secondary flex-1">Bekor qilish</button>
+            <button onClick={handleSave} disabled={saving || !form.title.trim()}
               className="btn-primary bg-sky-600 hover:bg-sky-700 flex-1 flex items-center justify-center gap-2 disabled:opacity-50">
-              {saving ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Plus className="w-4 h-4" />}
-              {saving ? 'Saqlanmoqda...' : 'Dars Qo\'shish'}
+              {saving ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : (editingId ? <CheckCircle2 className="w-4 h-4" /> : <Plus className="w-4 h-4" />)}
+              {saving ? 'Saqlanmoqda...' : editingId ? 'Saqlash' : "Dars Qo'shish"}
             </button>
           </div>
         </div>
@@ -222,7 +368,7 @@ export default function TeacherCourseDetailPage() {
           <div className="text-center py-12">
             <BookOpen className="w-10 h-10 text-base-700 mx-auto mb-3" />
             <p className="text-sm text-base-500">Hali dars yo'q</p>
-            <button onClick={() => setShowForm(true)}
+            <button onClick={openCreate}
               className="mt-3 text-xs text-sky-400 hover:text-sky-300 transition-colors">
               + Birinchi darsni qo'shing
             </button>
@@ -249,21 +395,32 @@ export default function TeacherCourseDetailPage() {
 
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-medium text-base-100 truncate">{lesson.title}</div>
-                    <div className="flex items-center gap-2 mt-0.5">
+                    <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                       <span className={`text-xs ${TYPE_COLOR[lesson.type as LessonType] || 'text-base-500'}`}>
                         {TYPE_LABEL[lesson.type as LessonType]}
                       </span>
                       <span className="text-xs text-base-600">{lesson.duration}</span>
                       {lesson.videoUrl && (
-                        <a href={lesson.videoUrl} target="_blank" rel="noopener noreferrer"
+                        <a href={toEmbedUrl(lesson.videoUrl)} target="_blank" rel="noopener noreferrer"
                           className="text-xs text-sky-400 hover:text-sky-300 flex items-center gap-0.5">
-                          <ExternalLink className="w-2.5 h-2.5" /> URL
+                          <ExternalLink className="w-2.5 h-2.5" /> Video
                         </a>
+                      )}
+                      {lesson.resourceName && (
+                        <span className="text-xs text-amber-400 flex items-center gap-0.5 max-w-[200px] truncate">
+                          <Paperclip className="w-2.5 h-2.5 flex-shrink-0" />
+                          {lesson.resourceName}
+                        </span>
                       )}
                     </div>
                   </div>
 
                   <span className="text-xs text-amber-400/70 badge-amber flex-shrink-0">+{lesson.xpReward} XP</span>
+
+                  <button onClick={() => openEdit(lesson)}
+                    className="p-1.5 rounded-lg hover:bg-sky-500/10 text-base-700 hover:text-sky-400 opacity-0 group-hover:opacity-100 transition-all">
+                    <Pencil className="w-3.5 h-3.5" />
+                  </button>
 
                   <button onClick={() => handleDelete(lesson.id, lesson.title)}
                     disabled={deleting === lesson.id}

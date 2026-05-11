@@ -20,7 +20,8 @@ app.use(cors({
   credentials: true,
 }))
 
-app.use(express.json({ limit: '2mb' }))
+// PDF/Word qo'llanmalar base64 sifatida yuboriladi — 30mb limit
+app.use(express.json({ limit: '30mb' }))
 app.use(morgan('tiny'))
 
 // Health check (Railway uchun)

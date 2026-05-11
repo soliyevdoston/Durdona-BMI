@@ -75,16 +75,19 @@ model Enrollment {
 }
 
 model Lesson {
-  id        String  @id @default(cuid())
-  courseId  String
-  course    Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  title     String
-  duration  String
-  type      String  // video | text | quiz | practice
-  order     Int
-  xpReward  Int     @default(10)
-  content   String? @db.Text
-  videoUrl  String? // YouTube yoki boshqa video manzili
+  id            String  @id @default(cuid())
+  courseId      String
+  course        Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title         String
+  duration      String
+  type          String  // video | text | quiz | practice
+  order         Int
+  xpReward      Int     @default(10)
+  content       String? @db.Text
+  videoUrl      String? // YouTube yoki boshqa video manzili
+  resourceUrl   String? @db.Text // data URL (PDF/Word) — o'qituvchi yuklagan qo'llanma
+  resourceName  String? // asl fayl nomi (masalan, "1-dars-qollanma.pdf")
+  resourceType  String? // MIME turi (masalan, "application/pdf")
 
   progress  LessonProgress[]
 

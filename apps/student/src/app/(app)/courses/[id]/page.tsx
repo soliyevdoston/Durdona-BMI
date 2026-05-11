@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation'
 import {
   ChevronLeft, Play, Lock, CheckCircle2, Clock, BookOpen,
   Code2, FileQuestion, FileText, Brain, X, SkipForward,
-  Map, ArrowRight, Sparkles, Download
+  Map, ArrowRight, Sparkles, Download, Paperclip, FileDown
 } from 'lucide-react'
 import { api } from '@/lib/api'
 import { useApi } from '@/lib/useApi'
@@ -58,6 +58,36 @@ const DIAG_QUESTIONS = [
     options: ["1 bayt = 4 bit", "1 bayt = 8 bit", "1 bayt = 16 bit", "1 bayt = 2 bit"],
     correct: 1 },
 ]
+
+// ─── YouTube URL → embed URL ─────────────────────────────────────────────────
+function getYouTubeId(url: string): string | null {
+  if (!url) return null
+  const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^?&\n]{11})/)
+  return m ? m[1] : null
+}
+function toEmbedUrl(url: string): string {
+  const id = getYouTubeId(url)
+  return id ? `https://www.youtube.com/embed/${id}` : url
+}
+
+// ─── Teacher-uploaded resource — base64 data URL'ni faylga aylantirib yuklash ─
+function downloadTeacherResource(lesson: any) {
+  if (!lesson?.resourceUrl) return
+  const a = document.createElement('a')
+  a.href = lesson.resourceUrl
+  a.download = lesson.resourceName || 'qollanma'
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+}
+
+function getResourceExtension(lesson: any): string {
+  const name = lesson?.resourceName || ''
+  const ext = name.split('.').pop()?.toUpperCase() || ''
+  if (ext === 'PDF') return 'PDF'
+  if (ext === 'DOCX' || ext === 'DOC') return 'Word'
+  return ext || 'Fayl'
+}
 
 // ─── Downloadable resource helpers ───────────────────────────────────────────
 const KEY_TERMS: Record<string, string[]> = {
@@ -743,11 +773,35 @@ export default function CourseDetailPage() {
                   <div className="badge-amber flex-shrink-0 animate-bounce-once">+{currentLesson.xpReward} XP</div>
                 </div>
 
-                {/* Dars Resurslari — video'dan OLDIN ko'rsatiladi */}
-                {(currentLesson.type === 'video' || currentLesson.type === 'text') && (
+                {/* O'qituvchi yuklagan qo'llanma (PDF/Word) — video'dan OLDIN */}
+                {currentLesson.resourceUrl && (
+                  <div className="mb-4 bg-amber-500/5 border border-amber-500/20 rounded-xl p-4 animate-fade-in">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center flex-shrink-0">
+                        <Paperclip className="w-4 h-4 text-amber-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-amber-400/80 uppercase tracking-wider mb-0.5">
+                          O'qituvchi qo'llanmasi · {getResourceExtension(currentLesson)}
+                        </p>
+                        <p className="text-sm font-medium text-base-100 truncate">
+                          {currentLesson.resourceName || "Dars qo'llanmasi"}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => downloadTeacherResource(currentLesson)}
+                        className="flex items-center gap-1.5 text-xs font-medium text-base-100 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 hover:border-amber-500/50 rounded-lg px-3 py-2 transition-all flex-shrink-0">
+                        <FileDown className="w-3.5 h-3.5" /> Yuklab olish
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Avto-yaratiluvchi konspekt — faqat o'qituvchi qo'llanma yuklamagan bo'lsa */}
+                {!currentLesson.resourceUrl && (currentLesson.type === 'video' || currentLesson.type === 'text') && (
                   <div className="mb-4 bg-[#0D0D10] border border-[#1E1E24] rounded-xl p-4 animate-fade-in">
                     <div className="flex items-center justify-between mb-3">
-                      <p className="text-xs text-base-500 uppercase tracking-wider">Dars Materiallari</p>
+                      <p className="text-xs text-base-500 uppercase tracking-wider">Avto-konspekt</p>
                       <div className="flex gap-2">
                         <button
                           onClick={() => downloadAsWord(currentLesson, course)}
@@ -794,7 +848,7 @@ export default function CourseDetailPage() {
                   <div className="bg-black rounded-xl aspect-video overflow-hidden mb-4 border border-[#1E1E24] animate-fade-in shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
                     <iframe
                       className="w-full h-full"
-                      src={currentLesson.videoUrl}
+                      src={toEmbedUrl(currentLesson.videoUrl)}
                       title={currentLesson.title}
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                       allowFullScreen
