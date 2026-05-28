@@ -1,9 +1,4 @@
-/**
- * API client — backend bilan ulanish.
- * NEXT_PUBLIC_API_URL env var orqali backend manzilini o'zgartiring.
- */
-
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://durdona-bmi.onrender.com'
+const BASE_URL = 'https://durdona-bmi.onrender.com'
 
 type Method = 'GET' | 'POST' | 'PATCH' | 'DELETE'
 
