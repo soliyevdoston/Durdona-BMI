@@ -51,7 +51,7 @@ Asosiy kirish: **http://localhost:3000** — landing sahifadan rol tanlaydi.
 
 ### Backend → Railway + Neon
 
-**Live URL:** `https://durdona-bmi-production-bdaf.up.railway.app`
+**Live URL:** `https://durdona-bmi.onrender.com`
 
 Batafsil: [backend/README.md](./backend/README.md)
 
@@ -62,9 +62,9 @@ Har biri **alohida Vercel loyiha** sifatida deploy qilinadi:
 | Loyiha | Root Directory | Env variables |
 |---|---|---|
 | educode-landing | `apps/landing` | `NEXT_PUBLIC_STUDENT_URL`, `NEXT_PUBLIC_TEACHER_URL`, `NEXT_PUBLIC_ADMIN_URL` |
-| educode-student | `apps/student` | `NEXT_PUBLIC_API_URL=https://durdona-bmi-production-bdaf.up.railway.app` |
-| educode-teacher | `apps/teacher` | `NEXT_PUBLIC_API_URL=https://durdona-bmi-production-bdaf.up.railway.app` |
-| educode-admin | `apps/admin` | `NEXT_PUBLIC_API_URL=https://durdona-bmi-production-bdaf.up.railway.app` |
+| educode-student | `apps/student` | `NEXT_PUBLIC_API_URL=https://durdona-bmi.onrender.com` |
+| educode-teacher | `apps/teacher` | `NEXT_PUBLIC_API_URL=https://durdona-bmi.onrender.com` |
+| educode-admin | `apps/admin` | `NEXT_PUBLIC_API_URL=https://durdona-bmi.onrender.com` |
 
 **Deploy tartibi:**
 1. Avval student/teacher/admin'ni deploy qiling → URL'larni oling

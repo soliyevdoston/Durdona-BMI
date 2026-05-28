@@ -43,7 +43,7 @@ Server: `http://localhost:8080` · Health: `http://localhost:8080/api/health`
 
 ### 2. Railway.app
 
-1. [railway.app](https://railway.app) → **New Project** → **Deploy from GitHub repo**
+1. [render.com](https://render.com) → **New Web Service** → **Connect GitHub repo**
 2. Repo'ni tanlang, **Root Directory** = `backend`
 3. Railway avtomatik `Dockerfile` va `railway.json` ni topadi
 4. **Variables** (Settings → Variables):

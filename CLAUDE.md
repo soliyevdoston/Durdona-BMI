@@ -21,7 +21,7 @@ Har frontend app — **alohida Next.js loyihasi**. Barchasi bitta backend bilan 
 
 ```
 Vercel #1 (student.vercel.app) ──┐
-Vercel #2 (teacher.vercel.app) ──┼──→  Railway (durdona-bmi-production-bdaf.up.railway.app)
+Vercel #2 (teacher.vercel.app) ──┼──→  Render (durdona-bmi.onrender.com)
 Vercel #3 (admin.vercel.app)   ──┘
 ```
 
@@ -35,7 +35,7 @@ Vercel #3 (admin.vercel.app)   ──┘
 | **Frontend (×3)** | Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · Zustand · Recharts · Lucide |
 | **Ma'lumotlar** | In-memory (hozir) → PostgreSQL (keyingi bosqich) |
 | **Auth** | JWT (access token, 7 kun) + role-based routing |
-| **Hosting** | Railway (backend) + Vercel (3 ta frontend) |
+| **Hosting** | Render (backend) + Vercel (3 ta frontend) |
 
 ---
 
@@ -179,17 +179,20 @@ NEXT_PUBLIC_API_URL=http://localhost:8080
 
 ## 🌐 Deploy
 
-### Backend → Railway
+### Backend → Render
 
 1. GitHub repo'ga push
-2. railway.app → **New Project** → **Deploy from GitHub repo**
-3. Root Directory: `backend`
-4. Variables:
+2. render.com → **New Web Service** → **Connect GitHub repo**
+3. Root Directory: `backend`, Language: `Node`
+4. Build Command: `npm install && npm run build`
+5. Start Command: `npm start`
+6. Variables:
    - `DATABASE_URL` = Neon pooled URL
    - `JWT_SECRET` (random 32+ belgi)
    - `CORS_ORIGINS` = 3 ta Vercel URL'i, vergul bilan
    - `PORT` = `8080`
-5. Deploy → URL oling
+   - `OPENAI_API_KEY` = OpenAI API kaliti
+7. Deploy → `https://durdona-bmi.onrender.com`
 
 ### 3 ta Vercel loyihasi
 
@@ -197,7 +200,7 @@ Har birida **Root Directory**ni belgilang:
 
 | Loyiha | Root Directory | Env: NEXT_PUBLIC_API_URL |
 |---|---|---|
-| educode-student | `apps/student` | `https://durdona-bmi-production-bdaf.up.railway.app` |
+| educode-student | `apps/student` | `https://durdona-bmi.onrender.com` |
 | educode-teacher | `apps/teacher` | (xuddi shunday) |
 | educode-admin | `apps/admin` | (xuddi shunday) |
 
@@ -255,7 +258,7 @@ Vercel'da **Framework Preset** avtomatik Next.js aniqlaydi. Boshqa sozlama shart
 
 ### Sessiya 6 — 2026-04-29 (Render → Railway migratsiya + demo hisoblar)
 - ✅ **Backend hosting: Render → Railway**
-  - Barcha `educode-backend.onrender.com` → `durdona-bmi-production-bdaf.up.railway.app`
+  - Barcha `educode-backend.onrender.com` → `durdona-bmi.onrender.com`
   - `backend/Dockerfile` — OpenSSL qo'shildi (`apk add openssl`), `prisma generate + tsc` build qadami
   - `backend/railway.json` — Railway deploy konfiguratsiyasi yaratildi
   - `backend/render.yaml` saqlanib qoldi (eski ref sifatida)

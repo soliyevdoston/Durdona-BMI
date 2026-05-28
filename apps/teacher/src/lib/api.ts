@@ -3,7 +3,7 @@
  * NEXT_PUBLIC_API_URL env var orqali backend manzilini o'zgartiring.
  */
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://durdona-bmi-production-bdaf.up.railway.app'
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://durdona-bmi.onrender.com'
 
 type Method = 'GET' | 'POST' | 'PATCH' | 'DELETE'
 
