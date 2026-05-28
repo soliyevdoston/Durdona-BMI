@@ -51,6 +51,8 @@ export const api = {
   createLesson: (data: any) => request('/api/lessons', { method: 'POST', body: data }),
   updateLesson: (id: string, data: any) => request(`/api/lessons/${id}`, { method: 'PATCH', body: data }),
   deleteLesson: (id: string) => request(`/api/lessons/${id}`, { method: 'DELETE' }),
+  generateQuiz: (id: string) => request<{ questions: any[]; cached: boolean }>(`/api/lessons/${id}/generate-quiz`, { method: 'POST' }),
+  getQuiz: (id: string) => request<{ questions: any[] }>(`/api/lessons/${id}/quiz`),
 
   // Assignments
   myAssignments: () => request<any[]>('/api/assignments/mine'),

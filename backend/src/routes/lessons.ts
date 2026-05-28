@@ -1,8 +1,30 @@
 import { Router } from 'express'
 import { prisma, log } from '../prisma'
 import { requireAuth, requireRole } from '../auth'
+import OpenAI from 'openai'
+import * as pdfParseModule from 'pdf-parse'
+const pdfParse = (pdfParseModule as any).default ?? pdfParseModule
+import mammoth from 'mammoth'
 
 const router = Router()
+
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+
+// base64 data URL dan matn chiqarish (PDF yoki DOCX)
+async function extractTextFromDataUrl(dataUrl: string): Promise<string> {
+  const [header, base64] = dataUrl.split(',')
+  if (!base64) return ''
+  const buffer = Buffer.from(base64, 'base64')
+  if (header.includes('pdf')) {
+    const result = await pdfParse(buffer)
+    return result.text.slice(0, 6000)
+  }
+  if (header.includes('word') || header.includes('officedocument')) {
+    const result = await mammoth.extractRawText({ buffer })
+    return result.value.slice(0, 6000)
+  }
+  return ''
+}
 
 // Create lesson
 router.post('/', requireAuth, requireRole('teacher', 'admin', 'super_admin'), async (req, res) => {
@@ -61,6 +83,124 @@ router.delete('/:id', requireAuth, requireRole('teacher', 'admin', 'super_admin'
   await prisma.lesson.delete({ where: { id: req.params.id } })
   await log(req.user!.id, 'lesson.delete', { lessonId: req.params.id })
   res.json({ ok: true })
+})
+
+// Quiz savollari generatsiyasi — OpenAI orqali
+router.post('/:id/generate-quiz', requireAuth, async (req, res) => {
+  const lessonId = req.params.id
+  const lesson = await prisma.lesson.findUnique({ where: { id: lessonId } })
+  if (!lesson) return res.status(404).json({ error: 'Dars topilmadi' })
+
+  // Keshda bor bo'lsa qaytaramiz
+  if (lesson.content) {
+    try {
+      const cached = JSON.parse(lesson.content)
+      if (Array.isArray(cached) && cached.length > 0) {
+        return res.json({ questions: cached, cached: true })
+      }
+    } catch {}
+  }
+
+  if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY === 'your-openai-api-key-here') {
+    return res.status(503).json({ error: 'OpenAI API kaliti sozlanmagan' })
+  }
+
+  // Kurs darslaridan manba matnni topamiz
+  const courseLessons = await prisma.lesson.findMany({
+    where: { courseId: lesson.courseId },
+    orderBy: { order: 'asc' },
+  })
+
+  let sourceText = ''
+
+  // Avval o'sha darsning o'z resursini tekshiramiz
+  if (lesson.resourceUrl) {
+    sourceText = await extractTextFromDataUrl(lesson.resourceUrl)
+  }
+
+  // Agar yo'q bo'lsa, kurs darslaridagi resurslarni yig'amiz
+  if (!sourceText) {
+    for (const l of courseLessons) {
+      if (l.resourceUrl) {
+        const text = await extractTextFromDataUrl(l.resourceUrl)
+        sourceText += text + '\n'
+        if (sourceText.length > 5000) break
+      }
+    }
+  }
+
+  // Hech qanday resurs yuklanmagan bo'lsa
+  if (!sourceText.trim()) {
+    return res.status(400).json({ error: 'Bu kurs uchun hali hech qanday material yuklanmagan' })
+  }
+
+  try {
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      temperature: 0.4,
+      messages: [
+        {
+          role: 'system',
+          content: `You are an educational quiz generator. Generate exactly 5 multiple-choice questions from the given text.
+
+CRITICAL RULES:
+- Detect the language of the input text automatically
+- Write ALL questions AND all answer options in THE SAME language as the input text
+- If the text is in English → all questions and answers must be in English
+- If the text is in Russian → all questions and answers must be in Russian
+- If the text is in Uzbek → all questions and answers must be in Uzbek
+- Each question has exactly 4 options
+- Only one option is correct
+- Test understanding of key concepts
+
+Return ONLY valid JSON array, no markdown, no explanation:
+[{"id":1,"q":"Question?","options":["A","B","C","D"],"correct":0},...]
+
+where "correct" is the 0-based index of the correct option.`,
+        },
+        {
+          role: 'user',
+          content: sourceText.slice(0, 5000),
+        },
+      ],
+    })
+
+    const raw = completion.choices[0].message.content?.trim() || '[]'
+    // markdown kod blokini tozalaymiz
+    const cleaned = raw.replace(/^```json\n?/, '').replace(/^```\n?/, '').replace(/\n?```$/, '')
+    const questions = JSON.parse(cleaned)
+
+    if (!Array.isArray(questions) || questions.length === 0) {
+      return res.status(500).json({ error: 'Savollar generatsiya qilinmadi' })
+    }
+
+    // Keshga saqlaymiz
+    await prisma.lesson.update({
+      where: { id: lessonId },
+      data: { content: JSON.stringify(questions) },
+    })
+
+    await log(req.user!.id, 'quiz.generate', { lessonId, count: questions.length })
+    res.json({ questions, cached: false })
+  } catch (err: any) {
+    console.error('OpenAI error:', err.message)
+    res.status(500).json({ error: 'Savollar yaratishda xatolik: ' + err.message })
+  }
+})
+
+// Keshdan quiz savollarini olish
+router.get('/:id/quiz', requireAuth, async (req, res) => {
+  const lesson = await prisma.lesson.findUnique({ where: { id: req.params.id } })
+  if (!lesson) return res.status(404).json({ error: 'Dars topilmadi' })
+  if (lesson.content) {
+    try {
+      const questions = JSON.parse(lesson.content)
+      if (Array.isArray(questions) && questions.length > 0) {
+        return res.json({ questions })
+      }
+    } catch {}
+  }
+  res.json({ questions: [] })
 })
 
 router.post('/:id/complete', requireAuth, async (req, res) => {

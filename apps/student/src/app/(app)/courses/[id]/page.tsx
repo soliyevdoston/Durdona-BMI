@@ -491,15 +491,12 @@ function PathComparisonCard({ standard, personal, saved }: { standard: number; p
   )
 }
 
-// ─── In-lesson quiz questions ─────────────────────────────────────────────────
-const QUIZ_QUESTIONS = [
-  { id: 1, q: 'Python\'da ro\'yxat (list) yaratishning to\'g\'ri usuli qaysi?',
-    options: ['list = (1, 2, 3)', 'list = [1, 2, 3]', 'list = {1, 2, 3}', 'list = <1, 2, 3>'], correct: 1 },
-  { id: 2, q: 'range(5) funksiyasi qanday qiymatlar qaytaradi?',
-    options: ['1, 2, 3, 4, 5', '0, 1, 2, 3, 4', '0, 1, 2, 3, 4, 5', '1, 2, 3, 4'], correct: 1 },
-  { id: 3, q: 'for i in range(3): print(i) — natija nima?',
-    options: ['1 2 3', '0 1 2', '0 1 2 3', 'Xato'], correct: 1 },
-]
+interface QuizQuestion {
+  id: number
+  q: string
+  options: string[]
+  correct: number
+}
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function CourseDetailPage() {
@@ -521,6 +518,11 @@ export default function CourseDetailPage() {
   const [practiceCode, setPracticeCode] = useState('for i in range(1, 11):\n    print(f"{i} ** 2 = {i**2}")')
   const [practiceOutput, setPracticeOutput] = useState<string | null>(null)
   const [practiceRunning, setPracticeRunning] = useState(false)
+
+  // AI quiz state
+  const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>([])
+  const [quizLoading, setQuizLoading] = useState(false)
+  const [quizError, setQuizError] = useState<string | null>(null)
 
   // Diagnostic state
   const [diagState, setDiagState] = useState<'idle' | 'running' | 'done'>('idle')
@@ -559,6 +561,35 @@ export default function CourseDetailPage() {
     setDiagState('done')
     localStorage.setItem(`diag_${id}`, JSON.stringify([...skippable]))
   }
+
+  // Quiz dars ochilganda savollarni yuklash
+  useEffect(() => {
+    if (!currentLesson || currentLesson.type !== 'quiz') return
+    setQuizQuestions([])
+    setQuizError(null)
+    setQuizSubmitted(false)
+    setQuizAnswers({})
+
+    const load = async () => {
+      setQuizLoading(true)
+      try {
+        // Avval keshdan olishga urinamiz
+        const cached = await api.getQuiz(currentLesson.id)
+        if (cached.questions.length > 0) {
+          setQuizQuestions(cached.questions)
+          setQuizLoading(false)
+          return
+        }
+        // Keshda yo'q — generatsiya qilamiz
+        const generated = await api.generateQuiz(currentLesson.id)
+        setQuizQuestions(generated.questions)
+      } catch (err: any) {
+        setQuizError(err.message)
+      }
+      setQuizLoading(false)
+    }
+    load()
+  }, [activeLesson])
 
   if (loading) return (
     <div className="flex items-center justify-center h-64">
@@ -624,7 +655,7 @@ export default function CourseDetailPage() {
   }
 
   const submitQuiz = () => setQuizSubmitted(true)
-  const quizScore = quizSubmitted ? QUIZ_QUESTIONS.filter(q => quizAnswers[q.id] === q.correct).length : 0
+  const quizScore = quizSubmitted ? quizQuestions.filter(q => quizAnswers[q.id] === q.correct).length : 0
 
   const savedCount = skippableIdxs.size
   const personalCount = lessons.filter((_: any, idx: number) => !skippableIdxs.has(idx)).length
@@ -931,56 +962,93 @@ export default function CourseDetailPage() {
                 {/* Quiz */}
                 {(currentLesson.type === 'quiz' || quizActive) && (
                   <div className="mb-4 space-y-4 animate-fade-in">
-                    {!quizSubmitted ? (
-                      <>
-                        <div className="flex items-center gap-2 text-sm text-base-400 mb-1">
-                          <FileQuestion className="w-4 h-4 text-base-600" />
-                          <span>{QUIZ_QUESTIONS.length} ta savol</span>
+
+                    {/* Loading holati */}
+                    {quizLoading && (
+                      <div className="flex flex-col items-center justify-center py-12 gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-[#1A1A1F] border border-[#27272A] flex items-center justify-center">
+                          <Brain className="w-5 h-5 text-base-500 animate-pulse" />
                         </div>
-                        {QUIZ_QUESTIONS.map((q, qi) => (
-                          <div key={q.id} className={`card-elevated p-4 rounded-xl stagger-item animate-slide-up`}
-                            style={{ animationDelay: `${qi * 80}ms`, animationFillMode: 'backwards' }}>
-                            <p className="text-sm text-base-200 mb-3 font-medium">{q.id}. {q.q}</p>
-                            <div className="space-y-2">
-                              {q.options.map((opt, i) => (
-                                <button key={i} onClick={() => setQuizAnswers(prev => ({ ...prev, [q.id]: i }))}
-                                  className={`w-full text-left px-3 py-2.5 rounded-lg text-xs transition-all duration-200 border active:scale-[0.99] ${
-                                    quizAnswers[q.id] === i
-                                      ? 'bg-accent-600/10 border-accent-600/40 text-accent-300'
-                                      : 'border-[#27272A] text-base-400 hover:border-[#3F3F46] hover:bg-[#111113] hover:text-base-200'
-                                  }`}>
-                                  <span className="text-base-700 mr-2">{['A', 'B', 'C', 'D'][i]}.</span> {opt}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                        ))}
-                        <button onClick={submitQuiz}
-                          disabled={Object.keys(quizAnswers).length < QUIZ_QUESTIONS.length}
-                          className="btn-primary px-6 py-2 disabled:opacity-30 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98] transition-transform">
-                          Topshirish
-                        </button>
-                      </>
-                    ) : (
-                      <div className="text-center py-10 animate-scale-in">
-                        <div className={`text-5xl font-bold mb-2 ${quizScore === QUIZ_QUESTIONS.length ? 'text-base-200' : quizScore >= 2 ? 'text-base-300' : 'text-base-500'}`}>
-                          {quizScore}/{QUIZ_QUESTIONS.length}
+                        <div className="text-center">
+                          <p className="text-sm font-medium text-base-200 mb-1">AI savollar tayyorlamoqda...</p>
+                          <p className="text-xs text-base-600">Yuklanган materialdan savollar tuzilmoqda</p>
                         </div>
-                        <p className="text-sm text-base-500 mb-4">
-                          {quizScore === QUIZ_QUESTIONS.length ? 'Mukammal! Barcha javoblar to\'g\'ri' :
-                            quizScore >= 2 ? 'Yaxshi natija! Biroz ko\'proq mashq qiling.' :
-                            'Qayta urinib ko\'ring — siz uddalay olasiz!'}
-                        </p>
-                        <div className="badge-amber text-sm inline-flex animate-bounce-once">
-                          +{Math.round(currentLesson.xpReward * (quizScore / QUIZ_QUESTIONS.length))} XP
-                        </div>
-                        <div className="mt-4">
-                          <button onClick={() => { setQuizSubmitted(false); setQuizAnswers({}) }}
-                            className="btn-secondary px-6 hover:scale-[1.02] active:scale-[0.98] transition-transform">
-                            Qayta urinish
-                          </button>
+                        <div className="flex gap-1.5">
+                          {[0,1,2].map(i => (
+                            <div key={i} className="w-1.5 h-1.5 rounded-full bg-accent-500 animate-pulse"
+                              style={{ animationDelay: `${i * 150}ms` }} />
+                          ))}
                         </div>
                       </div>
+                    )}
+
+                    {/* Xatolik holati */}
+                    {!quizLoading && quizError && (
+                      <div className="bg-rose-500/5 border border-rose-500/20 rounded-xl p-5 text-center">
+                        <p className="text-sm text-rose-400 mb-1 font-medium">Savollar yuklashda xatolik</p>
+                        <p className="text-xs text-rose-500/70 mb-4">{quizError}</p>
+                        <p className="text-xs text-base-600">
+                          O'qituvchi bu darsga hali material yuklamagan bo'lishi mumkin.
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Savollar */}
+                    {!quizLoading && !quizError && quizQuestions.length > 0 && (
+                      !quizSubmitted ? (
+                        <>
+                          <div className="flex items-center gap-2 text-sm text-base-400 mb-1">
+                            <FileQuestion className="w-4 h-4 text-base-600" />
+                            <span>{quizQuestions.length} ta savol</span>
+                            <span className="ml-auto text-xs text-base-700 flex items-center gap-1">
+                              <Brain className="w-3 h-3" /> AI tomonidan tuzildi
+                            </span>
+                          </div>
+                          {quizQuestions.map((q, qi) => (
+                            <div key={q.id} className="card-elevated p-4 rounded-xl stagger-item animate-slide-up"
+                              style={{ animationDelay: `${qi * 80}ms`, animationFillMode: 'backwards' }}>
+                              <p className="text-sm text-base-200 mb-3 font-medium">{q.id}. {q.q}</p>
+                              <div className="space-y-2">
+                                {q.options.map((opt, i) => (
+                                  <button key={i} onClick={() => setQuizAnswers(prev => ({ ...prev, [q.id]: i }))}
+                                    className={`w-full text-left px-3 py-2.5 rounded-lg text-xs transition-all duration-200 border active:scale-[0.99] ${
+                                      quizAnswers[q.id] === i
+                                        ? 'bg-accent-600/10 border-accent-600/40 text-accent-300'
+                                        : 'border-[#27272A] text-base-400 hover:border-[#3F3F46] hover:bg-[#111113] hover:text-base-200'
+                                    }`}>
+                                    <span className="text-base-700 mr-2">{['A', 'B', 'C', 'D'][i]}.</span> {opt}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                          <button onClick={submitQuiz}
+                            disabled={Object.keys(quizAnswers).length < quizQuestions.length}
+                            className="btn-primary px-6 py-2 disabled:opacity-30 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98] transition-transform">
+                            Topshirish
+                          </button>
+                        </>
+                      ) : (
+                        <div className="text-center py-10 animate-scale-in">
+                          <div className={`text-5xl font-bold mb-2 ${quizScore === quizQuestions.length ? 'text-base-200' : quizScore >= Math.ceil(quizQuestions.length / 2) ? 'text-base-300' : 'text-base-500'}`}>
+                            {quizScore}/{quizQuestions.length}
+                          </div>
+                          <p className="text-sm text-base-500 mb-4">
+                            {quizScore === quizQuestions.length ? 'Mukammal! Barcha javoblar to\'g\'ri' :
+                              quizScore >= Math.ceil(quizQuestions.length / 2) ? 'Yaxshi natija! Biroz ko\'proq mashq qiling.' :
+                              'Qayta urinib ko\'ring — siz uddalay olasiz!'}
+                          </p>
+                          <div className="badge-amber text-sm inline-flex animate-bounce-once">
+                            +{Math.round(currentLesson.xpReward * (quizScore / quizQuestions.length))} XP
+                          </div>
+                          <div className="mt-4">
+                            <button onClick={() => { setQuizSubmitted(false); setQuizAnswers({}) }}
+                              className="btn-secondary px-6 hover:scale-[1.02] active:scale-[0.98] transition-transform">
+                              Qayta urinish
+                            </button>
+                          </div>
+                        </div>
+                      )
                     )}
                   </div>
                 )}
