@@ -1,30 +1,61 @@
-'use client'
-import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
-import { api } from './api'
+"use client";
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import type { PersistStorage } from "zustand/middleware";
+import { api } from "./api";
 
-export type Role = 'student' | 'teacher' | 'admin' | 'super_admin'
+export type Role = "student" | "teacher" | "admin" | "super_admin";
+
+// Safe storage — SSR'da localStorage'ga urinish xatosini oldini oladi
+const safeStorage: PersistStorage<any> = {
+  getItem: (name: string) => {
+    if (typeof window === "undefined") return null;
+    try {
+      const item = localStorage.getItem(name);
+      return item ? JSON.parse(item) : null;
+    } catch {
+      return null;
+    }
+  },
+  setItem: (name: string, value: any) => {
+    if (typeof window === "undefined") return;
+    try {
+      localStorage.setItem(name, JSON.stringify(value));
+    } catch {}
+  },
+  removeItem: (name: string) => {
+    if (typeof window === "undefined") return;
+    try {
+      localStorage.removeItem(name);
+    } catch {}
+  },
+};
 
 export interface User {
-  id: string
-  name: string
-  email: string
-  role: Role
-  avatar: string
-  xp: number
-  level: number
-  streak: number
-  joinedAt: string
+  id: string;
+  name: string;
+  email: string;
+  role: Role;
+  avatar: string;
+  xp: number;
+  level: number;
+  streak: number;
+  joinedAt: string;
 }
 
 interface AuthState {
-  user: User | null
-  token: string | null
-  isAuthenticated: boolean
-  login: (email: string, password: string) => Promise<User>
-  register: (data: { name: string; email: string; password: string; role: Role }) => Promise<User>
-  logout: () => Promise<void>
-  refresh: () => Promise<void>
+  user: User | null;
+  token: string | null;
+  isAuthenticated: boolean;
+  login: (email: string, password: string) => Promise<User>;
+  register: (data: {
+    name: string;
+    email: string;
+    password: string;
+    role: Role;
+  }) => Promise<User>;
+  logout: () => Promise<void>;
+  refresh: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -35,44 +66,52 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
 
       login: async (email, password) => {
-        const { token, user } = await api.login(email, password, 'student')
-        if (typeof window !== 'undefined') localStorage.setItem('edu-token', token)
-        set({ user, token, isAuthenticated: true })
-        return user
+        const { token, user } = await api.login(email, password, "student");
+        if (typeof window !== "undefined")
+          localStorage.setItem("edu-token", token);
+        set({ user, token, isAuthenticated: true });
+        return user;
       },
 
       register: async (data) => {
-        const { token, user } = await api.register(data)
-        if (typeof window !== 'undefined') localStorage.setItem('edu-token', token)
-        set({ user, token, isAuthenticated: true })
-        return user
+        const { token, user } = await api.register(data);
+        if (typeof window !== "undefined")
+          localStorage.setItem("edu-token", token);
+        set({ user, token, isAuthenticated: true });
+        return user;
       },
 
       logout: async () => {
-        try { await api.logout() } catch {}
-        if (typeof window !== 'undefined') localStorage.removeItem('edu-token')
-        set({ user: null, token: null, isAuthenticated: false })
+        try {
+          await api.logout();
+        } catch {}
+        if (typeof window !== "undefined") localStorage.removeItem("edu-token");
+        set({ user: null, token: null, isAuthenticated: false });
       },
 
       refresh: async () => {
         try {
-          const user = await api.me()
-          set({ user, isAuthenticated: true })
+          const user = await api.me();
+          set({ user, isAuthenticated: true });
         } catch {
-          if (typeof window !== 'undefined') localStorage.removeItem('edu-token')
-          set({ user: null, token: null, isAuthenticated: false })
+          if (typeof window !== "undefined")
+            localStorage.removeItem("edu-token");
+          set({ user: null, token: null, isAuthenticated: false });
         }
       },
     }),
-    { name: 'edu-auth' }
-  )
-)
+    {
+      name: "edu-auth",
+      storage: safeStorage,
+    },
+  ),
+);
 
 interface UIState {
-  sidebarOpen: boolean
-  setSidebarOpen: (v: boolean) => void
+  sidebarOpen: boolean;
+  setSidebarOpen: (v: boolean) => void;
 }
 export const useUIStore = create<UIState>((set) => ({
   sidebarOpen: true,
   setSidebarOpen: (v) => set({ sidebarOpen: v }),
-}))
+}));
