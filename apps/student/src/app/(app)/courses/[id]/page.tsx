@@ -733,193 +733,220 @@ interface QuizQuestion {
   correct: number;
 }
 
-// ─── Word Match Game ──────────────────────────────────────────────────────────
-interface WMPair { term: string; def: string }
+// ─── Practice: Kod To'ldirish O'yini ─────────────────────────────────────────
+interface FillItem {
+  task: string;
+  template: string;
+  options: string[];
+  correct: string;
+  lang: string;
+}
 
-const WM_DATA: Record<string, WMPair[]> = {
+const FILL_DATA: Record<string, FillItem[]> = {
   python: [
-    { term: "print()", def: "Ekranga matn chiqaradi" },
-    { term: "input()", def: "Foydalanuvchidan ma'lumot oladi" },
-    { term: "len()", def: "Uzunlikni qaytaradi" },
-    { term: "range()", def: "Ketma-ketlik yaratadi" },
-    { term: "def", def: "Funksiya e'lon qiladi" },
-    { term: "for", def: "Takrorlash tsikli" },
+    { task: 'Ekranga "Salom" chiqar', template: '___("Salom dunyo!")', options: ['print','input','len','range','def','return'], correct: 'print', lang: 'python' },
+    { task: '1 dan 10 gacha raqamlar', template: 'for i in ___(1, 11):\n    print(i)', options: ['range','list','len','print','input','enumerate'], correct: 'range', lang: 'python' },
+    { task: "Foydalanuvchidan ism ol", template: 'name = ___("Ismingiz: ")', options: ['input','print','len','str','get','read'], correct: 'input', lang: 'python' },
+    { task: "Ro'yxat uzunligi", template: 'n = ___([1, 2, 3, 4, 5])', options: ['len','count','size','range','max','sum'], correct: 'len', lang: 'python' },
+    { task: "Funksiya e'lon qil", template: '___ salom():\n    print("Hi")', options: ['def','func','class','return','lambda','call'], correct: 'def', lang: 'python' },
+    { task: "Musbat sonni tekshir", template: '___ x > 0:\n    print("Musbat")', options: ['if','for','while','def','elif','else'], correct: 'if', lang: 'python' },
   ],
   html: [
-    { term: "<h1>", def: "Asosiy sarlavha tegi" },
-    { term: "<p>", def: "Paragraf — matn bloki" },
-    { term: "<a>", def: "Havola — link" },
-    { term: "<img>", def: "Rasm qo'shish" },
-    { term: "<div>", def: "Blok element — bo'lim" },
-    { term: "<form>", def: "Kirish formasi" },
+    { task: "Asosiy sarlavha qo'sh", template: '<___>Mening Saytim</___>', options: ['h1','p','div','span','title','b'], correct: 'h1', lang: 'html' },
+    { task: "Havola (link) yaratish", template: '<___ href="https://google.com">Google</___>', options: ['a','link','href','nav','url','button'], correct: 'a', lang: 'html' },
+    { task: "Rasm qo'shish", template: '<___ src="rasm.jpg" alt="Rasm">', options: ['img','image','pic','src','photo','figure'], correct: 'img', lang: 'html' },
+    { task: "Paragraf yaratish", template: '<___>Bu matn paragraf</___>', options: ['p','div','span','text','body','section'], correct: 'p', lang: 'html' },
+    { task: "Tartibsiz ro'yxat", template: '<___>\n  <li>Element</li>\n</___>', options: ['ul','ol','li','list','menu','nav'], correct: 'ul', lang: 'html' },
+    { task: "Forma yaratish", template: '<___ method="POST">\n  ...\n</___>', options: ['form','input','div','section','body','table'], correct: 'form', lang: 'html' },
   ],
   css: [
-    { term: "color", def: "Matn rangini o'rnatadi" },
-    { term: "background", def: "Fon rangini o'rnatadi" },
-    { term: "font-size", def: "Shrift o'lchamini belgilaydi" },
-    { term: "margin", def: "Tashqi bo'sh joy" },
-    { term: "padding", def: "Ichki bo'sh joy" },
-    { term: "display", def: "Ko'rsatish usulini belgilaydi" },
+    { task: "Matn rangini qizil qil", template: 'p {\n  ___: red;\n}', options: ['color','background','fill','text-color','border','opacity'], correct: 'color', lang: 'css' },
+    { task: "Shrift o'lchamini 16px", template: 'h1 {\n  ___: 16px;\n}', options: ['font-size','size','text-size','font','width','height'], correct: 'font-size', lang: 'css' },
+    { task: "Fon rangini ko'k qil", template: 'div {\n  ___: blue;\n}', options: ['background','color','fill','bg','back','backdrop'], correct: 'background', lang: 'css' },
+    { task: "Matnni o'rtaga hizala", template: 'p {\n  ___: center;\n}', options: ['text-align','align','justify','center','position','float'], correct: 'text-align', lang: 'css' },
+    { task: "Tashqi bo'sh joy qo'sh", template: '.box {\n  ___: 10px;\n}', options: ['margin','padding','border','gap','space','offset'], correct: 'margin', lang: 'css' },
+    { task: "Ichki bo'sh joy qo'sh", template: '.card {\n  ___: 20px;\n}', options: ['padding','margin','border','gap','inner','space'], correct: 'padding', lang: 'css' },
   ],
   sql: [
-    { term: "SELECT", def: "Ma'lumotlarni tanlash" },
-    { term: "WHERE", def: "Shart qo'yish" },
-    { term: "INSERT", def: "Yangi qator qo'shish" },
-    { term: "UPDATE", def: "Ma'lumotni yangilash" },
-    { term: "DELETE", def: "Qatorni o'chirish" },
-    { term: "JOIN", def: "Jadvallarni birlashtirish" },
+    { task: "Barcha foydalanuvchilarni ol", template: '___ * FROM users;', options: ['SELECT','GET','FETCH','READ','FIND','SHOW'], correct: 'SELECT', lang: 'sql' },
+    { task: "Yoshga qarab filter", template: 'SELECT * FROM users\n___ age > 18;', options: ['WHERE','IF','WHEN','HAVING','FILTER','AND'], correct: 'WHERE', lang: 'sql' },
+    { task: "Yangi foydalanuvchi qo'sh", template: '___ INTO users (name)\nVALUES ("Ali");', options: ['INSERT','ADD','PUT','APPEND','CREATE','NEW'], correct: 'INSERT', lang: 'sql' },
+    { task: "Ma'lumotni yangilash", template: '___ users\nSET name="Vali"\nWHERE id=1;', options: ['UPDATE','CHANGE','MODIFY','SET','ALTER','EDIT'], correct: 'UPDATE', lang: 'sql' },
+    { task: "Foydalanuvchini o'chirish", template: '___ FROM users\nWHERE id=1;', options: ['DELETE','REMOVE','DROP','ERASE','CLEAR','DESTROY'], correct: 'DELETE', lang: 'sql' },
+    { task: "Natijalarni tartiblash", template: 'SELECT * FROM users\n___ BY name;', options: ['ORDER','SORT','GROUP','ARRANGE','RANK','ALIGN'], correct: 'ORDER', lang: 'sql' },
   ],
   algoritm: [
-    { term: "Algoritm", def: "Qadam-baqadam ko'rsatma" },
-    { term: "Tsikl", def: "Qayta-qayta bajariladigan blok" },
-    { term: "Shart", def: "if/else — yo'nalish tanlash" },
-    { term: "Rekursiya", def: "Funksiya o'zini o'zi chaqiradi" },
-    { term: "O(n)", def: "Chiziqli murakkablik" },
-    { term: "Massiv", def: "Tartibli elementlar to'plami" },
+    { task: "Shartli tarmoqlanish", template: '___ son > 0:\n    print("Musbat")', options: ['if','for','while','def','elif','switch'], correct: 'if', lang: 'python' },
+    { task: "Sonsiz tsikl", template: '___ True:\n    print("Davom")', options: ['while','for','loop','repeat','until','do'], correct: 'while', lang: 'python' },
+    { task: "Rekursiv chaqiruv", template: 'def factorial(n):\n    if n==0: return 1\n    return n * ___(n-1)', options: ['factorial','recursion','self','func','call','f'], correct: 'factorial', lang: 'python' },
+    { task: "Ro'yxatga element qo'shish", template: 'lst = [1,2,3]\nlst.___(4)', options: ['append','add','push','insert','extend','put'], correct: 'append', lang: 'python' },
+    { task: "Massivni saralash", template: 'lst = [3,1,2]\nlst.___() ', options: ['sort','order','arrange','rank','sorted','reverse'], correct: 'sort', lang: 'python' },
+    { task: "Ikki ro'yxat birlashmasi", template: 'a = [1,2]\nb = [3,4]\nc = a ___ b', options: ['+','-','*','/','&','|'], correct: '+', lang: 'python' },
   ],
   internet: [
-    { term: "HTTP", def: "Web sahifalar uzatish protokoli" },
-    { term: "URL", def: "Veb manzil" },
-    { term: "DNS", def: "Domen → IP tarjimasi" },
-    { term: "IP", def: "Internet protokol manzil" },
-    { term: "Router", def: "Tarmoq yo'naltiruvchi qurilma" },
-    { term: "HTTPS", def: "Xavfsiz shifrlangan protokol" },
+    { task: "Ma'lumot olish so'rovi", template: '___ /api/users HTTP/1.1', options: ['GET','POST','PUT','DELETE','PATCH','FETCH'], correct: 'GET', lang: 'http' },
+    { task: "Yangi ma'lumot yuborish", template: '___ /api/users HTTP/1.1\n{"name": "Ali"}', options: ['POST','GET','PUT','SEND','PUSH','SUBMIT'], correct: 'POST', lang: 'http' },
+    { task: "Xavfsiz web protokol", template: '___://www.google.com', options: ['https','http','ftp','ssh','smtp','tcp'], correct: 'https', lang: 'url' },
+    { task: "URL parametr belgisi", template: 'https://site.com/search___q=python', options: ['?','&','=','#','/','@'], correct: '?', lang: 'url' },
+    { task: "JWT token sarlavhasi", template: 'Authorization: ___ eyJhbG...', options: ['Bearer','Token','Basic','Auth','JWT','Key'], correct: 'Bearer', lang: 'http' },
+    { task: "HTTPS standart porti", template: 'https://site.com:___/page', options: ['443','80','8080','3000','22','21'], correct: '443', lang: 'url' },
   ],
   xavfsizlik: [
-    { term: "Phishing", def: "Aldov yo'li bilan ma'lumot o'g'irlash" },
-    { term: "Firewall", def: "Tarmoqni himoya qiluvchi to'siq" },
-    { term: "Encryption", def: "Ma'lumotni shifrlash" },
-    { term: "2FA", def: "Ikki bosqichli autentifikatsiya" },
-    { term: "Malware", def: "Zararli dasturiy ta'minot" },
-    { term: "VPN", def: "Virtual xususiy tarmoq" },
+    { task: "Parolni hashlash", template: 'import ___\nhashlib.sha256(b"parol")', options: ['hashlib','crypto','security','bcrypt','encrypt','hash'], correct: 'hashlib', lang: 'python' },
+    { task: "SQL Injection himoyasi", template: 'cursor.execute(\n  "SELECT * FROM u WHERE id=___",\n  (uid,)\n)', options: ['%s','id','?',"'",'var','num'], correct: '%s', lang: 'python' },
+    { task: "XSS himoyasi (HTML)", template: '<p>{{ user.name | ___ }}</p>', options: ['escape','safe','encode','filter','sanitize','clean'], correct: 'escape', lang: 'html' },
+    { task: "Cookie xavfsizlik atributi", template: 'Set-Cookie: id=1; ___; HttpOnly', options: ['Secure','Safe','HTTPS','Private','Encrypted','Auth'], correct: 'Secure', lang: 'http' },
+    { task: "HTTPS porti", template: 'firewall allow ___/tcp', options: ['443','80','22','8080','3000','21'], correct: '443', lang: 'bash' },
+    { task: "Ikki bosqichli tekshiruv", template: 'require_2fa = ___', options: ['True','False','None','1','0','true'], correct: 'True', lang: 'python' },
   ],
   kompyuter: [
-    { term: "CPU", def: "Markaziy protsessor — 'miya'" },
-    { term: "RAM", def: "Tezkor xotira — vaqtincha saqlash" },
-    { term: "SSD", def: "Tez elektron qattiq disk" },
-    { term: "GPU", def: "Grafik protsessor" },
-    { term: "BIOS", def: "Asosiy kiritish-chiqarish tizimi" },
-    { term: "USB", def: "Universal ketma-ket shinasi" },
+    { task: "1 Kilobayt = necha bayt", template: '1 KB = ___ bytes', options: ['1024','1000','512','2048','256','4096'], correct: '1024', lang: 'units' },
+    { task: "Python: butun son bo'linma", template: '10 ___ 3  # natija: 3', options: ['//','/',  '%','**','+','-'], correct: '//', lang: 'python' },
+    { task: "ASCII: 'A' harfining kodi", template: 'ord("A") == ___', options: ['65','97','64','66','48','90'], correct: '65', lang: 'python' },
+    { task: "Hex rangda qizil", template: 'color: #___0000', options: ['ff','00','AA','CC','EE','11'], correct: 'ff', lang: 'css' },
+    { task: "Bit operatsiyasi VA", template: '0b1010 ___ 0b1100 = 0b1000', options: ['&','|','^','~','<<','>>'], correct: '&', lang: 'python' },
+    { task: "1 Megabayt = necha Kilobayt", template: '1 MB = ___ KB', options: ['1024','1000','512','2048','256','4096'], correct: '1024', lang: 'units' },
   ],
   word: [
-    { term: "Font", def: "Matn turi va ko'rinishi" },
-    { term: "Paragraph", def: "Matn bloki — abzats" },
-    { term: "Table", def: "Jadval — qatorlar va ustunlar" },
-    { term: "Header", def: "Sahifa sarlavhasi yuqori qismi" },
-    { term: "Footer", def: "Sahifa pastki qismi" },
-    { term: "Indent", def: "Qatorni ichkariga siljitish" },
+    { task: "Matnni qalin qilish", template: 'Ctrl + ___ → Bold', options: ['B','I','U','F','G','D'], correct: 'B', lang: 'shortcut' },
+    { task: "Matnni kursiv qilish", template: 'Ctrl + ___ → Italic', options: ['I','B','U','E','K','L'], correct: 'I', lang: 'shortcut' },
+    { task: "Hujjatni saqlash", template: 'Ctrl + ___ → Save', options: ['S','A','D','W','F','P'], correct: 'S', lang: 'shortcut' },
+    { task: "Matnni o'rtaga hizalash", template: 'Home → Paragraph → ___', options: ['Center','Left','Right','Justify','Align','Middle'], correct: 'Center', lang: 'word' },
+    { task: "Jadval qo'shish yo'li", template: 'Insert → ___ → qatorlar/ustunlar', options: ['Table','Grid','Matrix','Frame','Cell','Row'], correct: 'Table', lang: 'word' },
+    { task: "Nusxalash", template: 'Ctrl + ___ → Copy', options: ['C','V','X','Z','A','B'], correct: 'C', lang: 'shortcut' },
   ],
   excel: [
-    { term: "Cell", def: "Katakcha — jadval yacheykasi" },
-    { term: "Formula", def: "Hisoblash ifodasi (=...)" },
-    { term: "=SUM()", def: "Yig'indi hisoblash funksiyasi" },
-    { term: "=IF()", def: "Shartli funksiya" },
-    { term: "Chart", def: "Diagramma yoki grafik" },
-    { term: "Filter", def: "Ma'lumotlarni filtrlash" },
+    { task: "Yig'indi formula", template: '=___(A1:A10)', options: ['SUM','ADD','TOTAL','PLUS','COUNT','AVG'], correct: 'SUM', lang: 'excel' },
+    { task: "O'rtacha qiymat", template: '=___(B1:B5)', options: ['AVERAGE','MEAN','AVG','MID','SUM','CENTER'], correct: 'AVERAGE', lang: 'excel' },
+    { task: "Eng katta qiymat", template: '=___(C1:C10)', options: ['MAX','LARGE','HIGH','TOP','PEAK','MIN'], correct: 'MAX', lang: 'excel' },
+    { task: "Shartli funksiya", template: '=___(A1>0, "Ha", "Yo\'q")', options: ['IF','WHEN','CASE','SWITCH','IFF','COND'], correct: 'IF', lang: 'excel' },
+    { task: "Katakchalar soni", template: '=___(A1:A10)', options: ['COUNT','NUMBER','LEN','SIZE','TOTAL','SUM'], correct: 'COUNT', lang: 'excel' },
+    { task: "Matnni katta harfga", template: '=___(A1)', options: ['UPPER','CAPS','BIG','LARGE','UP','CAPITAL'], correct: 'UPPER', lang: 'excel' },
   ],
   operatsion: [
-    { term: "OS", def: "Operatsion tizim" },
-    { term: "Process", def: "Ishlaydigan dastur jarayoni" },
-    { term: "Driver", def: "Qurilma boshqaruv dasturi" },
-    { term: "File System", def: "Fayllarni tashkil etish tizimi" },
-    { term: "Terminal", def: "Buyruq qatori interfeysi" },
-    { term: "Kernel", def: "OS ning asosiy yadrosi" },
+    { task: "Fayl nusxalash (Linux)", template: '___ file.txt /backup/', options: ['cp','mv','rm','ls','cat','cd'], correct: 'cp', lang: 'bash' },
+    { task: "Fayl o'chirish (Linux)", template: '___ -f file.txt', options: ['rm','del','cp','mv','ls','cat'], correct: 'rm', lang: 'bash' },
+    { task: "Papka ro'yxatini ko'rish", template: '___ -la /home/', options: ['ls','dir','cd','pwd','cat','show'], correct: 'ls', lang: 'bash' },
+    { task: "Papkaga o'tish", template: '___ /home/user/docs', options: ['cd','go','mv','ls','dir','open'], correct: 'cd', lang: 'bash' },
+    { task: "Fayl mazmunini ko'rish", template: '___ README.txt', options: ['cat','read','open','show','print','view'], correct: 'cat', lang: 'bash' },
+    { task: "Joriy papka yo'li", template: '___ # /home/user', options: ['pwd','ls','cd','dir','path','where'], correct: 'pwd', lang: 'bash' },
   ],
   tarmoq: [
-    { term: "LAN", def: "Mahalliy hududiy tarmoq" },
-    { term: "WAN", def: "Keng hududiy tarmoq" },
-    { term: "MAC", def: "Qurilmaning fizik manzili" },
-    { term: "Switch", def: "Tarmoq kommutatori" },
-    { term: "Bandwidth", def: "Tarmoq o'tkazish quvvati" },
-    { term: "Ping", def: "Tarmoq kechikishini o'lchaydi" },
+    { task: "Tarmoq ulanishini tekshirish", template: '___ google.com', options: ['ping','check','test','trace','curl','nmap'], correct: 'ping', lang: 'bash' },
+    { task: "HTTP so'rov yuborish", template: '___ https://api.site.com/users', options: ['curl','wget','fetch','get','request','http'], correct: 'curl', lang: 'bash' },
+    { task: "IP manzilni ko'rish (Linux)", template: '___ addr show', options: ['ip','ifconfig','net','addr','show','route'], correct: 'ip', lang: 'bash' },
+    { task: "Fayl yuklab olish", template: '___ https://site.com/file.zip', options: ['wget','curl','download','get','fetch','pull'], correct: 'wget', lang: 'bash' },
+    { task: "Ochiq portlarni ko'rish", template: '___ -l', options: ['netstat','ports','ss','lsof','ip','ifconfig'], correct: 'netstat', lang: 'bash' },
+    { task: "DNS so'rov", template: '___ google.com', options: ['nslookup','dig','dns','resolve','host','lookup'], correct: 'nslookup', lang: 'bash' },
   ],
 };
 
-function getWMPairs(title: string): WMPair[] {
+function getFillItems(title: string): FillItem[] {
   const t = title.toLowerCase();
-  for (const [key, pairs] of Object.entries(WM_DATA)) {
-    if (t.includes(key)) return pairs;
+  for (const [key, items] of Object.entries(FILL_DATA)) {
+    if (t.includes(key)) return items;
   }
-  return WM_DATA.kompyuter;
+  return FILL_DATA.python;
 }
 
-function WordMatchGame({ lesson }: { lesson: any }) {
-  const pairs = getWMPairs(lesson?.title || "");
-  const [shuffledDefs, setShuffledDefs] = useState<{ text: string; idx: number }[]>([]);
-  const [selTerm, setSelTerm] = useState<number | null>(null);
-  const [matched, setMatched] = useState<Set<number>>(new Set());
-  const [wrongFlash, setWrongFlash] = useState<{ term: number; def: number } | null>(null);
-  const [score, setScore] = useState(0);
-  const [errors, setErrors] = useState(0);
-  const [secs, setSecs] = useState(0);
-  const [finished, setFinished] = useState(false);
+const LANG_META: Record<string, { file: string; badge: string; badgeCls: string }> = {
+  python:   { file: 'main.py',     badge: 'Python',   badgeCls: 'bg-sky-500/10 text-sky-400 border-sky-500/20' },
+  html:     { file: 'index.html',  badge: 'HTML',     badgeCls: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
+  css:      { file: 'style.css',   badge: 'CSS',      badgeCls: 'bg-violet-500/10 text-violet-400 border-violet-500/20' },
+  sql:      { file: 'query.sql',   badge: 'SQL',      badgeCls: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
+  bash:     { file: 'terminal',    badge: 'Bash',     badgeCls: 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20' },
+  http:     { file: 'request',     badge: 'HTTP',     badgeCls: 'bg-rose-500/10 text-rose-400 border-rose-500/20' },
+  url:      { file: 'url',         badge: 'URL',      badgeCls: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20' },
+  json:     { file: 'data.json',   badge: 'JSON',     badgeCls: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
+  excel:    { file: 'sheet.xlsx',  badge: 'Excel',    badgeCls: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
+  word:     { file: 'doc.docx',    badge: 'Word',     badgeCls: 'bg-sky-500/10 text-sky-400 border-sky-500/20' },
+  shortcut: { file: 'shortcut',    badge: 'Shortcut', badgeCls: 'bg-violet-500/10 text-violet-400 border-violet-500/20' },
+  units:    { file: 'units',       badge: 'Units',    badgeCls: 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20' },
+  binary:   { file: 'binary',      badge: 'Binary',   badgeCls: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
+};
 
-  const initGame = (prs: WMPair[]) => {
-    const defs = prs.map((p, i) => ({ text: p.def, idx: i }));
-    defs.sort(() => Math.random() - 0.5);
-    setShuffledDefs(defs);
-    setSelTerm(null);
-    setMatched(new Set());
-    setWrongFlash(null);
-    setScore(0);
-    setErrors(0);
-    setSecs(0);
-    setFinished(false);
+function PracticeGame({ lesson }: { lesson: any }) {
+  const items = getFillItems(lesson?.title || "");
+  const [qIdx, setQIdx] = useState(0);
+  const [score, setScore] = useState(0);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [answered, setAnswered] = useState(false);
+  const [elapsed, setElapsed] = useState(0);
+  const [finished, setFinished] = useState(false);
+  const [errors, setErrors] = useState(0);
+  const [streak, setStreak] = useState(0);
+  const [timerSecs, setTimerSecs] = useState(10);
+  const [showXP, setShowXP] = useState<number | null>(null);
+
+  const current = items[qIdx];
+
+  const resetGame = () => {
+    setQIdx(0); setScore(0); setSelected(null); setAnswered(false);
+    setElapsed(0); setFinished(false); setErrors(0); setStreak(0);
+    setTimerSecs(10); setShowXP(null);
   };
 
-  useEffect(() => { initGame(pairs); }, [lesson?.id]);
+  useEffect(() => { resetGame(); }, [lesson?.id]);
 
   useEffect(() => {
     if (finished) return;
-    const t = setInterval(() => setSecs((s) => s + 1), 1000);
+    const t = setInterval(() => setElapsed(s => s + 1), 1000);
     return () => clearInterval(t);
   }, [finished]);
 
-  const handleTerm = (i: number) => {
-    if (matched.has(i) || finished) return;
-    setSelTerm(i === selTerm ? null : i);
-  };
+  useEffect(() => {
+    if (answered || finished) return;
+    setTimerSecs(10);
+    const t = setInterval(() => setTimerSecs(s => Math.max(0, s - 1)), 1000);
+    return () => clearInterval(t);
+  }, [qIdx, answered, finished]);
 
-  const handleDef = (d: { text: string; idx: number }) => {
-    if (matched.has(d.idx) || selTerm === null || finished) return;
-    if (d.idx === selTerm) {
-      const newMatched = new Set(matched);
-      newMatched.add(selTerm);
-      setMatched(newMatched);
-      setScore((s) => s + 1);
-      setSelTerm(null);
-      if (newMatched.size === pairs.length) setFinished(true);
+  useEffect(() => {
+    if (timerSecs === 0 && !answered && !finished) pickAnswer("__TIMEOUT__");
+  }, [timerSecs]);
+
+  const pickAnswer = (opt: string) => {
+    if (answered || finished) return;
+    setSelected(opt);
+    setAnswered(true);
+    const ok = opt === current.correct;
+    if (ok) {
+      const xp = 10 + Math.max(0, timerSecs - 2) + (streak >= 2 ? 5 : 0);
+      setScore(s => s + xp);
+      setStreak(s => s + 1);
+      setShowXP(xp);
     } else {
-      setErrors((e) => e + 1);
-      setWrongFlash({ term: selTerm, def: d.idx });
-      setTimeout(() => { setWrongFlash(null); setSelTerm(null); }, 700);
+      setErrors(e => e + 1);
+      setStreak(0);
     }
+    setTimeout(() => {
+      setShowXP(null);
+      if (qIdx + 1 >= items.length) { setFinished(true); }
+      else { setQIdx(i => i + 1); setSelected(null); setAnswered(false); }
+    }, ok ? 900 : 1400);
   };
 
-  const timeStr = `${Math.floor(secs / 60).toString().padStart(2, "0")}:${(secs % 60).toString().padStart(2, "0")}`;
-  const pct = pairs.length ? Math.round((score / pairs.length) * 100) : 0;
-  const xpEarned = Math.max(5, 20 - errors * 2);
+  const elapsedStr = `${Math.floor(elapsed / 60).toString().padStart(2, "0")}:${(elapsed % 60).toString().padStart(2, "0")}`;
+  const pct = Math.round((qIdx / items.length) * 100);
+  const timerPct = (timerSecs / 10) * 100;
+  const stars = errors === 0 ? 3 : errors <= 2 ? 2 : 1;
+  const xpEarned = Math.min(score, 40);
+  const meta = LANG_META[current?.lang] || LANG_META.python;
 
   if (finished) {
     return (
-      <div className="text-center py-10 animate-scale-in">
-        <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto mb-4 animate-bounce-once">
-          <Trophy className="w-7 h-7 text-emerald-400" />
+      <div className="text-center py-8 animate-scale-in">
+        <div className="flex justify-center gap-2 mb-4">
+          {[1, 2, 3].map(s => (
+            <span key={s} className={`text-2xl ${s <= stars ? "animate-bounce-once" : "opacity-20"}`}
+              style={{ animationDelay: `${s * 120}ms`, animationFillMode: "backwards" }}>⭐</span>
+          ))}
         </div>
-        <div className="text-3xl font-bold text-base-100 mb-1">
-          {score}/{pairs.length}
-        </div>
-        <p className="text-sm text-base-500 mb-1">
-          Vaqt: {timeStr} · Xatolar: {errors}
-        </p>
-        <div className="badge-amber inline-flex text-sm animate-bounce-once mb-5">
-          +{xpEarned} XP
-        </div>
+        <div className="text-3xl font-bold text-base-100 mb-1 tabular-nums">{score} ball</div>
+        <p className="text-sm text-base-500 mb-1">{items.length} ta topshiriq · {errors} xato · {elapsedStr}</p>
+        <div className="badge-amber inline-flex text-sm animate-bounce-once my-3">+{xpEarned} XP</div>
         <div>
-          <button
-            onClick={() => initGame(pairs)}
-            className="btn-secondary text-xs px-6 hover:scale-[1.02] active:scale-[0.98] transition-transform"
-          >
+          <button onClick={resetGame} className="btn-secondary text-xs px-6 hover:scale-[1.02] active:scale-[0.98] transition-transform">
             Qayta o'ynash
           </button>
         </div>
@@ -927,98 +954,110 @@ function WordMatchGame({ lesson }: { lesson: any }) {
     );
   }
 
+  const renderCode = (template: string) => {
+    const parts = template.split("___");
+    return parts.map((part, i) => (
+      <span key={i}>
+        <span className="text-base-300">{part}</span>
+        {i < parts.length - 1 && (
+          <span className={`inline-block min-w-[56px] text-center rounded-md px-2 mx-0.5 font-semibold transition-all duration-400
+            ${answered && selected === current.correct
+              ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
+              : answered
+                ? "bg-rose-500/20 text-rose-300 border border-rose-500/40"
+                : "bg-accent-600/20 text-accent-400 border border-accent-600/40 border-dashed"
+            }`}>
+            {answered ? current.correct : "?"}
+          </span>
+        )}
+      </span>
+    ));
+  };
+
   return (
     <div className="animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <Trophy className="w-4 h-4 text-amber-400" />
-          <span className="text-xs font-semibold text-base-200">So'z Juftlashtirish</span>
+          <Code2 className="w-4 h-4 text-sky-400" />
+          <span className="text-xs font-semibold text-base-200">Kod Amaliyoti</span>
+          {streak >= 2 && (
+            <span className="badge bg-amber-500/10 border-amber-500/20 text-amber-400 text-xs animate-bounce-once">
+              🔥 {streak}x
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-3 text-xs">
-          <span className="text-base-600 code-font">{timeStr}</span>
-          {errors > 0 && <span className="text-rose-500">{errors} xato</span>}
-          <span className="text-base-500">{score}/{pairs.length}</span>
+          <span className="text-base-600 code-font">{elapsedStr}</span>
+          <span className="font-semibold text-base-200 tabular-nums">{score} ball</span>
+          <span className="text-base-500">{qIdx + 1}/{items.length}</span>
         </div>
       </div>
 
-      {/* Progress bar */}
-      <div className="progress-bar mb-4">
-        <div className="progress-fill" style={{ width: `${pct}%` }} />
+      {/* Savol progressi */}
+      <div className="progress-bar mb-2">
+        <div className="progress-fill transition-all duration-500" style={{ width: `${pct}%` }} />
       </div>
 
-      <p className="text-xs text-base-600 mb-3 text-center">
-        Atamani bosing → keyin uning ta'rifini toping
-      </p>
+      {/* Vaqt progressi */}
+      <div className="h-1 bg-[#1A1A1F] rounded-full mb-4 overflow-hidden">
+        <div className={`h-full rounded-full transition-all duration-1000 linear
+          ${timerSecs <= 3 ? "bg-rose-500" : timerSecs <= 6 ? "bg-amber-500" : "bg-sky-500"}`}
+          style={{ width: `${timerPct}%` }} />
+      </div>
 
-      {/* Game columns */}
-      <div className="grid grid-cols-2 gap-3">
-        {/* Terms */}
-        <div className="space-y-2">
-          <p className="text-xs text-center text-base-700 mb-1 uppercase tracking-wider">
-            Atamalar
-          </p>
-          {pairs.map((p, i) => {
-            const isMatched = matched.has(i);
-            const isSel = selTerm === i;
-            const isWrong = wrongFlash?.term === i;
-            return (
-              <button
-                key={i}
-                onClick={() => handleTerm(i)}
-                disabled={isMatched}
-                className={`w-full text-left px-3 py-2.5 rounded-xl text-xs border transition-all duration-200 font-medium
-                  ${isMatched
-                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400 cursor-default"
-                    : isWrong
-                      ? "bg-rose-500/10 border-rose-500/40 text-rose-400 animate-shake"
-                      : isSel
-                        ? "bg-accent-600/15 border-accent-500/50 text-accent-300 shadow-[0_0_12px_rgba(124,58,237,0.25)] scale-[1.02]"
-                        : "border-[#27272A] text-base-300 hover:border-[#3F3F46] hover:bg-[#1A1A1F] hover:text-base-100 active:scale-[0.98]"
-                  }`}
-              >
-                {isMatched && <span className="mr-1">✓</span>}
-                <span className="code-font">{p.term}</span>
-              </button>
-            );
-          })}
+      {/* Topshiriq */}
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-xs text-base-600">Topshiriq:</span>
+        <span className="text-xs font-medium text-base-100">{current.task}</span>
+        <span className="ml-auto text-xs text-base-700 tabular-nums">⏱ {timerSecs}s</span>
+      </div>
+
+      {/* Kod bloki */}
+      <div className="bg-[#0A0A0D] rounded-xl border border-[#1E1E24] overflow-hidden mb-4 shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
+        <div className="flex items-center justify-between px-4 py-2.5 border-b border-[#1E1E24] bg-[#0D0D10]">
+          <div className="flex items-center gap-1.5">
+            <div className="w-3 h-3 rounded-full bg-[#FF5F57]" />
+            <div className="w-3 h-3 rounded-full bg-[#FEBC2E]" />
+            <div className="w-3 h-3 rounded-full bg-[#28C840]" />
+          </div>
+          <span className="text-xs text-base-700 code-font">{meta.file}</span>
+          <span className={`badge text-xs border ${meta.badgeCls}`}>{meta.badge}</span>
         </div>
-
-        {/* Definitions */}
-        <div className="space-y-2">
-          <p className="text-xs text-center text-base-700 mb-1 uppercase tracking-wider">
-            Ta'riflar
-          </p>
-          {shuffledDefs.map((d, si) => {
-            const isMatched = matched.has(d.idx);
-            const isWrong = wrongFlash?.def === d.idx;
-            return (
-              <button
-                key={si}
-                onClick={() => handleDef(d)}
-                disabled={isMatched}
-                className={`w-full text-left px-3 py-2.5 rounded-xl text-xs border transition-all duration-200
-                  ${isMatched
-                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400 cursor-default"
-                    : isWrong
-                      ? "bg-rose-500/10 border-rose-500/40 text-rose-400 animate-shake"
-                      : selTerm !== null
-                        ? "border-[#27272A] text-base-300 hover:border-accent-500/40 hover:bg-accent-600/5 hover:text-base-100 cursor-pointer"
-                        : "border-[#27272A] text-base-500 cursor-default opacity-50"
-                  }`}
-              >
-                {isMatched && <span className="mr-1 text-emerald-400">✓</span>}
-                {d.text}
-              </button>
-            );
-          })}
+        <div className="p-5">
+          <pre className="text-sm code-font leading-relaxed whitespace-pre-wrap">
+            {renderCode(current.template)}
+          </pre>
         </div>
       </div>
 
-      {selTerm !== null && (
-        <p className="text-xs text-center text-accent-500 mt-3 animate-fade-in">
-          "<span className="text-accent-300 font-medium code-font">{pairs[selTerm].term}</span>" tanlandi — ta'rifini toping
-        </p>
+      {/* Variant tugmalari */}
+      <div className="grid grid-cols-3 gap-2">
+        {current.options.map((opt, i) => {
+          const isCorrect = opt === current.correct;
+          const isSelected = selected === opt;
+          return (
+            <button key={i} onClick={() => pickAnswer(opt)} disabled={answered}
+              className={`px-3 py-3 rounded-xl text-sm code-font font-semibold border transition-all duration-300
+                ${answered
+                  ? isCorrect
+                    ? "bg-emerald-500/15 border-emerald-500/50 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.2)]"
+                    : isSelected
+                      ? "bg-rose-500/10 border-rose-500/30 text-rose-400 animate-shake"
+                      : "border-[#1A1A1F] text-base-700 opacity-30"
+                  : "border-[#27272A] text-base-200 hover:border-accent-500/60 hover:bg-accent-600/10 hover:text-accent-300 active:scale-[0.96] cursor-pointer"
+                }`}>
+              {opt}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* XP animatsiya */}
+      {showXP !== null && (
+        <div className="text-center mt-3 animate-bounce-once">
+          <span className="badge-amber text-sm">+{showXP} XP</span>
+        </div>
       )}
     </div>
   );
@@ -1503,10 +1542,10 @@ export default function CourseDetailPage() {
                   </div>
                 )}
 
-                {/* Practice — Word Match Game */}
+                {/* Practice — Kod To'ldirish O'yini */}
                 {currentLesson.type === "practice" && !quizActive && (
-                  <div className="mb-4 bg-[#0D0D10] rounded-xl border border-[#1E1E24] p-4 animate-fade-in">
-                    <WordMatchGame lesson={currentLesson} />
+                  <div className="mb-4 bg-[#0D0D10] rounded-xl border border-[#1E1E24] p-5 animate-fade-in">
+                    <PracticeGame lesson={currentLesson} />
                   </div>
                 )}
 
