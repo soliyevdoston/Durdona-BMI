@@ -1,120 +1,307 @@
-'use client'
-import { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { useParams } from 'next/navigation'
+"use client";
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 import {
-  ChevronLeft, Play, Lock, CheckCircle2, Clock, BookOpen,
-  Code2, FileQuestion, FileText, Brain, X, SkipForward,
-  Map, ArrowRight, Sparkles, Download, Paperclip, FileDown
-} from 'lucide-react'
-import { api } from '@/lib/api'
-import { useApi } from '@/lib/useApi'
-import { getDifficultyColor, getDifficultyLabel } from '@/lib/utils'
+  ChevronLeft,
+  Play,
+  Lock,
+  CheckCircle2,
+  Clock,
+  BookOpen,
+  Code2,
+  FileQuestion,
+  FileText,
+  Brain,
+  X,
+  SkipForward,
+  Map,
+  ArrowRight,
+  Sparkles,
+  Download,
+  Paperclip,
+  FileDown,
+} from "lucide-react";
+import { api } from "@/lib/api";
+import { useApi } from "@/lib/useApi";
+import { getDifficultyColor, getDifficultyLabel } from "@/lib/utils";
 
-const TYPE_ICON: Record<string, any> = { video: Play, text: FileText, quiz: FileQuestion, practice: Code2 }
-const TYPE_LABEL: Record<string, string> = { video: 'Video', text: 'Matn', quiz: 'Test', practice: 'Amaliyot' }
-const TYPE_COLOR: Record<string, string> = { video: 'text-base-500', text: 'text-base-500', quiz: 'text-base-500', practice: 'text-base-500' }
+const TYPE_ICON: Record<string, any> = {
+  video: Play,
+  text: FileText,
+  quiz: FileQuestion,
+  practice: Code2,
+};
+const TYPE_LABEL: Record<string, string> = {
+  video: "Video",
+  text: "Matn",
+  quiz: "Test",
+  practice: "Amaliyot",
+};
+const TYPE_COLOR: Record<string, string> = {
+  video: "text-base-500",
+  text: "text-base-500",
+  quiz: "text-base-500",
+  practice: "text-base-500",
+};
 
 // ─── Knowledge Space Theory — Diagnostic Questions ──────────────────────────
 const DIAG_QUESTIONS = [
-  { id: 1, lessonIdx: 0, topic: "Kompyuter asoslari",
+  {
+    id: 1,
+    lessonIdx: 0,
+    topic: "Kompyuter asoslari",
     q: "CPU — kompyuterning qaysi qismi?",
     options: ["Xotira (RAM)", "Markaziy protsessor", "Qattiq disk", "Ekran"],
-    correct: 1 },
-  { id: 2, lessonIdx: 1, topic: "Operatsion tizim",
+    correct: 1,
+  },
+  {
+    id: 2,
+    lessonIdx: 1,
+    topic: "Operatsion tizim",
     q: "Windows, MacOS, Linux — bular nima?",
-    options: ["Dasturlash tillari", "Operatsion tizimlar", "Antiviruslar", "Brauzerlar"],
-    correct: 1 },
-  { id: 3, lessonIdx: 2, topic: "Ofis dasturlari",
+    options: [
+      "Dasturlash tillari",
+      "Operatsion tizimlar",
+      "Antiviruslar",
+      "Brauzerlar",
+    ],
+    correct: 1,
+  },
+  {
+    id: 3,
+    lessonIdx: 2,
+    topic: "Ofis dasturlari",
     q: "MS Excel asosan nima uchun ishlatiladi?",
-    options: ["Taqdimot yaratish", "Elektron jadvallar bilan ishlash", "Rasmlar tahrirlash", "Video montaj"],
-    correct: 1 },
-  { id: 4, lessonIdx: 3, topic: "Algoritmlar",
+    options: [
+      "Taqdimot yaratish",
+      "Elektron jadvallar bilan ishlash",
+      "Rasmlar tahrirlash",
+      "Video montaj",
+    ],
+    correct: 1,
+  },
+  {
+    id: 4,
+    lessonIdx: 3,
+    topic: "Algoritmlar",
     q: "Algoritm deganda nimani tushunasiz?",
-    options: ["Kompyuter tili", "Muammoni yechishning qadam-baqadam ko'rsatmasi", "Dastur nomi", "Internet manzili"],
-    correct: 1 },
-  { id: 5, lessonIdx: 4, topic: "Dasturlash",
+    options: [
+      "Kompyuter tili",
+      "Muammoni yechishning qadam-baqadam ko'rsatmasi",
+      "Dastur nomi",
+      "Internet manzili",
+    ],
+    correct: 1,
+  },
+  {
+    id: 5,
+    lessonIdx: 4,
+    topic: "Dasturlash",
     q: "Python'da 'print' buyrug'i nima qiladi?",
-    options: ["Faylni chop etadi", "Ekranga matn chiqaradi", "Dasturni o'chiradi", "Rasm chizadi"],
-    correct: 1 },
-  { id: 6, lessonIdx: 5, topic: "Internet",
+    options: [
+      "Faylni chop etadi",
+      "Ekranga matn chiqaradi",
+      "Dasturni o'chiradi",
+      "Rasm chizadi",
+    ],
+    correct: 1,
+  },
+  {
+    id: 6,
+    lessonIdx: 5,
+    topic: "Internet",
     q: "www.google.com — bu nima?",
-    options: ["IP manzil", "Veb-sayt manzili (URL)", "Elektron pochta", "Fayl nomi"],
-    correct: 1 },
-  { id: 7, lessonIdx: 6, topic: "Xavfsizlik",
+    options: [
+      "IP manzil",
+      "Veb-sayt manzili (URL)",
+      "Elektron pochta",
+      "Fayl nomi",
+    ],
+    correct: 1,
+  },
+  {
+    id: 7,
+    lessonIdx: 6,
+    topic: "Xavfsizlik",
     q: "Kuchli parol qanday bo'lishi kerak?",
-    options: ["Tug'ilgan sanangiz", "Faqat raqamlar", "Harf, raqam va belgilar aralashmasi", "Ismingiz"],
-    correct: 2 },
-  { id: 8, lessonIdx: 7, topic: "Ma'lumotlar bazasi",
+    options: [
+      "Tug'ilgan sanangiz",
+      "Faqat raqamlar",
+      "Harf, raqam va belgilar aralashmasi",
+      "Ismingiz",
+    ],
+    correct: 2,
+  },
+  {
+    id: 8,
+    lessonIdx: 7,
+    topic: "Ma'lumotlar bazasi",
     q: "SQL qanday til?",
-    options: ["Dasturlash tili", "Ma'lumotlar bazasi so'rov tili", "Tarmoq protokoli", "Operatsion tizim"],
-    correct: 1 },
-  { id: 9, lessonIdx: 8, topic: "Web texnologiyalar",
+    options: [
+      "Dasturlash tili",
+      "Ma'lumotlar bazasi so'rov tili",
+      "Tarmoq protokoli",
+      "Operatsion tizim",
+    ],
+    correct: 1,
+  },
+  {
+    id: 9,
+    lessonIdx: 8,
+    topic: "Web texnologiyalar",
     q: "HTML nima uchun ishlatiladi?",
-    options: ["Veb-sahifa tuzilmasini yaratish", "Rasmlarni tahrirlash", "Dastur yozish", "Tarmoq sozlash"],
-    correct: 0 },
-  { id: 10, lessonIdx: 9, topic: "Umumiy informatika",
+    options: [
+      "Veb-sahifa tuzilmasini yaratish",
+      "Rasmlarni tahrirlash",
+      "Dastur yozish",
+      "Tarmoq sozlash",
+    ],
+    correct: 0,
+  },
+  {
+    id: 10,
+    lessonIdx: 9,
+    topic: "Umumiy informatika",
     q: "Bit va bayt nisbati qanday?",
-    options: ["1 bayt = 4 bit", "1 bayt = 8 bit", "1 bayt = 16 bit", "1 bayt = 2 bit"],
-    correct: 1 },
-]
+    options: [
+      "1 bayt = 4 bit",
+      "1 bayt = 8 bit",
+      "1 bayt = 16 bit",
+      "1 bayt = 2 bit",
+    ],
+    correct: 1,
+  },
+];
 
 // ─── YouTube URL → embed URL ─────────────────────────────────────────────────
 function getYouTubeId(url: string): string | null {
-  if (!url) return null
-  const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^?&\n]{11})/)
-  return m ? m[1] : null
+  if (!url) return null;
+  const m = url.match(
+    /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^?&\n]{11})/,
+  );
+  return m ? m[1] : null;
 }
 function toEmbedUrl(url: string): string {
-  const id = getYouTubeId(url)
-  return id ? `https://www.youtube.com/embed/${id}` : url
+  const id = getYouTubeId(url);
+  return id ? `https://www.youtube.com/embed/${id}` : url;
 }
 
 // ─── Teacher-uploaded resource — base64 data URL'ni faylga aylantirib yuklash ─
 function downloadTeacherResource(lesson: any) {
-  if (!lesson?.resourceUrl) return
-  const a = document.createElement('a')
-  a.href = lesson.resourceUrl
-  a.download = lesson.resourceName || 'qollanma'
-  document.body.appendChild(a)
-  a.click()
-  document.body.removeChild(a)
+  if (!lesson?.resourceUrl) return;
+  const a = document.createElement("a");
+  a.href = lesson.resourceUrl;
+  a.download = lesson.resourceName || "qollanma";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }
 
 function getResourceExtension(lesson: any): string {
-  const name = lesson?.resourceName || ''
-  const ext = name.split('.').pop()?.toUpperCase() || ''
-  if (ext === 'PDF') return 'PDF'
-  if (ext === 'DOCX' || ext === 'DOC') return 'Word'
-  return ext || 'Fayl'
+  const name = lesson?.resourceName || "";
+  const ext = name.split(".").pop()?.toUpperCase() || "";
+  if (ext === "PDF") return "PDF";
+  if (ext === "DOCX" || ext === "DOC") return "Word";
+  return ext || "Fayl";
 }
 
 // ─── Downloadable resource helpers ───────────────────────────────────────────
 const KEY_TERMS: Record<string, string[]> = {
-  kompyuter:  ["Hardware — apparat qism", "Software — dasturiy ta'minot", "CPU — markaziy protsessor", "RAM — operativ xotira", "HDD/SSD — saqlash qurilmasi"],
-  operatsion: ["OS — operatsion tizim", "Windows, Linux, MacOS", "Fayl tizimi", "Protsess — jarayon", "Drayvyer — haydovchi"],
-  word:       ["Hujjat — Document", "Paragraf — Paragraph", "Formatlash — Formatting", "Shrift — Font", "Jadval — Table"],
-  excel:      ["Katakcha — Cell", "Formula — Formula", "Funksiya — Function", "Diagramma — Chart", "=SUM(), =AVERAGE()"],
-  python:     ["O'zgaruvchi — Variable", "Funksiya — def", "Tsikl — for/while", "Shart — if/else", "Ro'yxat — List"],
-  algoritm:   ["Algoritm — Algorithm", "Psevdokod — Pseudocode", "Tarmoqlanish — Branch", "Takrorlash — Loop", "Murakkablik — Complexity"],
-  internet:   ["URL — veb manzil", "HTTP/HTTPS — protokol", "Brauzer — Browser", "Tarmoq — Network", "IP manzil"],
-  xavfsizlik: ["Parol — Password", "Fishing — Phishing", "Antivirus", "Shifrlash — Encryption", "2FA — ikki bosqichli"],
-  sql:        ["Ma'lumotlar bazasi — Database", "Jadval — Table", "SELECT / WHERE", "JOIN — birlashtirish", "INDEX — indeks"],
-  html:       ["Teg — Tag", "Element", "Atribut — Attribute", "Sarlavha — <h1>", "Havola — <a href>"],
-  css:        ["Selektor — Selector", "Rang — color", "Shrift — font", "Joylashuv — display/flex", "Animatsiya — animation"],
-}
+  kompyuter: [
+    "Hardware — apparat qism",
+    "Software — dasturiy ta'minot",
+    "CPU — markaziy protsessor",
+    "RAM — operativ xotira",
+    "HDD/SSD — saqlash qurilmasi",
+  ],
+  operatsion: [
+    "OS — operatsion tizim",
+    "Windows, Linux, MacOS",
+    "Fayl tizimi",
+    "Protsess — jarayon",
+    "Drayvyer — haydovchi",
+  ],
+  word: [
+    "Hujjat — Document",
+    "Paragraf — Paragraph",
+    "Formatlash — Formatting",
+    "Shrift — Font",
+    "Jadval — Table",
+  ],
+  excel: [
+    "Katakcha — Cell",
+    "Formula — Formula",
+    "Funksiya — Function",
+    "Diagramma — Chart",
+    "=SUM(), =AVERAGE()",
+  ],
+  python: [
+    "O'zgaruvchi — Variable",
+    "Funksiya — def",
+    "Tsikl — for/while",
+    "Shart — if/else",
+    "Ro'yxat — List",
+  ],
+  algoritm: [
+    "Algoritm — Algorithm",
+    "Psevdokod — Pseudocode",
+    "Tarmoqlanish — Branch",
+    "Takrorlash — Loop",
+    "Murakkablik — Complexity",
+  ],
+  internet: [
+    "URL — veb manzil",
+    "HTTP/HTTPS — protokol",
+    "Brauzer — Browser",
+    "Tarmoq — Network",
+    "IP manzil",
+  ],
+  xavfsizlik: [
+    "Parol — Password",
+    "Fishing — Phishing",
+    "Antivirus",
+    "Shifrlash — Encryption",
+    "2FA — ikki bosqichli",
+  ],
+  sql: [
+    "Ma'lumotlar bazasi — Database",
+    "Jadval — Table",
+    "SELECT / WHERE",
+    "JOIN — birlashtirish",
+    "INDEX — indeks",
+  ],
+  html: [
+    "Teg — Tag",
+    "Element",
+    "Atribut — Attribute",
+    "Sarlavha — <h1>",
+    "Havola — <a href>",
+  ],
+  css: [
+    "Selektor — Selector",
+    "Rang — color",
+    "Shrift — font",
+    "Joylashuv — display/flex",
+    "Animatsiya — animation",
+  ],
+};
 
 function getKeyTerms(title: string): string[] {
-  const t = title.toLowerCase()
+  const t = title.toLowerCase();
   for (const [key, terms] of Object.entries(KEY_TERMS)) {
-    if (t.includes(key)) return terms
+    if (t.includes(key)) return terms;
   }
-  return ["Mavzuni diqqat bilan o'qing", "Asosiy tushunchalarni yozing", "Testni bajaring va XP yig'ing"]
+  return [
+    "Mavzuni diqqat bilan o'qing",
+    "Asosiy tushunchalarni yozing",
+    "Testni bajaring va XP yig'ing",
+  ];
 }
 
 function buildResourceHTML(lesson: any, course: any): string {
-  const terms = getKeyTerms(lesson?.title || '')
-  const today = new Date().toLocaleDateString('uz-UZ')
+  const terms = getKeyTerms(lesson?.title || "");
+  const today = new Date().toLocaleDateString("uz-UZ");
   return `<html><head><meta charset="UTF-8">
 <style>
   body{font-family:Arial,sans-serif;max-width:680px;margin:40px auto;color:#1f2937;line-height:1.7}
@@ -125,16 +312,16 @@ function buildResourceHTML(lesson: any, course: any): string {
   .term{background:#f8fafc;border-left:4px solid #3b82f6;padding:7px 12px;margin-bottom:5px;border-radius:0 6px 6px 0;font-size:13px}
   .footer{margin-top:48px;color:#9ca3af;font-size:11px;border-top:1px solid #e5e7eb;padding-top:12px;text-align:center}
 </style></head><body>
-<h1>${lesson?.title || 'Dars materiali'}</h1>
-<p><span class="badge">${course?.title || 'Kurs'}</span><span class="badge">${lesson?.duration || ''}</span></p>
+<h1>${lesson?.title || "Dars materiali"}</h1>
+<p><span class="badge">${course?.title || "Kurs"}</span><span class="badge">${lesson?.duration || ""}</span></p>
 <h2>Dars Maqsadlari</h2>
 <ul>
-  <li>${lesson?.title || ''} mavzusini o'rganish</li>
+  <li>${lesson?.title || ""} mavzusini o'rganish</li>
   <li>Asosiy tushunchalarni tushunish va yodda saqlash</li>
   <li>Amaliy ko'nikmalarni rivojlantirish</li>
 </ul>
 <h2>Asosiy Atamalar</h2>
-${terms.map(t => `<div class="term">${t}</div>`).join('\n')}
+${terms.map((t) => `<div class="term">${t}</div>`).join("\n")}
 <h2>O'rganish Ko'rsatmalari</h2>
 <ul>
   <li>Mavzuni diqqat bilan ko'rib chiqing</li>
@@ -143,45 +330,48 @@ ${terms.map(t => `<div class="term">${t}</div>`).join('\n')}
   <li>Darsni tugatib, testni bajaring va XP yig'ing</li>
 </ul>
 <div class="footer">EduCode — AKT Virtual Sinf &bull; ${today}</div>
-</body></html>`
+</body></html>`;
 }
 
 function downloadAsWord(lesson: any, course: any) {
-  const html = buildResourceHTML(lesson, course)
-  const blob = new Blob([html], { type: 'application/msword' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = `${(lesson?.title || 'dars').replace(/[/\\?%*:|"<>]/g, '-')}.doc`
-  a.click()
-  URL.revokeObjectURL(url)
+  const html = buildResourceHTML(lesson, course);
+  const blob = new Blob([html], { type: "application/msword" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${(lesson?.title || "dars").replace(/[/\\?%*:|"<>]/g, "-")}.doc`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 function downloadAsPDF(lesson: any, course: any) {
-  const html = buildResourceHTML(lesson, course)
-  const win = window.open('', '_blank')
-  if (!win) return
-  win.document.write(html)
-  win.document.close()
-  win.focus()
-  setTimeout(() => win.print(), 400)
+  const html = buildResourceHTML(lesson, course);
+  const win = window.open("", "_blank");
+  if (!win) return;
+  win.document.write(html);
+  win.document.close();
+  win.focus();
+  setTimeout(() => win.print(), 400);
 }
 
 // ─── Animated counter hook ────────────────────────────────────────────────────
 function useCountUp(target: number, duration = 800) {
-  const [val, setVal] = useState(0)
+  const [val, setVal] = useState(0);
   useEffect(() => {
-    if (target === 0) { setVal(0); return }
-    let start = 0
-    const step = Math.ceil(target / (duration / 16))
+    if (target === 0) {
+      setVal(0);
+      return;
+    }
+    let start = 0;
+    const step = Math.ceil(target / (duration / 16));
     const timer = setInterval(() => {
-      start = Math.min(start + step, target)
-      setVal(start)
-      if (start >= target) clearInterval(timer)
-    }, 16)
-    return () => clearInterval(timer)
-  }, [target, duration])
-  return val
+      start = Math.min(start + step, target);
+      setVal(start);
+      if (start >= target) clearInterval(timer);
+    }, 16);
+    return () => clearInterval(timer);
+  }, [target, duration]);
+  return val;
 }
 
 // ─── Diagnostic Quiz Overlay ─────────────────────────────────────────────────
@@ -189,58 +379,61 @@ function DiagnosticQuiz({
   onComplete,
   onSkip,
 }: {
-  onComplete: (skippable: Set<number>) => void
-  onSkip: () => void
+  onComplete: (skippable: Set<number>) => void;
+  onSkip: () => void;
 }) {
-  const [current, setCurrent] = useState(0)
-  const [answers, setAnswers] = useState<Record<number, number>>({})
-  const [selected, setSelected] = useState<number | null>(null)
-  const [transitioning, setTransitioning] = useState(false)
-  const [showResult, setShowResult] = useState(false)
+  const [current, setCurrent] = useState(0);
+  const [answers, setAnswers] = useState<Record<number, number>>({});
+  const [selected, setSelected] = useState<number | null>(null);
+  const [transitioning, setTransitioning] = useState(false);
+  const [showResult, setShowResult] = useState(false);
 
-  const q = DIAG_QUESTIONS[current]
-  const progress = ((current + (selected !== null ? 1 : 0)) / DIAG_QUESTIONS.length) * 100
+  const q = DIAG_QUESTIONS[current];
+  const progress =
+    ((current + (selected !== null ? 1 : 0)) / DIAG_QUESTIONS.length) * 100;
 
   const handleAnswer = (optIdx: number) => {
-    if (selected !== null) return
-    setSelected(optIdx)
-    const newAnswers = { ...answers, [q.id]: optIdx }
-    setAnswers(newAnswers)
+    if (selected !== null) return;
+    setSelected(optIdx);
+    const newAnswers = { ...answers, [q.id]: optIdx };
+    setAnswers(newAnswers);
 
     setTimeout(() => {
-      setTransitioning(true)
+      setTransitioning(true);
       setTimeout(() => {
         if (current < DIAG_QUESTIONS.length - 1) {
-          setCurrent(c => c + 1)
-          setSelected(null)
-          setTransitioning(false)
+          setCurrent((c) => c + 1);
+          setSelected(null);
+          setTransitioning(false);
         } else {
-          const skippable = new Set<number>()
-          DIAG_QUESTIONS.forEach(dq => {
-            if (newAnswers[dq.id] === dq.correct) skippable.add(dq.lessonIdx)
-          })
-          setShowResult(true)
-          setTransitioning(false)
-          setTimeout(() => onComplete(skippable), 1800)
+          const skippable = new Set<number>();
+          DIAG_QUESTIONS.forEach((dq) => {
+            if (newAnswers[dq.id] === dq.correct) skippable.add(dq.lessonIdx);
+          });
+          setShowResult(true);
+          setTransitioning(false);
+          setTimeout(() => onComplete(skippable), 1800);
         }
-      }, 300)
-    }, 600)
-  }
+      }, 300);
+    }, 600);
+  };
 
   const correctCount = Object.entries(answers).filter(([id, ans]) => {
-    const dq = DIAG_QUESTIONS.find(q => q.id === Number(id))
-    return dq && ans === dq.correct
-  }).length
+    const dq = DIAG_QUESTIONS.find((q) => q.id === Number(id));
+    return dq && ans === dq.correct;
+  }).length;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/75 backdrop-blur-md" onClick={onSkip} />
+      <div
+        className="absolute inset-0 bg-black/75 backdrop-blur-md"
+        onClick={onSkip}
+      />
 
       {/* Modal */}
       <div className="relative w-full max-w-lg animate-scale-in">
         <div className="card-elevated rounded-2xl shadow-[0_24px_64px_rgba(0,0,0,0.6)] overflow-hidden">
-
           {/* Top progress bar */}
           <div className="h-0.5 bg-[#1A1A1F]">
             <div
@@ -260,7 +453,9 @@ function DiagnosticQuiz({
                   <div className="text-xs text-base-600">
                     Diagnostika · {current + 1}/{DIAG_QUESTIONS.length}
                   </div>
-                  <div className="text-sm font-semibold text-base-200">{q.topic}</div>
+                  <div className="text-sm font-semibold text-base-200">
+                    {q.topic}
+                  </div>
                 </div>
               </div>
               <button
@@ -277,9 +472,11 @@ function DiagnosticQuiz({
                 <div
                   key={i}
                   className={`h-1 rounded-full transition-all duration-400 ${
-                    i < current ? 'bg-[#3F3F46] flex-1' :
-                    i === current ? 'bg-accent-500 flex-[2]' :
-                    'bg-[#1A1A1F] flex-1'
+                    i < current
+                      ? "bg-[#3F3F46] flex-1"
+                      : i === current
+                        ? "bg-accent-500 flex-[2]"
+                        : "bg-[#1A1A1F] flex-1"
                   }`}
                 />
               ))}
@@ -294,10 +491,14 @@ function DiagnosticQuiz({
                 <div className="text-3xl font-bold text-base-100 mb-1">
                   {correctCount}/{DIAG_QUESTIONS.length}
                 </div>
-                <p className="text-sm text-base-500 mb-2">Diagnostika tugallandi</p>
-                <p className="text-xs text-base-600">Shaxsiy o'quv yo'lingiz tayyorlanmoqda...</p>
+                <p className="text-sm text-base-500 mb-2">
+                  Diagnostika tugallandi
+                </p>
+                <p className="text-xs text-base-600">
+                  Shaxsiy o'quv yo'lingiz tayyorlanmoqda...
+                </p>
                 <div className="mt-4 flex justify-center gap-1">
-                  {[0, 1, 2].map(i => (
+                  {[0, 1, 2].map((i) => (
                     <div
                       key={i}
                       className="w-1.5 h-1.5 rounded-full bg-accent-500 animate-pulse"
@@ -310,7 +511,7 @@ function DiagnosticQuiz({
               /* Question + options */
               <div
                 key={current}
-                className={`transition-opacity duration-300 ${transitioning ? 'opacity-0' : 'opacity-100'}`}
+                className={`transition-opacity duration-300 ${transitioning ? "opacity-0" : "opacity-100"}`}
               >
                 <p className="text-base font-medium text-base-100 leading-relaxed mb-5 animate-slide-up">
                   {q.q}
@@ -318,27 +519,36 @@ function DiagnosticQuiz({
 
                 <div className="space-y-2">
                   {q.options.map((opt, i) => {
-                    const isSelected = selected === i
-                    const isCorrect = isSelected && i === q.correct
-                    const isWrong = isSelected && i !== q.correct
+                    const isSelected = selected === i;
+                    const isCorrect = isSelected && i === q.correct;
+                    const isWrong = isSelected && i !== q.correct;
                     return (
                       <button
                         key={i}
                         onClick={() => handleAnswer(i)}
                         disabled={selected !== null}
                         className={`stagger-item animate-slide-up w-full text-left px-4 py-3 rounded-xl text-sm border transition-all duration-300 group
-                          ${isCorrect ? 'answer-correct' :
-                            isWrong ? 'answer-wrong' :
-                            'border-[#27272A] text-base-300 hover:border-[#3F3F46] hover:bg-[#1A1A1F] hover:text-base-100 active:scale-[0.99]'}
+                          ${
+                            isCorrect
+                              ? "answer-correct"
+                              : isWrong
+                                ? "answer-wrong"
+                                : "border-[#27272A] text-base-300 hover:border-[#3F3F46] hover:bg-[#1A1A1F] hover:text-base-100 active:scale-[0.99]"
+                          }
                           disabled:cursor-default`}
-                        style={{ animationDelay: `${i * 60}ms`, animationFillMode: 'backwards' }}
+                        style={{
+                          animationDelay: `${i * 60}ms`,
+                          animationFillMode: "backwards",
+                        }}
                       >
-                        <span className={`inline-block w-5 text-xs mr-2 transition-colors ${isCorrect ? 'text-base-400' : isWrong ? 'text-base-700' : 'text-base-700 group-hover:text-base-500'}`}>
-                          {['A', 'B', 'C', 'D'][i]}.
+                        <span
+                          className={`inline-block w-5 text-xs mr-2 transition-colors ${isCorrect ? "text-base-400" : isWrong ? "text-base-700" : "text-base-700 group-hover:text-base-500"}`}
+                        >
+                          {["A", "B", "C", "D"][i]}.
                         </span>
                         {opt}
                       </button>
-                    )
+                    );
                   })}
                 </div>
 
@@ -351,7 +561,7 @@ function DiagnosticQuiz({
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 // ─── Diagnostic Intro Overlay ────────────────────────────────────────────────
@@ -360,9 +570,9 @@ function DiagnosticIntro({
   onStart,
   onSkip,
 }: {
-  totalLessons: number
-  onStart: () => void
-  onSkip: () => void
+  totalLessons: number;
+  onStart: () => void;
+  onSkip: () => void;
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -384,20 +594,27 @@ function DiagnosticIntro({
             </h2>
             <p className="text-sm text-base-500 leading-relaxed mb-6">
               Bilim darajangizni aniqlab, faqat kerakli darslarni ko'rsatamiz.
-              Allaqachon bilganlaringizni o'tkazib yuborasiz — vaqtingizni tejang.
+              Allaqachon bilganlaringizni o'tkazib yuborasiz — vaqtingizni
+              tejang.
             </p>
 
             {/* Steps */}
             <div className="space-y-3 mb-6">
               {[
-                { text: '10 ta qisqa savol — atigi 2 daqiqa', icon: Brain },
+                { text: "10 ta qisqa savol — atigi 2 daqiqa", icon: Brain },
                 { text: "Bilgan mavzularingiz aniqlanadi", icon: CheckCircle2 },
-                { text: `${totalLessons} o'rniga faqat kerakli darslar`, icon: Map },
+                {
+                  text: `${totalLessons} o'rniga faqat kerakli darslar`,
+                  icon: Map,
+                },
               ].map(({ text, icon: Icon }, i) => (
                 <div
                   key={i}
                   className="flex items-center gap-3 stagger-item animate-slide-in-left"
-                  style={{ animationDelay: `${100 + i * 80}ms`, animationFillMode: 'backwards' }}
+                  style={{
+                    animationDelay: `${100 + i * 80}ms`,
+                    animationFillMode: "backwards",
+                  }}
                 >
                   <div className="w-8 h-8 rounded-xl bg-[#111113] border border-[#1E1E24] flex items-center justify-center flex-shrink-0">
                     <Icon className="w-3.5 h-3.5 text-base-600" />
@@ -411,11 +628,15 @@ function DiagnosticIntro({
             <div className="grid grid-cols-2 gap-3 mb-6">
               <div className="bg-[#0D0D10] rounded-xl p-3 border border-[#1E1E24] text-center">
                 <div className="text-xs text-base-700 mb-1">Standart yo'l</div>
-                <div className="text-2xl font-bold text-base-700 line-through decoration-[#3F3F46]">{totalLessons}</div>
+                <div className="text-2xl font-bold text-base-700 line-through decoration-[#3F3F46]">
+                  {totalLessons}
+                </div>
                 <div className="text-xs text-base-700">dars</div>
               </div>
               <div className="path-card-personal rounded-xl p-3 text-center">
-                <div className="text-xs text-base-500 mb-1">Sizning yo'lingiz</div>
+                <div className="text-xs text-base-500 mb-1">
+                  Sizning yo'lingiz
+                </div>
                 <div className="text-2xl font-bold text-base-100">?</div>
                 <div className="text-xs text-base-600">dars</div>
               </div>
@@ -439,13 +660,21 @@ function DiagnosticIntro({
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 // ─── Personalized path comparison card ───────────────────────────────────────
-function PathComparisonCard({ standard, personal, saved }: { standard: number; personal: number; saved: number }) {
-  const animPersonal = useCountUp(personal, 600)
-  const animSaved = useCountUp(saved, 800)
+function PathComparisonCard({
+  standard,
+  personal,
+  saved,
+}: {
+  standard: number;
+  personal: number;
+  saved: number;
+}) {
+  const animPersonal = useCountUp(personal, 600);
+  const animSaved = useCountUp(saved, 800);
 
   return (
     <div className="card border-[#1E1E24] overflow-hidden animate-slide-up">
@@ -454,7 +683,9 @@ function PathComparisonCard({ standard, personal, saved }: { standard: number; p
       <div className="p-4">
         <div className="flex items-center gap-2 mb-3">
           <Map className="w-4 h-4 text-base-500" />
-          <span className="text-sm font-semibold text-base-100">Shaxsiy O'quv Yo'li</span>
+          <span className="text-sm font-semibold text-base-100">
+            Shaxsiy O'quv Yo'li
+          </span>
           <div className="ml-auto badge bg-[#1A1A1F] border border-[#27272A] text-base-600 text-xs">
             <Sparkles className="w-2.5 h-2.5" /> AI tahlil
           </div>
@@ -483,230 +714,277 @@ function PathComparisonCard({ standard, personal, saved }: { standard: number; p
         <div className="flex items-center justify-center gap-2 py-2 rounded-xl bg-[#0D0D10] border border-[#1E1E24]">
           <SkipForward className="w-3 h-3 text-base-600" />
           <span className="text-xs text-base-500">
-            <span className="font-semibold text-base-300 animate-count-up">{animSaved}</span> ta mavzu o'tkaziladi — allaqachon bilasiz
+            <span className="font-semibold text-base-300 animate-count-up">
+              {animSaved}
+            </span>{" "}
+            ta mavzu o'tkaziladi — allaqachon bilasiz
           </span>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 interface QuizQuestion {
-  id: number
-  q: string
-  options: string[]
-  correct: number
+  id: number;
+  q: string;
+  options: string[];
+  correct: number;
 }
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function CourseDetailPage() {
-  const { id } = useParams()
-  const { data: course, loading } = useApi(() => api.course(String(id)), [id])
-  const lessons: any[] = course?.lessons || []
+  const { id } = useParams();
+  const { data: course, loading } = useApi(() => api.course(String(id)), [id]);
+  const lessons: any[] = course?.lessons || [];
 
-  const [activeLesson, setActiveLesson] = useState<string | null>(null)
-  const [quizActive] = useState(false)
-  const [quizAnswers, setQuizAnswers] = useState<Record<number, number>>({})
-  const [quizSubmitted, setQuizSubmitted] = useState(false)
-  const [aiChat, setAiChat] = useState<{ role: 'user' | 'ai'; text: string }[]>([
-    { role: 'ai', text: 'Salom! Men bu kurs bo\'yicha AI yordamchiman. Savol bering.' },
-  ])
-  const [aiInput, setAiInput] = useState('')
-  const [aiTyping, setAiTyping] = useState(false)
-  const [completing, setCompleting] = useState(false)
-  const [localCompleted, setLocalCompleted] = useState<Set<string>>(new Set())
-  const [practiceCode, setPracticeCode] = useState('for i in range(1, 11):\n    print(f"{i} ** 2 = {i**2}")')
-  const [practiceOutput, setPracticeOutput] = useState<string | null>(null)
-  const [practiceRunning, setPracticeRunning] = useState(false)
+  const [activeLesson, setActiveLesson] = useState<string | null>(null);
+  const [quizActive] = useState(false);
+  const [quizAnswers, setQuizAnswers] = useState<Record<number, number>>({});
+  const [quizSubmitted, setQuizSubmitted] = useState(false);
+  const [aiChat, setAiChat] = useState<{ role: "user" | "ai"; text: string }[]>(
+    [
+      {
+        role: "ai",
+        text: "Salom! Men bu kurs bo'yicha AI yordamchiman. Savol bering.",
+      },
+    ],
+  );
+  const [aiInput, setAiInput] = useState("");
+  const [aiTyping, setAiTyping] = useState(false);
+  const [completing, setCompleting] = useState(false);
+  const [localCompleted, setLocalCompleted] = useState<Set<string>>(new Set());
+  const [practiceCode, setPracticeCode] = useState(
+    'for i in range(1, 11):\n    print(f"{i} ** 2 = {i**2}")',
+  );
+  const [practiceOutput, setPracticeOutput] = useState<string | null>(null);
+  const [practiceRunning, setPracticeRunning] = useState(false);
 
   // AI quiz state
-  const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>([])
-  const [quizLoading, setQuizLoading] = useState(false)
-  const [quizError, setQuizError] = useState<string | null>(null)
+  const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>([]);
+  const [quizLoading, setQuizLoading] = useState(false);
+  const [quizError, setQuizError] = useState<string | null>(null);
 
   // Diagnostic state
-  const [diagState, setDiagState] = useState<'idle' | 'running' | 'done'>('idle')
-  const [skippableIdxs, setSkippableIdxs] = useState<Set<number>>(new Set())
+  const [diagState, setDiagState] = useState<"idle" | "running" | "done">(
+    "idle",
+  );
+  const [skippableIdxs, setSkippableIdxs] = useState<Set<number>>(new Set());
 
   // Auto-enroll if not enrolled
   useEffect(() => {
-    if (!id || !course) return
+    if (!id || !course) return;
     if (!course.enrollment) {
-      api.enroll(String(id)).catch(() => {})
+      api.enroll(String(id)).catch(() => {});
     }
-  }, [course, id])
+  }, [course, id]);
 
   // Load saved diagnostic from localStorage
   useEffect(() => {
-    if (!id) return
-    const saved = localStorage.getItem(`diag_${id}`)
+    if (!id) return;
+    const saved = localStorage.getItem(`diag_${id}`);
     if (saved) {
       try {
-        setSkippableIdxs(new Set(JSON.parse(saved) as number[]))
-        setDiagState('done')
+        setSkippableIdxs(new Set(JSON.parse(saved) as number[]));
+        setDiagState("done");
       } catch {}
     }
-  }, [id])
+  }, [id]);
 
   // Auto-select first unlocked lesson
   useEffect(() => {
     if (lessons.length > 0 && !activeLesson) {
-      const first = lessons.find((l: any) => !l.completed && !l.locked)
-      setActiveLesson(first?.id || lessons[0].id)
+      const first = lessons.find((l: any) => !l.completed && !l.locked);
+      setActiveLesson(first?.id || lessons[0].id);
     }
-  }, [lessons, activeLesson])
+  }, [lessons, activeLesson]);
 
   const diagComplete = (skippable: Set<number>) => {
-    setSkippableIdxs(skippable)
-    setDiagState('done')
-    localStorage.setItem(`diag_${id}`, JSON.stringify([...skippable]))
-  }
+    setSkippableIdxs(skippable);
+    setDiagState("done");
+    localStorage.setItem(`diag_${id}`, JSON.stringify([...skippable]));
+  };
 
   // Quiz dars ochilganda savollarni yuklash
   useEffect(() => {
-    if (!currentLesson || currentLesson.type !== 'quiz') return
-    setQuizQuestions([])
-    setQuizError(null)
-    setQuizSubmitted(false)
-    setQuizAnswers({})
+    if (!currentLesson || currentLesson.type !== "quiz") return;
+    setQuizQuestions([]);
+    setQuizError(null);
+    setQuizSubmitted(false);
+    setQuizAnswers({});
 
     const load = async () => {
-      setQuizLoading(true)
+      setQuizLoading(true);
       try {
         // Avval keshdan olishga urinamiz
-        const cached = await api.getQuiz(currentLesson.id)
+        const cached = await api.getQuiz(currentLesson.id);
         if (cached.questions.length > 0) {
-          setQuizQuestions(cached.questions)
-          setQuizLoading(false)
-          return
+          setQuizQuestions(cached.questions);
+          setQuizLoading(false);
+          return;
         }
         // Keshda yo'q — generatsiya qilamiz
-        const generated = await api.generateQuiz(currentLesson.id)
-        setQuizQuestions(generated.questions)
+        const generated = await api.generateQuiz(currentLesson.id);
+        setQuizQuestions(generated.questions);
       } catch (err: any) {
-        setQuizError(err.message)
+        setQuizError(err.message);
       }
-      setQuizLoading(false)
-    }
-    load()
-  }, [activeLesson])
+      setQuizLoading(false);
+    };
+    load();
+  }, [activeLesson, lessons]);
 
-  if (loading) return (
-    <div className="flex items-center justify-center h-64">
-      <div className="flex gap-1.5">
-        {[0, 1, 2].map(i => (
-          <div key={i} className="w-2 h-2 rounded-full bg-base-700 animate-pulse"
-            style={{ animationDelay: `${i * 150}ms` }} />
-        ))}
+  if (loading)
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="flex gap-1.5">
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className="w-2 h-2 rounded-full bg-base-700 animate-pulse"
+              style={{ animationDelay: `${i * 150}ms` }}
+            />
+          ))}
+        </div>
       </div>
-    </div>
-  )
+    );
 
-  if (!course) return (
-    <div className="flex items-center justify-center h-64">
-      <p className="text-base-500">Kurs topilmadi</p>
-    </div>
-  )
+  if (!course)
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-base-500">Kurs topilmadi</p>
+      </div>
+    );
 
-  const currentLesson = lessons.find((l: any) => l.id === activeLesson)
-  const completedCount = lessons.filter((l: any) => l.completed || localCompleted.has(l.id)).length
-  const progress = lessons.length ? Math.round((completedCount / lessons.length) * 100) : 0
+  const currentLesson = lessons.find((l: any) => l.id === activeLesson);
+  const completedCount = lessons.filter(
+    (l: any) => l.completed || localCompleted.has(l.id),
+  ).length;
+  const progress = lessons.length
+    ? Math.round((completedCount / lessons.length) * 100)
+    : 0;
 
   const sendAiMessage = async () => {
-    if (!aiInput.trim() || aiTyping) return
-    const q = aiInput.trim()
-    setAiChat(prev => [...prev, { role: 'user', text: q }])
-    setAiInput('')
-    setAiTyping(true)
+    if (!aiInput.trim() || aiTyping) return;
+    const q = aiInput.trim();
+    setAiChat((prev) => [...prev, { role: "user", text: q }]);
+    setAiInput("");
+    setAiTyping(true);
     try {
-      const { reply } = await api.aiChat(q)
-      setAiChat(prev => [...prev, { role: 'ai', text: reply }])
+      const { reply } = await api.aiChat(q);
+      setAiChat((prev) => [...prev, { role: "ai", text: reply }]);
     } catch {
-      setAiChat(prev => [...prev, {
-        role: 'ai',
-        text: `"${q}" bo'yicha tushuntiraman. Bu konsept Python'da amaliyotda keng qo'llaniladi. Keyingi darsda ham ko'rib chiqamiz.`,
-      }])
+      setAiChat((prev) => [
+        ...prev,
+        {
+          role: "ai",
+          text: `"${q}" bo'yicha tushuntiraman. Bu konsept Python'da amaliyotda keng qo'llaniladi. Keyingi darsda ham ko'rib chiqamiz.`,
+        },
+      ]);
     }
-    setAiTyping(false)
-  }
+    setAiTyping(false);
+  };
 
   const handleCompleteLesson = async () => {
-    if (!currentLesson || completing) return
-    if (currentLesson.completed || localCompleted.has(currentLesson.id)) return
-    setCompleting(true)
+    if (!currentLesson || completing) return;
+    if (currentLesson.completed || localCompleted.has(currentLesson.id)) return;
+    setCompleting(true);
     try {
-      await api.completeLesson(currentLesson.id)
-      setLocalCompleted(prev => new Set([...prev, currentLesson.id]))
+      await api.completeLesson(currentLesson.id);
+      setLocalCompleted((prev) => new Set([...prev, currentLesson.id]));
     } catch (e: any) {
-      console.error('Lesson complete:', e.message)
+      console.error("Lesson complete:", e.message);
     }
-    setCompleting(false)
-  }
+    setCompleting(false);
+  };
 
   const runPracticeCode = async () => {
-    setPracticeRunning(true)
+    setPracticeRunning(true);
     try {
-      const { output, duration } = await api.runCode(practiceCode, 'python')
-      setPracticeOutput(`${output}\n\n⏱ ${duration}ms`)
+      const { output, duration } = await api.runCode(practiceCode, "python");
+      setPracticeOutput(`${output}\n\n⏱ ${duration}ms`);
     } catch {
-      setPracticeOutput("Backend ulanishda xatolik. Keyinroq urinib ko'ring.")
+      setPracticeOutput("Backend ulanishda xatolik. Keyinroq urinib ko'ring.");
     }
-    setPracticeRunning(false)
-  }
+    setPracticeRunning(false);
+  };
 
-  const submitQuiz = () => setQuizSubmitted(true)
-  const quizScore = quizSubmitted ? quizQuestions.filter(q => quizAnswers[q.id] === q.correct).length : 0
+  const submitQuiz = () => setQuizSubmitted(true);
+  const quizScore = quizSubmitted
+    ? quizQuestions.filter((q) => quizAnswers[q.id] === q.correct).length
+    : 0;
 
-  const savedCount = skippableIdxs.size
-  const personalCount = lessons.filter((_: any, idx: number) => !skippableIdxs.has(idx)).length
+  const savedCount = skippableIdxs.size;
+  const personalCount = lessons.filter(
+    (_: any, idx: number) => !skippableIdxs.has(idx),
+  ).length;
 
   return (
     <div className="max-w-7xl mx-auto animate-fade-in">
       {/* Diagnostic intro overlay — shows immediately on course open */}
-      {diagState === 'idle' && !loading && course && (
+      {diagState === "idle" && !loading && course && (
         <DiagnosticIntro
           totalLessons={lessons.length}
-          onStart={() => setDiagState('running')}
-          onSkip={() => setDiagState('done')}
+          onStart={() => setDiagState("running")}
+          onSkip={() => setDiagState("done")}
         />
       )}
 
       {/* Diagnostic quiz overlay */}
-      {diagState === 'running' && (
-        <DiagnosticQuiz onComplete={diagComplete} onSkip={() => setDiagState('done')} />
+      {diagState === "running" && (
+        <DiagnosticQuiz
+          onComplete={diagComplete}
+          onSkip={() => setDiagState("done")}
+        />
       )}
 
       {/* Back */}
-      <Link href="/courses"
-        className="inline-flex items-center gap-2 text-sm text-base-600 hover:text-base-300 mb-5 transition-colors duration-200 group">
+      <Link
+        href="/courses"
+        className="inline-flex items-center gap-2 text-sm text-base-600 hover:text-base-300 mb-5 transition-colors duration-200 group"
+      >
         <ChevronLeft className="w-4 h-4 transition-transform duration-200 group-hover:-translate-x-0.5" />
         Kurslar
       </Link>
 
       <div className="grid lg:grid-cols-3 gap-5">
-
         {/* ─── Left: Lesson List ─────────────────────────────────────────── */}
         <div className="lg:col-span-1">
           <div className="card p-5 sticky top-5">
             {/* Course header */}
             <div className="mb-5">
-              <h2 className="font-bold text-base-100 text-lg mb-1">{course.title}</h2>
+              <h2 className="font-bold text-base-100 text-lg mb-1">
+                {course.title}
+              </h2>
               <div className="flex items-center gap-3 text-xs text-base-500 mb-3">
-                <span className="flex items-center gap-1"><BookOpen className="w-3 h-3" />{lessons.length} dars</span>
-                <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{course.duration}</span>
-                <span className={getDifficultyColor(course.difficulty)}>{getDifficultyLabel(course.difficulty)}</span>
+                <span className="flex items-center gap-1">
+                  <BookOpen className="w-3 h-3" />
+                  {lessons.length} dars
+                </span>
+                <span className="flex items-center gap-1">
+                  <Clock className="w-3 h-3" />
+                  {course.duration}
+                </span>
+                <span className={getDifficultyColor(course.difficulty)}>
+                  {getDifficultyLabel(course.difficulty)}
+                </span>
               </div>
               <div className="progress-bar mb-1.5">
-                <div className="progress-fill" style={{ width: `${progress}%` }} />
+                <div
+                  className="progress-fill"
+                  style={{ width: `${progress}%` }}
+                />
               </div>
               <div className="flex justify-between text-xs text-base-600">
-                <span>{completedCount}/{lessons.length} dars</span>
+                <span>
+                  {completedCount}/{lessons.length} dars
+                </span>
                 <span>{progress}% bajarildi</span>
               </div>
             </div>
 
             {/* Personalized path mini-badge */}
-            {diagState === 'done' && savedCount > 0 && (
+            {diagState === "done" && savedCount > 0 && (
               <div className="mb-3 px-3 py-2 rounded-xl bg-[#0D0D10] border border-[#1E1E24] flex items-center justify-between animate-slide-in-left">
                 <div className="flex items-center gap-1.5 text-xs text-base-600">
                   <Map className="w-3 h-3" /> Shaxsiy yo'l
@@ -720,20 +998,23 @@ export default function CourseDetailPage() {
             {/* Lessons */}
             <div className="space-y-0.5 max-h-[60vh] overflow-y-auto no-scrollbar">
               {lessons.map((lesson: any, idx: number) => {
-                const Icon = TYPE_ICON[lesson.type] || Play
-                const active = lesson.id === activeLesson
-                const isSkippable = skippableIdxs.has(idx)
+                const Icon = TYPE_ICON[lesson.type] || Play;
+                const active = lesson.id === activeLesson;
+                const isSkippable = skippableIdxs.has(idx);
                 return (
-                  <button key={lesson.id}
+                  <button
+                    key={lesson.id}
                     onClick={() => !lesson.locked && setActiveLesson(lesson.id)}
                     disabled={lesson.locked}
                     className={`w-full flex items-center gap-3 px-2.5 py-2.5 rounded-xl text-left transition-all duration-200
-                      ${active
-                        ? 'bg-[#1A1A1F] border border-[#27272A]'
-                        : 'hover:bg-[#111113] border border-transparent'}
-                      ${lesson.locked ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'}
-                      ${isSkippable && !lesson.completed && !active ? 'opacity-40' : ''}`}>
-
+                      ${
+                        active
+                          ? "bg-[#1A1A1F] border border-[#27272A]"
+                          : "hover:bg-[#111113] border border-transparent"
+                      }
+                      ${lesson.locked ? "opacity-30 cursor-not-allowed" : "cursor-pointer"}
+                      ${isSkippable && !lesson.completed && !active ? "opacity-40" : ""}`}
+                  >
                     {/* Status icon */}
                     <div className="flex-shrink-0 relative">
                       {lesson.completed || localCompleted.has(lesson.id) ? (
@@ -743,7 +1024,9 @@ export default function CourseDetailPage() {
                       ) : isSkippable ? (
                         <SkipForward className="w-4 h-4 text-base-700" />
                       ) : (
-                        <div className={`w-4 h-4 rounded-full border-2 transition-all duration-300 ${active ? 'border-accent-500 bg-accent-500/20 shadow-[0_0_8px_rgba(124,58,237,0.3)]' : 'border-base-700'}`}>
+                        <div
+                          className={`w-4 h-4 rounded-full border-2 transition-all duration-300 ${active ? "border-accent-500 bg-accent-500/20 shadow-[0_0_8px_rgba(124,58,237,0.3)]" : "border-base-700"}`}
+                        >
                           {active && (
                             <div className="absolute inset-0 rounded-full border-2 border-accent-500 animate-ping opacity-30" />
                           )}
@@ -752,11 +1035,17 @@ export default function CourseDetailPage() {
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <div className={`text-xs font-medium truncate transition-colors duration-200 ${
-                        active ? 'text-base-100' :
-                        (lesson.completed || localCompleted.has(lesson.id)) ? 'text-base-600' :
-                        isSkippable ? 'text-base-700' :
-                        'text-base-300'}`}>
+                      <div
+                        className={`text-xs font-medium truncate transition-colors duration-200 ${
+                          active
+                            ? "text-base-100"
+                            : lesson.completed || localCompleted.has(lesson.id)
+                              ? "text-base-600"
+                              : isSkippable
+                                ? "text-base-700"
+                                : "text-base-300"
+                        }`}
+                      >
                         {idx + 1}. {lesson.title}
                       </div>
                       <div className="text-xs mt-0.5 flex items-center gap-1 text-base-700">
@@ -771,7 +1060,7 @@ export default function CourseDetailPage() {
                       +{lesson.xpReward}
                     </div>
                   </button>
-                )
+                );
               })}
             </div>
           </div>
@@ -779,9 +1068,8 @@ export default function CourseDetailPage() {
 
         {/* ─── Right: Content ────────────────────────────────────────────── */}
         <div className="lg:col-span-2 space-y-4">
-
           {/* Personalized path comparison card */}
-          {diagState === 'done' && savedCount > 0 && (
+          {diagState === "done" && savedCount > 0 && (
             <PathComparisonCard
               standard={lessons.length}
               personal={personalCount}
@@ -795,13 +1083,23 @@ export default function CourseDetailPage() {
               <div className="card p-5 animate-slide-up">
                 <div className="flex items-start justify-between gap-4 mb-4">
                   <div>
-                    <div className={`flex items-center gap-1.5 text-xs mb-2 ${TYPE_COLOR[currentLesson.type]}`}>
-                      {(() => { const Icon = TYPE_ICON[currentLesson.type]; return <Icon className="w-3 h-3" /> })()}
-                      {TYPE_LABEL[currentLesson.type]} · {currentLesson.duration}
+                    <div
+                      className={`flex items-center gap-1.5 text-xs mb-2 ${TYPE_COLOR[currentLesson.type]}`}
+                    >
+                      {(() => {
+                        const Icon = TYPE_ICON[currentLesson.type];
+                        return <Icon className="w-3 h-3" />;
+                      })()}
+                      {TYPE_LABEL[currentLesson.type]} ·{" "}
+                      {currentLesson.duration}
                     </div>
-                    <h1 className="text-xl font-bold text-base-100">{currentLesson.title}</h1>
+                    <h1 className="text-xl font-bold text-base-100">
+                      {currentLesson.title}
+                    </h1>
                   </div>
-                  <div className="badge-amber flex-shrink-0 animate-bounce-once">+{currentLesson.xpReward} XP</div>
+                  <div className="badge-amber flex-shrink-0 animate-bounce-once">
+                    +{currentLesson.xpReward} XP
+                  </div>
                 </div>
 
                 {/* O'qituvchi yuklagan qo'llanma (PDF/Word) — video'dan OLDIN */}
@@ -813,7 +1111,8 @@ export default function CourseDetailPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-xs text-amber-400/80 uppercase tracking-wider mb-0.5">
-                          O'qituvchi qo'llanmasi · {getResourceExtension(currentLesson)}
+                          O'qituvchi qo'llanmasi ·{" "}
+                          {getResourceExtension(currentLesson)}
                         </p>
                         <p className="text-sm font-medium text-base-100 truncate">
                           {currentLesson.resourceName || "Dars qo'llanmasi"}
@@ -821,7 +1120,8 @@ export default function CourseDetailPage() {
                       </div>
                       <button
                         onClick={() => downloadTeacherResource(currentLesson)}
-                        className="flex items-center gap-1.5 text-xs font-medium text-base-100 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 hover:border-amber-500/50 rounded-lg px-3 py-2 transition-all flex-shrink-0">
+                        className="flex items-center gap-1.5 text-xs font-medium text-base-100 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 hover:border-amber-500/50 rounded-lg px-3 py-2 transition-all flex-shrink-0"
+                      >
                         <FileDown className="w-3.5 h-3.5" /> Yuklab olish
                       </button>
                     </div>
@@ -829,50 +1129,74 @@ export default function CourseDetailPage() {
                 )}
 
                 {/* Avto-yaratiluvchi konspekt — faqat o'qituvchi qo'llanma yuklamagan bo'lsa */}
-                {!currentLesson.resourceUrl && (currentLesson.type === 'video' || currentLesson.type === 'text') && (
-                  <div className="mb-4 bg-[#0D0D10] border border-[#1E1E24] rounded-xl p-4 animate-fade-in">
-                    <div className="flex items-center justify-between mb-3">
-                      <p className="text-xs text-base-500 uppercase tracking-wider">Avto-konspekt</p>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => downloadAsWord(currentLesson, course)}
-                          className="flex items-center gap-1.5 text-xs text-base-400 hover:text-base-100 bg-[#1A1A1F] border border-[#27272A] hover:border-sky-600/40 rounded-lg px-3 py-1.5 transition-all">
-                          <Download className="w-3 h-3" /> Word
-                        </button>
-                        <button
-                          onClick={() => downloadAsPDF(currentLesson, course)}
-                          className="flex items-center gap-1.5 text-xs text-base-400 hover:text-base-100 bg-[#1A1A1F] border border-[#27272A] hover:border-rose-500/40 rounded-lg px-3 py-1.5 transition-all">
-                          <Download className="w-3 h-3" /> PDF
-                        </button>
+                {!currentLesson.resourceUrl &&
+                  (currentLesson.type === "video" ||
+                    currentLesson.type === "text") && (
+                    <div className="mb-4 bg-[#0D0D10] border border-[#1E1E24] rounded-xl p-4 animate-fade-in">
+                      <div className="flex items-center justify-between mb-3">
+                        <p className="text-xs text-base-500 uppercase tracking-wider">
+                          Avto-konspekt
+                        </p>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() =>
+                              downloadAsWord(currentLesson, course)
+                            }
+                            className="flex items-center gap-1.5 text-xs text-base-400 hover:text-base-100 bg-[#1A1A1F] border border-[#27272A] hover:border-sky-600/40 rounded-lg px-3 py-1.5 transition-all"
+                          >
+                            <Download className="w-3 h-3" /> Word
+                          </button>
+                          <button
+                            onClick={() => downloadAsPDF(currentLesson, course)}
+                            className="flex items-center gap-1.5 text-xs text-base-400 hover:text-base-100 bg-[#1A1A1F] border border-[#27272A] hover:border-rose-500/40 rounded-lg px-3 py-1.5 transition-all"
+                          >
+                            <Download className="w-3 h-3" /> PDF
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                    <p className="text-sm text-base-400 leading-relaxed mb-3">
-                      Bu darsda <strong className="text-base-200">{currentLesson.title}</strong> mavzusini o'rganasiz.
-                    </p>
-                    <div className="mb-3">
-                      <p className="text-xs text-base-600 mb-2 uppercase tracking-wider">Asosiy Atamalar</p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {getKeyTerms(currentLesson.title).map((term, i) => (
-                          <span key={i} className="text-xs px-2.5 py-1 rounded-lg bg-[#111113] border border-[#27272A] text-base-400">
-                            {term}
-                          </span>
+                      <p className="text-sm text-base-400 leading-relaxed mb-3">
+                        Bu darsda{" "}
+                        <strong className="text-base-200">
+                          {currentLesson.title}
+                        </strong>{" "}
+                        mavzusini o'rganasiz.
+                      </p>
+                      <div className="mb-3">
+                        <p className="text-xs text-base-600 mb-2 uppercase tracking-wider">
+                          Asosiy Atamalar
+                        </p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {getKeyTerms(currentLesson.title).map((term, i) => (
+                            <span
+                              key={i}
+                              className="text-xs px-2.5 py-1 rounded-lg bg-[#111113] border border-[#27272A] text-base-400"
+                            >
+                              {term}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      <ul className="space-y-2 text-xs text-base-500">
+                        {[
+                          "Mavzuni diqqat bilan o'qib, asosiy tushunchalarni yozing",
+                          "Dars davomida savol tug'ilsa — AI yordamchiga murojaat qiling",
+                          "Darsni tugatib, testni bajaring va XP yig'ing",
+                        ].map((item, i) => (
+                          <li
+                            key={i}
+                            className="flex items-start gap-2 animate-slide-in-left"
+                            style={{
+                              animationDelay: `${i * 60}ms`,
+                              animationFillMode: "backwards",
+                            }}
+                          >
+                            <span className="text-base-700 mt-0.5">•</span>
+                            {item}
+                          </li>
                         ))}
-                      </div>
+                      </ul>
                     </div>
-                    <ul className="space-y-2 text-xs text-base-500">
-                      {[
-                        "Mavzuni diqqat bilan o'qib, asosiy tushunchalarni yozing",
-                        "Dars davomida savol tug'ilsa — AI yordamchiga murojaat qiling",
-                        "Darsni tugatib, testni bajaring va XP yig'ing",
-                      ].map((item, i) => (
-                        <li key={i} className="flex items-start gap-2 animate-slide-in-left"
-                          style={{ animationDelay: `${i * 60}ms`, animationFillMode: 'backwards' }}>
-                          <span className="text-base-700 mt-0.5">•</span>{item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+                  )}
 
                 {/* Video Player */}
                 {currentLesson.videoUrl && (
@@ -888,17 +1212,19 @@ export default function CourseDetailPage() {
                 )}
 
                 {/* Video placeholder */}
-                {currentLesson.type === 'video' && !currentLesson.videoUrl && (
+                {currentLesson.type === "video" && !currentLesson.videoUrl && (
                   <div className="bg-[#0D0D10] rounded-xl aspect-video flex flex-col items-center justify-center border border-[#1E1E24] mb-4">
                     <div className="w-16 h-16 rounded-full bg-[#111113] border border-[#1E1E24] flex items-center justify-center mb-3">
                       <Play className="w-7 h-7 text-base-600 ml-1" />
                     </div>
-                    <p className="text-sm text-base-600">Video hali yuklanmagan</p>
+                    <p className="text-sm text-base-600">
+                      Video hali yuklanmagan
+                    </p>
                   </div>
                 )}
 
                 {/* Practice */}
-                {currentLesson.type === 'practice' && !quizActive && (
+                {currentLesson.type === "practice" && !quizActive && (
                   <div className="mb-4 animate-fade-in">
                     <div className="bg-[#0D0D10] rounded-xl border border-[#1E1E24] overflow-hidden">
                       <div className="flex items-center justify-between px-4 py-2.5 border-b border-[#1E1E24]">
@@ -907,25 +1233,38 @@ export default function CourseDetailPage() {
                           <div className="w-2.5 h-2.5 rounded-full bg-amber-500/70" />
                           <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/70" />
                         </div>
-                        <span className="text-xs text-base-700 code-font">main.py</span>
-                        <span className="badge bg-sky-500/10 text-sky-400 border border-sky-500/20 text-xs">Python</span>
+                        <span className="text-xs text-base-700 code-font">
+                          main.py
+                        </span>
+                        <span className="badge bg-sky-500/10 text-sky-400 border border-sky-500/20 text-xs">
+                          Python
+                        </span>
                       </div>
                       <div className="p-4">
                         <pre className="text-xs code-font text-base-400 leading-relaxed">
-                          <span className="text-base-700"># Topshiriq: 1-10 gacha sonlarning kvadratlari</span>{'\n\n'}
-                          <span className="text-sky-400">for</span>{' '}
-                          <span className="text-base-200">i</span>{' '}
-                          <span className="text-sky-400">in</span>{' '}
+                          <span className="text-base-700">
+                            # Topshiriq: 1-10 gacha sonlarning kvadratlari
+                          </span>
+                          {"\n\n"}
+                          <span className="text-sky-400">for</span>{" "}
+                          <span className="text-base-200">i</span>{" "}
+                          <span className="text-sky-400">in</span>{" "}
                           <span className="text-accent-400">range</span>
-                          <span className="text-base-400">(1, 11):</span>{'\n'}
-                          {'    '}<span className="text-base-700"># Sizning kodingiz</span>{'\n'}
-                          {'    '}<span className="text-amber-400">pass</span>
+                          <span className="text-base-400">(1, 11):</span>
+                          {"\n"}
+                          {"    "}
+                          <span className="text-base-700">
+                            # Sizning kodingiz
+                          </span>
+                          {"\n"}
+                          {"    "}
+                          <span className="text-amber-400">pass</span>
                         </pre>
                       </div>
                       <div className="px-4 pb-4">
                         <textarea
                           value={practiceCode}
-                          onChange={e => setPracticeCode(e.target.value)}
+                          onChange={(e) => setPracticeCode(e.target.value)}
                           className="w-full h-24 bg-[#111113] border border-[#1E1E24] rounded-lg p-3 text-xs code-font text-emerald-400 resize-none focus:outline-none focus:border-[#27272A] transition-colors"
                         />
                         <div className="flex gap-2 mt-2">
@@ -934,10 +1273,14 @@ export default function CourseDetailPage() {
                             disabled={practiceRunning}
                             className="btn-primary text-xs py-1.5 px-4 flex items-center gap-1.5 hover:scale-[1.02] active:scale-[0.98] transition-transform disabled:opacity-50 disabled:scale-100"
                           >
+                            {practiceRunning ? (
+                              <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            ) : (
+                              <Play className="w-3 h-3" />
+                            )}
                             {practiceRunning
-                              ? <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                              : <Play className="w-3 h-3" />}
-                            {practiceRunning ? 'Bajarilmoqda...' : 'Ishga tushirish'}
+                              ? "Bajarilmoqda..."
+                              : "Ishga tushirish"}
                           </button>
                           <button
                             onClick={() => sendAiMessage()}
@@ -951,18 +1294,20 @@ export default function CourseDetailPage() {
                     {practiceOutput && (
                       <div className="mt-3 bg-[#0D0D10] rounded-xl border border-[#1A2A1A] p-4 animate-fade-in">
                         <div className="text-xs text-emerald-600 mb-2 flex items-center gap-1.5">
-                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60" /> Natija:
+                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60" />{" "}
+                          Natija:
                         </div>
-                        <pre className="text-xs code-font text-emerald-400/80 leading-relaxed whitespace-pre-wrap">{practiceOutput}</pre>
+                        <pre className="text-xs code-font text-emerald-400/80 leading-relaxed whitespace-pre-wrap">
+                          {practiceOutput}
+                        </pre>
                       </div>
                     )}
                   </div>
                 )}
 
                 {/* Quiz */}
-                {(currentLesson.type === 'quiz' || quizActive) && (
+                {(currentLesson.type === "quiz" || quizActive) && (
                   <div className="mb-4 space-y-4 animate-fade-in">
-
                     {/* Loading holati */}
                     {quizLoading && (
                       <div className="flex flex-col items-center justify-center py-12 gap-4">
@@ -970,13 +1315,20 @@ export default function CourseDetailPage() {
                           <Brain className="w-5 h-5 text-base-500 animate-pulse" />
                         </div>
                         <div className="text-center">
-                          <p className="text-sm font-medium text-base-200 mb-1">AI savollar tayyorlamoqda...</p>
-                          <p className="text-xs text-base-600">Yuklanган materialdan savollar tuzilmoqda</p>
+                          <p className="text-sm font-medium text-base-200 mb-1">
+                            AI savollar tayyorlamoqda...
+                          </p>
+                          <p className="text-xs text-base-600">
+                            Yuklanган materialdan savollar tuzilmoqda
+                          </p>
                         </div>
                         <div className="flex gap-1.5">
-                          {[0,1,2].map(i => (
-                            <div key={i} className="w-1.5 h-1.5 rounded-full bg-accent-500 animate-pulse"
-                              style={{ animationDelay: `${i * 150}ms` }} />
+                          {[0, 1, 2].map((i) => (
+                            <div
+                              key={i}
+                              className="w-1.5 h-1.5 rounded-full bg-accent-500 animate-pulse"
+                              style={{ animationDelay: `${i * 150}ms` }}
+                            />
                           ))}
                         </div>
                       </div>
@@ -985,17 +1337,24 @@ export default function CourseDetailPage() {
                     {/* Xatolik holati */}
                     {!quizLoading && quizError && (
                       <div className="bg-rose-500/5 border border-rose-500/20 rounded-xl p-5 text-center">
-                        <p className="text-sm text-rose-400 mb-1 font-medium">Savollar yuklashda xatolik</p>
-                        <p className="text-xs text-rose-500/70 mb-4">{quizError}</p>
+                        <p className="text-sm text-rose-400 mb-1 font-medium">
+                          Savollar yuklashda xatolik
+                        </p>
+                        <p className="text-xs text-rose-500/70 mb-4">
+                          {quizError}
+                        </p>
                         <p className="text-xs text-base-600">
-                          O'qituvchi bu darsga hali material yuklamagan bo'lishi mumkin.
+                          O'qituvchi bu darsga hali material yuklamagan bo'lishi
+                          mumkin.
                         </p>
                       </div>
                     )}
 
                     {/* Savollar */}
-                    {!quizLoading && !quizError && quizQuestions.length > 0 && (
-                      !quizSubmitted ? (
+                    {!quizLoading &&
+                      !quizError &&
+                      quizQuestions.length > 0 &&
+                      (!quizSubmitted ? (
                         <>
                           <div className="flex items-center gap-2 text-sm text-base-400 mb-1">
                             <FileQuestion className="w-4 h-4 text-base-600" />
@@ -1005,94 +1364,158 @@ export default function CourseDetailPage() {
                             </span>
                           </div>
                           {quizQuestions.map((q, qi) => (
-                            <div key={q.id} className="card-elevated p-4 rounded-xl stagger-item animate-slide-up"
-                              style={{ animationDelay: `${qi * 80}ms`, animationFillMode: 'backwards' }}>
-                              <p className="text-sm text-base-200 mb-3 font-medium">{q.id}. {q.q}</p>
+                            <div
+                              key={q.id}
+                              className="card-elevated p-4 rounded-xl stagger-item animate-slide-up"
+                              style={{
+                                animationDelay: `${qi * 80}ms`,
+                                animationFillMode: "backwards",
+                              }}
+                            >
+                              <p className="text-sm text-base-200 mb-3 font-medium">
+                                {q.id}. {q.q}
+                              </p>
                               <div className="space-y-2">
                                 {q.options.map((opt, i) => (
-                                  <button key={i} onClick={() => setQuizAnswers(prev => ({ ...prev, [q.id]: i }))}
+                                  <button
+                                    key={i}
+                                    onClick={() =>
+                                      setQuizAnswers((prev) => ({
+                                        ...prev,
+                                        [q.id]: i,
+                                      }))
+                                    }
                                     className={`w-full text-left px-3 py-2.5 rounded-lg text-xs transition-all duration-200 border active:scale-[0.99] ${
                                       quizAnswers[q.id] === i
-                                        ? 'bg-accent-600/10 border-accent-600/40 text-accent-300'
-                                        : 'border-[#27272A] text-base-400 hover:border-[#3F3F46] hover:bg-[#111113] hover:text-base-200'
-                                    }`}>
-                                    <span className="text-base-700 mr-2">{['A', 'B', 'C', 'D'][i]}.</span> {opt}
+                                        ? "bg-accent-600/10 border-accent-600/40 text-accent-300"
+                                        : "border-[#27272A] text-base-400 hover:border-[#3F3F46] hover:bg-[#111113] hover:text-base-200"
+                                    }`}
+                                  >
+                                    <span className="text-base-700 mr-2">
+                                      {["A", "B", "C", "D"][i]}.
+                                    </span>{" "}
+                                    {opt}
                                   </button>
                                 ))}
                               </div>
                             </div>
                           ))}
-                          <button onClick={submitQuiz}
-                            disabled={Object.keys(quizAnswers).length < quizQuestions.length}
-                            className="btn-primary px-6 py-2 disabled:opacity-30 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98] transition-transform">
+                          <button
+                            onClick={submitQuiz}
+                            disabled={
+                              Object.keys(quizAnswers).length <
+                              quizQuestions.length
+                            }
+                            className="btn-primary px-6 py-2 disabled:opacity-30 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98] transition-transform"
+                          >
                             Topshirish
                           </button>
                         </>
                       ) : (
                         <div className="text-center py-10 animate-scale-in">
-                          <div className={`text-5xl font-bold mb-2 ${quizScore === quizQuestions.length ? 'text-base-200' : quizScore >= Math.ceil(quizQuestions.length / 2) ? 'text-base-300' : 'text-base-500'}`}>
+                          <div
+                            className={`text-5xl font-bold mb-2 ${quizScore === quizQuestions.length ? "text-base-200" : quizScore >= Math.ceil(quizQuestions.length / 2) ? "text-base-300" : "text-base-500"}`}
+                          >
                             {quizScore}/{quizQuestions.length}
                           </div>
                           <p className="text-sm text-base-500 mb-4">
-                            {quizScore === quizQuestions.length ? 'Mukammal! Barcha javoblar to\'g\'ri' :
-                              quizScore >= Math.ceil(quizQuestions.length / 2) ? 'Yaxshi natija! Biroz ko\'proq mashq qiling.' :
-                              'Qayta urinib ko\'ring — siz uddalay olasiz!'}
+                            {quizScore === quizQuestions.length
+                              ? "Mukammal! Barcha javoblar to'g'ri"
+                              : quizScore >= Math.ceil(quizQuestions.length / 2)
+                                ? "Yaxshi natija! Biroz ko'proq mashq qiling."
+                                : "Qayta urinib ko'ring — siz uddalay olasiz!"}
                           </p>
                           <div className="badge-amber text-sm inline-flex animate-bounce-once">
-                            +{Math.round(currentLesson.xpReward * (quizScore / quizQuestions.length))} XP
+                            +
+                            {Math.round(
+                              currentLesson.xpReward *
+                                (quizScore / quizQuestions.length),
+                            )}{" "}
+                            XP
                           </div>
                           <div className="mt-4">
-                            <button onClick={() => { setQuizSubmitted(false); setQuizAnswers({}) }}
-                              className="btn-secondary px-6 hover:scale-[1.02] active:scale-[0.98] transition-transform">
+                            <button
+                              onClick={() => {
+                                setQuizSubmitted(false);
+                                setQuizAnswers({});
+                              }}
+                              className="btn-secondary px-6 hover:scale-[1.02] active:scale-[0.98] transition-transform"
+                            >
                               Qayta urinish
                             </button>
                           </div>
                         </div>
-                      )
-                    )}
+                      ))}
                   </div>
                 )}
 
                 {/* Complete button */}
                 {(() => {
-                  const isDone = currentLesson.completed || localCompleted.has(currentLesson.id)
+                  const isDone =
+                    currentLesson.completed ||
+                    localCompleted.has(currentLesson.id);
                   return (
                     <button
                       onClick={handleCompleteLesson}
                       disabled={completing || isDone}
                       className="w-full btn-primary py-3 font-semibold flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99] transition-transform mt-2 disabled:scale-100 disabled:cursor-not-allowed"
                     >
-                      {completing
-                        ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        : <CheckCircle2 className={`w-4 h-4 ${isDone ? 'text-emerald-300' : ''}`} />}
-                      {isDone ? 'Bajarildi ✓' : completing ? 'Saqlanmoqda...' : `Darsni tugatish (+${currentLesson.xpReward} XP)`}
+                      {completing ? (
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      ) : (
+                        <CheckCircle2
+                          className={`w-4 h-4 ${isDone ? "text-emerald-300" : ""}`}
+                        />
+                      )}
+                      {isDone
+                        ? "Bajarildi ✓"
+                        : completing
+                          ? "Saqlanmoqda..."
+                          : `Darsni tugatish (+${currentLesson.xpReward} XP)`}
                     </button>
-                  )
+                  );
                 })()}
               </div>
 
               {/* AI Chat */}
-              <div className="card p-5 animate-slide-up" style={{ animationDelay: '60ms', animationFillMode: 'backwards' }}>
+              <div
+                className="card p-5 animate-slide-up"
+                style={{
+                  animationDelay: "60ms",
+                  animationFillMode: "backwards",
+                }}
+              >
                 <div className="flex items-center gap-2 mb-4">
                   <div className="w-8 h-8 rounded-lg bg-[#0D0D10] border border-[#1E1E24] flex items-center justify-center">
                     <Brain className="w-4 h-4 text-base-600" />
                   </div>
                   <div>
-                    <div className="text-sm font-semibold text-base-200">AI Yordamchi</div>
-                    <div className="text-xs text-base-700">Bu dars bo'yicha savol bering</div>
+                    <div className="text-sm font-semibold text-base-200">
+                      AI Yordamchi
+                    </div>
+                    <div className="text-xs text-base-700">
+                      Bu dars bo'yicha savol bering
+                    </div>
                   </div>
                 </div>
                 <div className="space-y-3 mb-4 max-h-60 overflow-y-auto no-scrollbar">
                   {aiChat.map((msg, i) => (
-                    <div key={i} className={`flex gap-2 animate-slide-up ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
-                      {msg.role === 'ai' && (
+                    <div
+                      key={i}
+                      className={`flex gap-2 animate-slide-up ${msg.role === "user" ? "flex-row-reverse" : ""}`}
+                    >
+                      {msg.role === "ai" && (
                         <div className="w-7 h-7 rounded-lg bg-[#0D0D10] border border-[#1E1E24] flex items-center justify-center flex-shrink-0">
                           <Brain className="w-3.5 h-3.5 text-base-600" />
                         </div>
                       )}
-                      <div className={`max-w-xs px-3 py-2 rounded-xl text-xs leading-relaxed ${
-                        msg.role === 'ai' ? 'bg-[#111113] border border-[#1E1E24] text-base-300' : 'bg-accent-600/10 border border-accent-600/20 text-accent-300'
-                      }`}>
+                      <div
+                        className={`max-w-xs px-3 py-2 rounded-xl text-xs leading-relaxed ${
+                          msg.role === "ai"
+                            ? "bg-[#111113] border border-[#1E1E24] text-base-300"
+                            : "bg-accent-600/10 border border-accent-600/20 text-accent-300"
+                        }`}
+                      >
                         {msg.text}
                       </div>
                     </div>
@@ -1103,19 +1526,32 @@ export default function CourseDetailPage() {
                         <Brain className="w-3.5 h-3.5 text-base-600" />
                       </div>
                       <div className="px-3 py-2.5 rounded-xl bg-[#111113] border border-[#1E1E24] flex gap-1 items-center">
-                        {[0, 1, 2].map(i => (
-                          <div key={i} className="w-1 h-1 rounded-full bg-accent-500 animate-pulse" style={{ animationDelay: `${i * 150}ms` }} />
+                        {[0, 1, 2].map((i) => (
+                          <div
+                            key={i}
+                            className="w-1 h-1 rounded-full bg-accent-500 animate-pulse"
+                            style={{ animationDelay: `${i * 150}ms` }}
+                          />
                         ))}
                       </div>
                     </div>
                   )}
                 </div>
                 <div className="flex gap-2">
-                  <input value={aiInput} onChange={(e) => setAiInput(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && !aiTyping && sendAiMessage()}
-                    className="input text-xs flex-1" placeholder="Savol bering..." />
-                  <button onClick={sendAiMessage} disabled={aiTyping}
-                    className="btn-primary px-4 text-xs hover:scale-[1.04] active:scale-[0.96] transition-transform disabled:opacity-50 disabled:scale-100">
+                  <input
+                    value={aiInput}
+                    onChange={(e) => setAiInput(e.target.value)}
+                    onKeyDown={(e) =>
+                      e.key === "Enter" && !aiTyping && sendAiMessage()
+                    }
+                    className="input text-xs flex-1"
+                    placeholder="Savol bering..."
+                  />
+                  <button
+                    onClick={sendAiMessage}
+                    disabled={aiTyping}
+                    className="btn-primary px-4 text-xs hover:scale-[1.04] active:scale-[0.96] transition-transform disabled:opacity-50 disabled:scale-100"
+                  >
                     Yuborish
                   </button>
                 </div>
@@ -1130,5 +1566,5 @@ export default function CourseDetailPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
