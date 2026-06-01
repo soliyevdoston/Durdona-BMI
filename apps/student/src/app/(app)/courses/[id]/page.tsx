@@ -781,7 +781,7 @@ export default function CourseDetailPage() {
 
   // Load saved diagnostic from localStorage
   useEffect(() => {
-    if (!id) return;
+    if (!id || typeof window === "undefined") return;
     const saved = localStorage.getItem(`diag_${id}`);
     if (saved) {
       try {
@@ -802,7 +802,9 @@ export default function CourseDetailPage() {
   const diagComplete = (skippable: Set<number>) => {
     setSkippableIdxs(skippable);
     setDiagState("done");
-    localStorage.setItem(`diag_${id}`, JSON.stringify([...skippable]));
+    if (typeof window !== "undefined") {
+      localStorage.setItem(`diag_${id}`, JSON.stringify([...skippable]));
+    }
   };
 
   // Quiz dars ochilganda savollarni yuklash
