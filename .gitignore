@@ -27,3 +27,18 @@ backend/dist/
 # TypeScript
 **/next-env.d.ts
 **/tsconfig.tsbuildinfo
+
+# Word / Office hujjatlar
+*.docx
+*.doc
+*.xlsx
+*.xls
+*.pptx
+*.ppt
+
+# Python skriptlar (vaqtinchalik)
+generate_*.py
+expand*.py
+
+# Skrinshot papka
+screenshots/

@@ -6,7 +6,6 @@ import { api } from "./api";
 
 export type Role = "student" | "teacher" | "admin" | "super_admin";
 
-// Safe storage — SSR'da localStorage'ga urinish xatosini oldini oladi
 const safeStorage: PersistStorage<any> = {
   getItem: (name: string) => {
     if (typeof window === "undefined") return null;

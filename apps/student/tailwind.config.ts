@@ -80,6 +80,7 @@ const config: Config = {
         'count-up':       'countUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)',
         'shimmer':        'shimmer 1.8s linear infinite',
         'draw-line':      'drawLine 0.6s ease-out forwards',
+        'shake':          'shake 0.6s ease-out',
       },
       keyframes: {
         fadeIn: {
@@ -127,6 +128,13 @@ const config: Config = {
         float: {
           '0%, 100%': { transform: 'translateY(0px)' },
           '50%':      { transform: 'translateY(-8px)' },
+        },
+        shake: {
+          '0%, 100%': { transform: 'translateX(0)' },
+          '20%':      { transform: 'translateX(-6px)' },
+          '40%':      { transform: 'translateX(6px)' },
+          '60%':      { transform: 'translateX(-4px)' },
+          '80%':      { transform: 'translateX(4px)' },
         },
       },
       boxShadow: {

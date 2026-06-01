@@ -21,6 +21,7 @@ import {
   Download,
   Paperclip,
   FileDown,
+  Trophy,
 } from "lucide-react";
 import { api } from "@/lib/api";
 import { useApi } from "@/lib/useApi";
@@ -732,6 +733,297 @@ interface QuizQuestion {
   correct: number;
 }
 
+// ─── Word Match Game ──────────────────────────────────────────────────────────
+interface WMPair { term: string; def: string }
+
+const WM_DATA: Record<string, WMPair[]> = {
+  python: [
+    { term: "print()", def: "Ekranga matn chiqaradi" },
+    { term: "input()", def: "Foydalanuvchidan ma'lumot oladi" },
+    { term: "len()", def: "Uzunlikni qaytaradi" },
+    { term: "range()", def: "Ketma-ketlik yaratadi" },
+    { term: "def", def: "Funksiya e'lon qiladi" },
+    { term: "for", def: "Takrorlash tsikli" },
+  ],
+  html: [
+    { term: "<h1>", def: "Asosiy sarlavha tegi" },
+    { term: "<p>", def: "Paragraf — matn bloki" },
+    { term: "<a>", def: "Havola — link" },
+    { term: "<img>", def: "Rasm qo'shish" },
+    { term: "<div>", def: "Blok element — bo'lim" },
+    { term: "<form>", def: "Kirish formasi" },
+  ],
+  css: [
+    { term: "color", def: "Matn rangini o'rnatadi" },
+    { term: "background", def: "Fon rangini o'rnatadi" },
+    { term: "font-size", def: "Shrift o'lchamini belgilaydi" },
+    { term: "margin", def: "Tashqi bo'sh joy" },
+    { term: "padding", def: "Ichki bo'sh joy" },
+    { term: "display", def: "Ko'rsatish usulini belgilaydi" },
+  ],
+  sql: [
+    { term: "SELECT", def: "Ma'lumotlarni tanlash" },
+    { term: "WHERE", def: "Shart qo'yish" },
+    { term: "INSERT", def: "Yangi qator qo'shish" },
+    { term: "UPDATE", def: "Ma'lumotni yangilash" },
+    { term: "DELETE", def: "Qatorni o'chirish" },
+    { term: "JOIN", def: "Jadvallarni birlashtirish" },
+  ],
+  algoritm: [
+    { term: "Algoritm", def: "Qadam-baqadam ko'rsatma" },
+    { term: "Tsikl", def: "Qayta-qayta bajariladigan blok" },
+    { term: "Shart", def: "if/else — yo'nalish tanlash" },
+    { term: "Rekursiya", def: "Funksiya o'zini o'zi chaqiradi" },
+    { term: "O(n)", def: "Chiziqli murakkablik" },
+    { term: "Massiv", def: "Tartibli elementlar to'plami" },
+  ],
+  internet: [
+    { term: "HTTP", def: "Web sahifalar uzatish protokoli" },
+    { term: "URL", def: "Veb manzil" },
+    { term: "DNS", def: "Domen → IP tarjimasi" },
+    { term: "IP", def: "Internet protokol manzil" },
+    { term: "Router", def: "Tarmoq yo'naltiruvchi qurilma" },
+    { term: "HTTPS", def: "Xavfsiz shifrlangan protokol" },
+  ],
+  xavfsizlik: [
+    { term: "Phishing", def: "Aldov yo'li bilan ma'lumot o'g'irlash" },
+    { term: "Firewall", def: "Tarmoqni himoya qiluvchi to'siq" },
+    { term: "Encryption", def: "Ma'lumotni shifrlash" },
+    { term: "2FA", def: "Ikki bosqichli autentifikatsiya" },
+    { term: "Malware", def: "Zararli dasturiy ta'minot" },
+    { term: "VPN", def: "Virtual xususiy tarmoq" },
+  ],
+  kompyuter: [
+    { term: "CPU", def: "Markaziy protsessor — 'miya'" },
+    { term: "RAM", def: "Tezkor xotira — vaqtincha saqlash" },
+    { term: "SSD", def: "Tez elektron qattiq disk" },
+    { term: "GPU", def: "Grafik protsessor" },
+    { term: "BIOS", def: "Asosiy kiritish-chiqarish tizimi" },
+    { term: "USB", def: "Universal ketma-ket shinasi" },
+  ],
+  word: [
+    { term: "Font", def: "Matn turi va ko'rinishi" },
+    { term: "Paragraph", def: "Matn bloki — abzats" },
+    { term: "Table", def: "Jadval — qatorlar va ustunlar" },
+    { term: "Header", def: "Sahifa sarlavhasi yuqori qismi" },
+    { term: "Footer", def: "Sahifa pastki qismi" },
+    { term: "Indent", def: "Qatorni ichkariga siljitish" },
+  ],
+  excel: [
+    { term: "Cell", def: "Katakcha — jadval yacheykasi" },
+    { term: "Formula", def: "Hisoblash ifodasi (=...)" },
+    { term: "=SUM()", def: "Yig'indi hisoblash funksiyasi" },
+    { term: "=IF()", def: "Shartli funksiya" },
+    { term: "Chart", def: "Diagramma yoki grafik" },
+    { term: "Filter", def: "Ma'lumotlarni filtrlash" },
+  ],
+  operatsion: [
+    { term: "OS", def: "Operatsion tizim" },
+    { term: "Process", def: "Ishlaydigan dastur jarayoni" },
+    { term: "Driver", def: "Qurilma boshqaruv dasturi" },
+    { term: "File System", def: "Fayllarni tashkil etish tizimi" },
+    { term: "Terminal", def: "Buyruq qatori interfeysi" },
+    { term: "Kernel", def: "OS ning asosiy yadrosi" },
+  ],
+  tarmoq: [
+    { term: "LAN", def: "Mahalliy hududiy tarmoq" },
+    { term: "WAN", def: "Keng hududiy tarmoq" },
+    { term: "MAC", def: "Qurilmaning fizik manzili" },
+    { term: "Switch", def: "Tarmoq kommutatori" },
+    { term: "Bandwidth", def: "Tarmoq o'tkazish quvvati" },
+    { term: "Ping", def: "Tarmoq kechikishini o'lchaydi" },
+  ],
+};
+
+function getWMPairs(title: string): WMPair[] {
+  const t = title.toLowerCase();
+  for (const [key, pairs] of Object.entries(WM_DATA)) {
+    if (t.includes(key)) return pairs;
+  }
+  return WM_DATA.kompyuter;
+}
+
+function WordMatchGame({ lesson }: { lesson: any }) {
+  const pairs = getWMPairs(lesson?.title || "");
+  const [shuffledDefs, setShuffledDefs] = useState<{ text: string; idx: number }[]>([]);
+  const [selTerm, setSelTerm] = useState<number | null>(null);
+  const [matched, setMatched] = useState<Set<number>>(new Set());
+  const [wrongFlash, setWrongFlash] = useState<{ term: number; def: number } | null>(null);
+  const [score, setScore] = useState(0);
+  const [errors, setErrors] = useState(0);
+  const [secs, setSecs] = useState(0);
+  const [finished, setFinished] = useState(false);
+
+  const initGame = (prs: WMPair[]) => {
+    const defs = prs.map((p, i) => ({ text: p.def, idx: i }));
+    defs.sort(() => Math.random() - 0.5);
+    setShuffledDefs(defs);
+    setSelTerm(null);
+    setMatched(new Set());
+    setWrongFlash(null);
+    setScore(0);
+    setErrors(0);
+    setSecs(0);
+    setFinished(false);
+  };
+
+  useEffect(() => { initGame(pairs); }, [lesson?.id]);
+
+  useEffect(() => {
+    if (finished) return;
+    const t = setInterval(() => setSecs((s) => s + 1), 1000);
+    return () => clearInterval(t);
+  }, [finished]);
+
+  const handleTerm = (i: number) => {
+    if (matched.has(i) || finished) return;
+    setSelTerm(i === selTerm ? null : i);
+  };
+
+  const handleDef = (d: { text: string; idx: number }) => {
+    if (matched.has(d.idx) || selTerm === null || finished) return;
+    if (d.idx === selTerm) {
+      const newMatched = new Set(matched);
+      newMatched.add(selTerm);
+      setMatched(newMatched);
+      setScore((s) => s + 1);
+      setSelTerm(null);
+      if (newMatched.size === pairs.length) setFinished(true);
+    } else {
+      setErrors((e) => e + 1);
+      setWrongFlash({ term: selTerm, def: d.idx });
+      setTimeout(() => { setWrongFlash(null); setSelTerm(null); }, 700);
+    }
+  };
+
+  const timeStr = `${Math.floor(secs / 60).toString().padStart(2, "0")}:${(secs % 60).toString().padStart(2, "0")}`;
+  const pct = pairs.length ? Math.round((score / pairs.length) * 100) : 0;
+  const xpEarned = Math.max(5, 20 - errors * 2);
+
+  if (finished) {
+    return (
+      <div className="text-center py-10 animate-scale-in">
+        <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto mb-4 animate-bounce-once">
+          <Trophy className="w-7 h-7 text-emerald-400" />
+        </div>
+        <div className="text-3xl font-bold text-base-100 mb-1">
+          {score}/{pairs.length}
+        </div>
+        <p className="text-sm text-base-500 mb-1">
+          Vaqt: {timeStr} · Xatolar: {errors}
+        </p>
+        <div className="badge-amber inline-flex text-sm animate-bounce-once mb-5">
+          +{xpEarned} XP
+        </div>
+        <div>
+          <button
+            onClick={() => initGame(pairs)}
+            className="btn-secondary text-xs px-6 hover:scale-[1.02] active:scale-[0.98] transition-transform"
+          >
+            Qayta o'ynash
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="animate-fade-in">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <Trophy className="w-4 h-4 text-amber-400" />
+          <span className="text-xs font-semibold text-base-200">So'z Juftlashtirish</span>
+        </div>
+        <div className="flex items-center gap-3 text-xs">
+          <span className="text-base-600 code-font">{timeStr}</span>
+          {errors > 0 && <span className="text-rose-500">{errors} xato</span>}
+          <span className="text-base-500">{score}/{pairs.length}</span>
+        </div>
+      </div>
+
+      {/* Progress bar */}
+      <div className="progress-bar mb-4">
+        <div className="progress-fill" style={{ width: `${pct}%` }} />
+      </div>
+
+      <p className="text-xs text-base-600 mb-3 text-center">
+        Atamani bosing → keyin uning ta'rifini toping
+      </p>
+
+      {/* Game columns */}
+      <div className="grid grid-cols-2 gap-3">
+        {/* Terms */}
+        <div className="space-y-2">
+          <p className="text-xs text-center text-base-700 mb-1 uppercase tracking-wider">
+            Atamalar
+          </p>
+          {pairs.map((p, i) => {
+            const isMatched = matched.has(i);
+            const isSel = selTerm === i;
+            const isWrong = wrongFlash?.term === i;
+            return (
+              <button
+                key={i}
+                onClick={() => handleTerm(i)}
+                disabled={isMatched}
+                className={`w-full text-left px-3 py-2.5 rounded-xl text-xs border transition-all duration-200 font-medium
+                  ${isMatched
+                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400 cursor-default"
+                    : isWrong
+                      ? "bg-rose-500/10 border-rose-500/40 text-rose-400 animate-shake"
+                      : isSel
+                        ? "bg-accent-600/15 border-accent-500/50 text-accent-300 shadow-[0_0_12px_rgba(124,58,237,0.25)] scale-[1.02]"
+                        : "border-[#27272A] text-base-300 hover:border-[#3F3F46] hover:bg-[#1A1A1F] hover:text-base-100 active:scale-[0.98]"
+                  }`}
+              >
+                {isMatched && <span className="mr-1">✓</span>}
+                <span className="code-font">{p.term}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Definitions */}
+        <div className="space-y-2">
+          <p className="text-xs text-center text-base-700 mb-1 uppercase tracking-wider">
+            Ta'riflar
+          </p>
+          {shuffledDefs.map((d, si) => {
+            const isMatched = matched.has(d.idx);
+            const isWrong = wrongFlash?.def === d.idx;
+            return (
+              <button
+                key={si}
+                onClick={() => handleDef(d)}
+                disabled={isMatched}
+                className={`w-full text-left px-3 py-2.5 rounded-xl text-xs border transition-all duration-200
+                  ${isMatched
+                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400 cursor-default"
+                    : isWrong
+                      ? "bg-rose-500/10 border-rose-500/40 text-rose-400 animate-shake"
+                      : selTerm !== null
+                        ? "border-[#27272A] text-base-300 hover:border-accent-500/40 hover:bg-accent-600/5 hover:text-base-100 cursor-pointer"
+                        : "border-[#27272A] text-base-500 cursor-default opacity-50"
+                  }`}
+              >
+                {isMatched && <span className="mr-1 text-emerald-400">✓</span>}
+                {d.text}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {selTerm !== null && (
+        <p className="text-xs text-center text-accent-500 mt-3 animate-fade-in">
+          "<span className="text-accent-300 font-medium code-font">{pairs[selTerm].term}</span>" tanlandi — ta'rifini toping
+        </p>
+      )}
+    </div>
+  );
+}
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function CourseDetailPage() {
   const { id } = useParams();
@@ -754,11 +1046,6 @@ export default function CourseDetailPage() {
   const [aiTyping, setAiTyping] = useState(false);
   const [completing, setCompleting] = useState(false);
   const [localCompleted, setLocalCompleted] = useState<Set<string>>(new Set());
-  const [practiceCode, setPracticeCode] = useState(
-    'for i in range(1, 11):\n    print(f"{i} ** 2 = {i**2}")',
-  );
-  const [practiceOutput, setPracticeOutput] = useState<string | null>(null);
-  const [practiceRunning, setPracticeRunning] = useState(false);
 
   // AI quiz state
   const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>([]);
@@ -770,6 +1057,9 @@ export default function CourseDetailPage() {
     "idle",
   );
   const [skippableIdxs, setSkippableIdxs] = useState<Set<number>>(new Set());
+
+  // useEffect closures currentLesson dan foydalanadi — shuning uchun bu yerda hisoblanadi
+  const currentLesson = lessons.find((l: any) => l.id === activeLesson);
 
   // Auto-enroll if not enrolled
   useEffect(() => {
@@ -858,7 +1148,6 @@ export default function CourseDetailPage() {
       </div>
     );
 
-  const currentLesson = lessons.find((l: any) => l.id === activeLesson);
   const completedCount = lessons.filter(
     (l: any) => l.completed || localCompleted.has(l.id),
   ).length;
@@ -898,17 +1187,6 @@ export default function CourseDetailPage() {
       console.error("Lesson complete:", e.message);
     }
     setCompleting(false);
-  };
-
-  const runPracticeCode = async () => {
-    setPracticeRunning(true);
-    try {
-      const { output, duration } = await api.runCode(practiceCode, "python");
-      setPracticeOutput(`${output}\n\n⏱ ${duration}ms`);
-    } catch {
-      setPracticeOutput("Backend ulanishda xatolik. Keyinroq urinib ko'ring.");
-    }
-    setPracticeRunning(false);
   };
 
   const submitQuiz = () => setQuizSubmitted(true);
@@ -1225,85 +1503,10 @@ export default function CourseDetailPage() {
                   </div>
                 )}
 
-                {/* Practice */}
+                {/* Practice — Word Match Game */}
                 {currentLesson.type === "practice" && !quizActive && (
-                  <div className="mb-4 animate-fade-in">
-                    <div className="bg-[#0D0D10] rounded-xl border border-[#1E1E24] overflow-hidden">
-                      <div className="flex items-center justify-between px-4 py-2.5 border-b border-[#1E1E24]">
-                        <div className="flex items-center gap-2">
-                          <div className="w-2.5 h-2.5 rounded-full bg-rose-500/70" />
-                          <div className="w-2.5 h-2.5 rounded-full bg-amber-500/70" />
-                          <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/70" />
-                        </div>
-                        <span className="text-xs text-base-700 code-font">
-                          main.py
-                        </span>
-                        <span className="badge bg-sky-500/10 text-sky-400 border border-sky-500/20 text-xs">
-                          Python
-                        </span>
-                      </div>
-                      <div className="p-4">
-                        <pre className="text-xs code-font text-base-400 leading-relaxed">
-                          <span className="text-base-700">
-                            # Topshiriq: 1-10 gacha sonlarning kvadratlari
-                          </span>
-                          {"\n\n"}
-                          <span className="text-sky-400">for</span>{" "}
-                          <span className="text-base-200">i</span>{" "}
-                          <span className="text-sky-400">in</span>{" "}
-                          <span className="text-accent-400">range</span>
-                          <span className="text-base-400">(1, 11):</span>
-                          {"\n"}
-                          {"    "}
-                          <span className="text-base-700">
-                            # Sizning kodingiz
-                          </span>
-                          {"\n"}
-                          {"    "}
-                          <span className="text-amber-400">pass</span>
-                        </pre>
-                      </div>
-                      <div className="px-4 pb-4">
-                        <textarea
-                          value={practiceCode}
-                          onChange={(e) => setPracticeCode(e.target.value)}
-                          className="w-full h-24 bg-[#111113] border border-[#1E1E24] rounded-lg p-3 text-xs code-font text-emerald-400 resize-none focus:outline-none focus:border-[#27272A] transition-colors"
-                        />
-                        <div className="flex gap-2 mt-2">
-                          <button
-                            onClick={runPracticeCode}
-                            disabled={practiceRunning}
-                            className="btn-primary text-xs py-1.5 px-4 flex items-center gap-1.5 hover:scale-[1.02] active:scale-[0.98] transition-transform disabled:opacity-50 disabled:scale-100"
-                          >
-                            {practiceRunning ? (
-                              <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                            ) : (
-                              <Play className="w-3 h-3" />
-                            )}
-                            {practiceRunning
-                              ? "Bajarilmoqda..."
-                              : "Ishga tushirish"}
-                          </button>
-                          <button
-                            onClick={() => sendAiMessage()}
-                            className="btn-ghost text-xs py-1.5 px-3 flex items-center gap-1.5"
-                          >
-                            <Brain className="w-3 h-3" /> AI Tushuntirsin
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                    {practiceOutput && (
-                      <div className="mt-3 bg-[#0D0D10] rounded-xl border border-[#1A2A1A] p-4 animate-fade-in">
-                        <div className="text-xs text-emerald-600 mb-2 flex items-center gap-1.5">
-                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60" />{" "}
-                          Natija:
-                        </div>
-                        <pre className="text-xs code-font text-emerald-400/80 leading-relaxed whitespace-pre-wrap">
-                          {practiceOutput}
-                        </pre>
-                      </div>
-                    )}
+                  <div className="mb-4 bg-[#0D0D10] rounded-xl border border-[#1E1E24] p-4 animate-fade-in">
+                    <WordMatchGame lesson={currentLesson} />
                   </div>
                 )}
 
