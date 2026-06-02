@@ -1096,6 +1096,7 @@ export default function CourseDetailPage() {
     "idle",
   );
   const [skippableIdxs, setSkippableIdxs] = useState<Set<number>>(new Set());
+  const [gameOpen, setGameOpen] = useState(false);
 
   // useEffect closures currentLesson dan foydalanadi — shuning uchun bu yerda hisoblanadi
   const currentLesson = lessons.find((l: any) => l.id === activeLesson);
@@ -1542,10 +1543,31 @@ export default function CourseDetailPage() {
                   </div>
                 )}
 
-                {/* Amaliyot O'yini — quiz bo'lmagan barcha darslarda ko'rinadi */}
+                {/* Amaliyot O'yini tugmasi */}
                 {currentLesson.type !== "quiz" && (
-                  <div className="mb-4 bg-[#0D0D10] rounded-xl border border-[#1E1E24] p-5 animate-fade-in">
-                    <PracticeGame lesson={currentLesson} />
+                  <div className="mb-4">
+                    <button
+                      onClick={() => setGameOpen((v) => !v)}
+                      className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-[#27272A] bg-[#111113] hover:border-accent-500/40 hover:bg-accent-600/5 transition-all duration-200 group"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-7 h-7 rounded-lg bg-accent-600/10 border border-accent-600/20 flex items-center justify-center">
+                          <Code2 className="w-3.5 h-3.5 text-accent-400" />
+                        </div>
+                        <div className="text-left">
+                          <div className="text-sm font-semibold text-base-100">Amaliyot O'yini</div>
+                          <div className="text-xs text-base-600">Kod to'ldirish · mavzuga oid savollar</div>
+                        </div>
+                      </div>
+                      <div className={`w-5 h-5 rounded-md border border-[#27272A] flex items-center justify-center transition-all duration-200 ${gameOpen ? "bg-accent-600/20 border-accent-500/40 rotate-180" : "group-hover:border-[#3F3F46]"}`}>
+                        <ArrowRight className={`w-3 h-3 transition-all duration-200 ${gameOpen ? "text-accent-400 -rotate-90" : "text-base-600 rotate-90"}`} />
+                      </div>
+                    </button>
+                    {gameOpen && (
+                      <div className="mt-2 bg-[#0D0D10] rounded-xl border border-[#1E1E24] p-5 animate-slide-up">
+                        <PracticeGame lesson={currentLesson} />
+                      </div>
+                    )}
                   </div>
                 )}
 
