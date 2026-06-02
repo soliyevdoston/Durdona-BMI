@@ -1542,8 +1542,8 @@ export default function CourseDetailPage() {
                   </div>
                 )}
 
-                {/* Practice — Kod To'ldirish O'yini */}
-                {currentLesson.type === "practice" && !quizActive && (
+                {/* Amaliyot O'yini — quiz bo'lmagan barcha darslarda ko'rinadi */}
+                {currentLesson.type !== "quiz" && (
                   <div className="mb-4 bg-[#0D0D10] rounded-xl border border-[#1E1E24] p-5 animate-fade-in">
                     <PracticeGame lesson={currentLesson} />
                   </div>
