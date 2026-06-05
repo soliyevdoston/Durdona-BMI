@@ -93,6 +93,44 @@ router.post('/', requireAuth, requireRole('admin', 'super_admin'), async (req, r
   res.status(201).json(publicUser(u))
 })
 
+// Get user's enrolled course IDs (admin)
+router.get('/:id/enrollments', requireAuth, requireRole('admin', 'super_admin'), async (req, res) => {
+  const enrollments = await prisma.enrollment.findMany({
+    where: { userId: req.params.id },
+    select: { courseId: true },
+  })
+  res.json(enrollments.map(e => e.courseId))
+})
+
+// Bulk-set user enrollments (admin): add missing, remove unchecked
+router.put('/:id/enrollments', requireAuth, requireRole('admin', 'super_admin'), async (req, res) => {
+  const { courseIds = [] } = req.body as { courseIds: string[] }
+  const userId = req.params.id
+
+  const current = await prisma.enrollment.findMany({
+    where: { userId },
+    select: { courseId: true },
+  })
+  const currentIds = current.map(e => e.courseId)
+  const toAdd = courseIds.filter(id => !currentIds.includes(id))
+  const toRemove = currentIds.filter(id => !courseIds.includes(id))
+
+  if (toAdd.length > 0) {
+    await prisma.enrollment.createMany({
+      data: toAdd.map(courseId => ({ userId, courseId })),
+      skipDuplicates: true,
+    })
+  }
+  if (toRemove.length > 0) {
+    await prisma.enrollment.deleteMany({
+      where: { userId, courseId: { in: toRemove } },
+    })
+  }
+
+  await log(req.user!.id, 'user.enrollments.set', { userId, added: toAdd, removed: toRemove })
+  res.json({ ok: true, added: toAdd.length, removed: toRemove.length })
+})
+
 router.patch('/:id', requireAuth, requireRole('admin', 'super_admin'), async (req, res) => {
   const { name, email, role } = req.body
   const u = await prisma.user.update({

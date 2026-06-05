@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Search, MoreVertical, Edit, Trash2, Shield, ShieldCheck,
   UserPlus, Download, Users, GraduationCap, BookOpen, Crown, X, CheckCircle2
@@ -13,6 +13,109 @@ const ROLE_CONFIG = {
   teacher: { label: "O'qituvchi", color: 'badge-sky', Icon: BookOpen },
   admin: { label: 'Admin', color: 'badge-emerald', Icon: ShieldCheck },
   super_admin: { label: 'Super Admin', color: 'badge bg-amber-500/10 text-amber-400 border border-amber-500/20', Icon: Crown },
+}
+
+function EditUserModal({ user, onClose, onSuccess }: { user: any; onClose: () => void; onSuccess: () => void }) {
+  const { data: allCourses, loading: coursesLoading } = useApi(() => api.courses())
+  const { data: enrolledIds, loading: enrollLoading } = useApi(() => api.getUserEnrollments(user.id))
+  const [selected, setSelected] = useState<Set<string>>(new Set())
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [done, setDone] = useState(false)
+
+  useEffect(() => {
+    if (enrolledIds) setSelected(new Set(enrolledIds))
+  }, [enrolledIds])
+
+  const toggle = (courseId: string) => {
+    setSelected(prev => {
+      const next = new Set(prev)
+      next.has(courseId) ? next.delete(courseId) : next.add(courseId)
+      return next
+    })
+  }
+
+  const handleSave = async () => {
+    setSaving(true); setError(null)
+    try {
+      await api.setUserEnrollments(user.id, [...selected])
+      setDone(true)
+      onSuccess()
+    } catch (e: any) { setError(e.message) }
+    setSaving(false)
+  }
+
+  const loading = coursesLoading || enrollLoading
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={!saving ? onClose : undefined} />
+      <div className="relative w-full max-w-md card-elevated p-6 animate-slide-up">
+        {done ? (
+          <div className="text-center py-6">
+            <div className="w-14 h-14 rounded-full bg-emerald-500/15 flex items-center justify-center mx-auto mb-4">
+              <CheckCircle2 className="w-7 h-7 text-emerald-400" />
+            </div>
+            <h2 className="text-xl font-bold text-base-100 mb-2">Saqlandi!</h2>
+            <p className="text-sm text-base-500 mb-5">O'quvchining kurs ro'yxati yangilandi.</p>
+            <button onClick={onClose} className="btn-secondary w-full py-2.5">Yopish</button>
+          </div>
+        ) : (
+          <>
+            <div className="flex items-center justify-between mb-5">
+              <div>
+                <h2 className="text-xl font-bold text-base-100">Kurslarni Belgilash</h2>
+                <p className="text-sm text-base-500 mt-0.5">{user.name}</p>
+              </div>
+              <button onClick={onClose}><X className="w-5 h-5 text-base-500 hover:text-base-200" /></button>
+            </div>
+
+            {loading ? (
+              <div className="text-center py-8 text-base-600 text-sm">Yuklanmoqda...</div>
+            ) : (
+              <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+                {(allCourses || []).map((course: any) => (
+                  <label key={course.id}
+                    className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${selected.has(course.id) ? 'border-accent-600/50 bg-accent-600/5' : 'border-[#27272A] hover:border-[#3a3a42]'}`}>
+                    <input
+                      type="checkbox"
+                      checked={selected.has(course.id)}
+                      onChange={() => toggle(course.id)}
+                      className="w-4 h-4 accent-violet-500 flex-shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium text-base-200 truncate">{course.title}</div>
+                      <div className="text-xs text-base-600">{course.lessons} dars · {course.category}</div>
+                    </div>
+                    {selected.has(course.id) && (
+                      <CheckCircle2 className="w-4 h-4 text-accent-400 flex-shrink-0" />
+                    )}
+                  </label>
+                ))}
+              </div>
+            )}
+
+            <div className="text-xs text-base-500 mt-3 mb-4">
+              {selected.size} ta kurs tanlangan
+            </div>
+
+            {error && (
+              <div className="mb-3 text-xs text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-xl px-3 py-2">{error}</div>
+            )}
+
+            <div className="flex gap-3">
+              <button onClick={onClose} disabled={saving} className="btn-secondary flex-1 py-2.5">Bekor</button>
+              <button onClick={handleSave} disabled={saving || loading}
+                className="btn-primary flex-1 py-2.5 flex items-center justify-center gap-2 disabled:opacity-70">
+                {saving && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
+                {saving ? 'Saqlanmoqda...' : 'Saqlash'}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  )
 }
 
 function AddUserModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: () => void }) {
@@ -99,6 +202,7 @@ export default function AdminUsersPage() {
   const [roleFilter, setRoleFilter] = useState<'all' | 'student' | 'teacher' | 'admin'>('all')
   const [menuOpen, setMenuOpen] = useState<string | null>(null)
   const [showAdd, setShowAdd] = useState(false)
+  const [editUser, setEditUser] = useState<any | null>(null)
   const [deleting, setDeleting] = useState<string | null>(null)
 
   const { data, loading, refetch } = useApi(() => api.users())
@@ -241,11 +345,13 @@ export default function AdminUsersPage() {
                         <MoreVertical className="w-4 h-4" />
                       </button>
                       {menuOpen === u.id && (
-                        <div className="absolute right-0 top-full mt-1 w-44 card-elevated shadow-card-hover z-20 py-1 text-left animate-slide-up">
-                          <button className="w-full px-3 py-2 text-xs flex items-center gap-2 hover:bg-[#222229] text-sky-400"
-                            onClick={() => { setMenuOpen(null) }}>
-                            <Shield className="w-3.5 h-3.5" /> Rol o'zgartirish
-                          </button>
+                        <div className="absolute right-0 top-full mt-1 w-48 card-elevated shadow-card-hover z-20 py-1 text-left animate-slide-up">
+                          {u.role === 'student' && (
+                            <button className="w-full px-3 py-2 text-xs flex items-center gap-2 hover:bg-[#222229] text-accent-400"
+                              onClick={() => { setEditUser(u); setMenuOpen(null) }}>
+                              <Edit className="w-3.5 h-3.5" /> Kurslarni belgilash
+                            </button>
+                          )}
                           <button
                             onClick={() => handleDelete(u.id, u.name)}
                             disabled={deleting === u.id}
@@ -269,6 +375,9 @@ export default function AdminUsersPage() {
 
       {showAdd && (
         <AddUserModal onClose={() => setShowAdd(false)} onSuccess={refetch} />
+      )}
+      {editUser && (
+        <EditUserModal user={editUser} onClose={() => setEditUser(null)} onSuccess={refetch} />
       )}
     </div>
   )

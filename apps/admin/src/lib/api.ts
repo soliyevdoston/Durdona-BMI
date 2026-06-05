@@ -1,6 +1,6 @@
 const BASE_URL = 'https://durdona-bmi.onrender.com'
 
-type Method = 'GET' | 'POST' | 'PATCH' | 'DELETE'
+type Method = 'GET' | 'POST' | 'PATCH' | 'DELETE' | 'PUT'
 
 async function request<T = any>(path: string, options: { method?: Method; body?: any } = {}): Promise<T> {
   const token = typeof window !== 'undefined' ? localStorage.getItem('edu-token') : null
@@ -67,6 +67,9 @@ export const api = {
   createUser: (data: any) => request('/api/users', { method: 'POST', body: data }),
   updateUser: (id: string, data: any) => request(`/api/users/${id}`, { method: 'PATCH', body: data }),
   deleteUser: (id: string) => request(`/api/users/${id}`, { method: 'DELETE' }),
+  getUserEnrollments: (id: string) => request<string[]>(`/api/users/${id}/enrollments`),
+  setUserEnrollments: (id: string, courseIds: string[]) =>
+    request(`/api/users/${id}/enrollments`, { method: 'PUT', body: { courseIds } }),
 
   // Misc
   notifications: () => request<any[]>('/api/notifications'),
